@@ -42,6 +42,8 @@ export function AppRoutes({
   shadowbanBusyOwnerId,
   nsfwBusyId,
   collections,
+  userCollections,
+  userCollectionsLoading,
   setQuery,
   selectTag,
   clearTags,
@@ -60,6 +62,12 @@ export function AppRoutes({
   selectVisibleTag,
   openTagEditor,
   openCollectionEditor,
+  openPetCollector,
+  openCollectionCreator,
+  openUserCollectionEditor,
+  deleteUserCollection,
+  removePetFromUserCollection,
+  startUserCollectionRoom,
   togglePetNsfw,
   toggleOwnerShadowban,
   deleteUpload,
@@ -141,6 +149,7 @@ export function AppRoutes({
           onTagClick={selectVisibleTag}
           onEditTags={openTagEditor}
           onManageCollections={openCollectionEditor}
+          onCollect={openPetCollector}
           onToggleNsfw={togglePetNsfw}
           onShadowbanOwner={toggleOwnerShadowban}
           onDelete={deleteUpload}
@@ -166,6 +175,7 @@ export function AppRoutes({
           onTagClick={selectVisibleTag}
           onEditTags={openTagEditor}
           onManageCollections={openCollectionEditor}
+          onCollect={openPetCollector}
           onToggleNsfw={togglePetNsfw}
           onShadowbanOwner={toggleOwnerShadowban}
           onDelete={deleteUpload}
@@ -209,10 +219,28 @@ export function AppRoutes({
       {route.name === "collections" && (
         <CollectionsPageWithPresence
           collections={collections}
+          userCollections={userCollections}
           loading={collectionsLoading}
+          userCollectionsLoading={userCollectionsLoading}
           signedIn={!!user}
           session={session}
           onSignIn={() => setAuthMode("login")}
+          onCreateCollection={openCollectionCreator}
+          onEditCollection={openUserCollectionEditor}
+          onDeleteCollection={deleteUserCollection}
+          onStartUserCollectionRoom={startUserCollectionRoom}
+          onShareCollection={(collection) => {
+            const subtitle = `${collection.petCount} ${collection.petCount === 1 ? "pet" : "pets"} · custom collection`;
+            setSharingEntity({
+              kind: "collection",
+              title: collection.displayName,
+              subtitle,
+              shareUrl: collectionShareUrl(collection),
+              imageUrl: collectionPreviewImage(collection),
+              shareText: `${collection.displayName} on ${APP_NAME}`,
+              ariaLabel: `Share ${collection.displayName}`
+            });
+          }}
           onShareRoom={(collection) => {
             const subtitle = `${collection.petCount} ${collection.petCount === 1 ? "pet" : "pets"} · permanent playground room`;
             setSharingEntity({
@@ -220,7 +248,7 @@ export function AppRoutes({
               title: `Playground · ${collection.displayName}`,
               subtitle,
               shareUrl: collectionPlayShareUrl(collection),
-              imageUrl: collectionCompositeUrl(collection.slug),
+              imageUrl: collectionPreviewImage(collection),
               shareText: `Join the ${collection.displayName} playground on ${APP_NAME}`,
               ariaLabel: `Share ${collection.displayName} playground`
             });
@@ -252,7 +280,9 @@ export function AppRoutes({
               title: collectionDetail.displayName,
               subtitle,
               shareUrl: collectionShareUrl(collectionDetail),
-              imageUrl: collectionCompositeUrl(collectionDetail.slug),
+              imageUrl: collectionDetail.ownerId
+                ? (collectionPets[0]?.shareImageUrl || collectionCompositeUrl(collectionDetail.slug))
+                : collectionCompositeUrl(collectionDetail.slug),
               shareText: `${collectionDetail.displayName} on ${APP_NAME}`,
               ariaLabel: `Share ${collectionDetail.displayName}`
             });
@@ -261,6 +291,9 @@ export function AppRoutes({
           onTagClick={selectVisibleTag}
           onEditTags={openTagEditor}
           onManageCollections={openCollectionEditor}
+          onCollect={openPetCollector}
+          onRemoveFromUserCollection={collectionDetail?.editable ? (pet) => removePetFromUserCollection(collectionDetail, pet) : undefined}
+          onStartRoom={collectionDetail?.ownerId ? () => startUserCollectionRoom(collectionDetail, collectionPets[0]?.id) : undefined}
           onToggleNsfw={togglePetNsfw}
           onShadowbanOwner={toggleOwnerShadowban}
           onDelete={deleteUpload}
@@ -321,6 +354,7 @@ export function AppRoutes({
           onTagClick={selectVisibleTag}
           onEditTags={openTagEditor}
           onManageCollections={openCollectionEditor}
+          onCollect={openPetCollector}
           onToggleNsfw={togglePetNsfw}
           onShadowbanOwner={toggleOwnerShadowban}
           onDelete={deleteUpload}
@@ -353,6 +387,7 @@ export function AppRoutes({
               onSignIn={openAuth}
               onEditTags={openTagEditor}
               onManageCollections={openCollectionEditor}
+              onCollect={openPetCollector}
               onToggleNsfw={togglePetNsfw}
               onShadowbanOwner={toggleOwnerShadowban}
               onDelete={deleteUpload}
@@ -362,4 +397,10 @@ export function AppRoutes({
       )}
     </>
   );
+}
+
+function collectionPreviewImage(collection: { slug: string; ownerId?: string | null; topPets?: Array<{ shareImageUrl: string }> }) {
+  return collection.ownerId
+    ? (collection.topPets?.[0]?.shareImageUrl || collectionCompositeUrl(collection.slug))
+    : collectionCompositeUrl(collection.slug);
 }

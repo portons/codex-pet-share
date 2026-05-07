@@ -1,4 +1,5 @@
 @import "./base.css";
+@import "../collections/user-collections.css";
 @import "../gallery/gallery.css";
 @import "../pets/pet-surfaces.css";
 @import "../uploads/uploads.css";

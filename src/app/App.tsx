@@ -11,6 +11,7 @@ import { useUploadWorkflow } from "../uploads/useUploadWorkflow";
 import { usePetEditors } from "../pets/usePetEditors";
 import { usePetMutations } from "../pets/usePetMutations";
 import { useGalleryBrowser } from "../gallery/useGalleryBrowser";
+import { useUserCollections } from "../collections/useUserCollections";
 import { refreshAfterAuthRoute, refreshAppSession } from "./appRefreshActions";
 import type {
   AuthSession,
@@ -73,6 +74,8 @@ function App() {
     creatorsTotal,
     collections,
     setCollections,
+    userCollections,
+    setUserCollections,
     adminCollections,
     setAdminCollections,
     collectionDetail,
@@ -85,6 +88,7 @@ function App() {
     creatorLoading,
     creatorsLoading,
     collectionsLoading,
+    userCollectionsLoading,
     adminCollectionsLoading,
     collectionDetailLoading,
     loadMine,
@@ -93,6 +97,7 @@ function App() {
     loadCreator,
     loadCreators,
     loadCollections,
+    loadUserCollections,
     loadCollectionDetail,
     loadAdminCollections,
     refreshPrimaryPetLists,
@@ -262,6 +267,20 @@ function App() {
     reconcileTaggedPet,
     reconcilePetCollections
   });
+  const userCollectionActions = useUserCollections({
+    user,
+    session,
+    route,
+    contentMode,
+    apiFetch,
+    userCollections,
+    setUserCollections,
+    setCollectionDetail,
+    setCollectionPets,
+    loadUserCollections,
+    loadCollectionDetail,
+    openAuth
+  });
   async function refreshAfterAuth(nextUser: User, nextSession: AuthSession) {
     await refreshAfterAuthRoute({
       nextUser,
@@ -282,6 +301,7 @@ function App() {
       loadCreator,
       loadCreators,
       loadCollections,
+      loadUserCollections,
       loadCollectionDetail,
       loadAdminCollections
     });
@@ -313,6 +333,7 @@ function App() {
     playgroundPet,
     refresh,
     loadCollections,
+    loadUserCollections,
     setAuthStatus,
     applyGalleryState,
     setLoading,
@@ -335,6 +356,7 @@ function App() {
 
   const { selectContentMode, selectCreatorPage, logout } = useAppNavigationActions({
     route,
+    user,
     session,
     contentMode,
     setContentMode,
@@ -358,6 +380,7 @@ function App() {
     loadCreator,
     loadCreators,
     loadCollections,
+    loadUserCollections,
     loadCollectionDetail
   });
 
@@ -365,10 +388,17 @@ function App() {
     nav: { route, user, onLogout: logout, onSignIn: openAuth, onAccount: openSettings },
     routes: {
       route, user, session, pets, galleryMeta, loading, query, activeTags, activeSort, activeView, activeKind,
-      contentMode, deletingPetId, shadowbanBusyOwnerId, nsfwBusyId, collections, setQuery, selectTag,
+      contentMode, deletingPetId, shadowbanBusyOwnerId, nsfwBusyId, collections, userCollections,
+      userCollectionsLoading, setQuery, selectTag,
       clearTags, selectSort, selectView, selectKind, selectContentMode, selectPage, randomizeGallery,
       submitSearch, likeBusyId, toggleLike, setSharingPet, setPlaygroundPet, setDownloadPet,
       selectVisibleTag, openTagEditor, openCollectionEditor, togglePetNsfw, toggleOwnerShadowban,
+      openPetCollector: userCollectionActions.openPetCollector,
+      openCollectionCreator: userCollectionActions.openCollectionCreator,
+      openUserCollectionEditor: userCollectionActions.openCollectionEditor,
+      deleteUserCollection: userCollectionActions.deleteUserCollection,
+      removePetFromUserCollection: userCollectionActions.removePetFromCollection,
+      startUserCollectionRoom: userCollectionActions.startCollectionRoom,
       deleteUpload, openAuth, favoritePets, favoritesLoading, minePets, mineLoading, deleteStatus,
       uploadState, uploadStatus, uploadBusy, setUploadState, setUploadStatus, submitUpload, creators,
       creatorsTotal, creatorsLoading, collectionsLoading, setAuthMode, setSharingEntity, collectionDetail,
@@ -385,7 +415,23 @@ function App() {
       tagEditorTags, tagEditorKind, tagEditorStatus, tagEditorBusy, setTagEditorKind, toggleTagEditorTag,
       submitTagEditor, closeTagEditor, collectionEditorPet, adminCollections, collectionEditorSlugs,
       collectionEditorStatus, collectionEditorBusy, toggleCollectionEditorSlug, submitCollectionEditor,
-      closeCollectionEditor
+      closeCollectionEditor,
+      userCollectionEditor: userCollectionActions.collectionEditor,
+      userCollectionEditorStatus: userCollectionActions.collectionEditorStatus,
+      userCollectionEditorBusy: userCollectionActions.collectionEditorBusy,
+      setUserCollectionEditorDisplayName: userCollectionActions.setCollectionEditorDisplayName,
+      submitUserCollectionEditor: userCollectionActions.submitCollectionEditor,
+      closeUserCollectionEditor: userCollectionActions.closeCollectionEditor,
+      collectPet: userCollectionActions.collectPet,
+      collectSelectedSlugs: userCollectionActions.collectSelectedSlugs,
+      collectNewName: userCollectionActions.collectNewName,
+      collectStatus: userCollectionActions.collectStatus,
+      collectBusy: userCollectionActions.collectBusy,
+      setCollectNewName: userCollectionActions.setCollectNewName,
+      toggleCollectSlug: userCollectionActions.toggleCollectSlug,
+      submitPetCollector: userCollectionActions.submitPetCollector,
+      closePetCollector: userCollectionActions.closePetCollector,
+      userCollections
     },
     playground: {
       route, user, session, playgroundPet, favoritePets, collections, setPlaygroundPet, setAuthMode, apiFetch

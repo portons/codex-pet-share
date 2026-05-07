@@ -129,6 +129,7 @@ export function PetCard({
   onTagClick,
   onEditTags,
   onManageCollections,
+  onCollect,
   onPreview,
   previewActive = false,
   onToggleNsfw,
@@ -152,6 +153,7 @@ export function PetCard({
   onTagClick: (tag: TagName, sourceTags: string[]) => void;
   onEditTags: (pet: Pet) => void;
   onManageCollections: (pet: Pet) => void;
+  onCollect?: (pet: Pet) => void;
   onPreview?: (pet: Pet) => void;
   previewActive?: boolean;
   onToggleNsfw: (pet: Pet) => void;
@@ -268,6 +270,18 @@ export function PetCard({
           <Icon name="share" size={13} />
           {!compact && "Share"}
         </button>
+        {user && onCollect && (
+          <button
+            className="btn btnSm"
+            type="button"
+            aria-label="Collect"
+            title="Collect"
+            onClick={() => onCollect(pet)}
+          >
+            <Icon name="package" size={13} />
+            {!compact && "Collect"}
+          </button>
+        )}
         {user?.isAdmin && (
           <AdminPetMenu
             pet={pet}

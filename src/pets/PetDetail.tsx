@@ -32,6 +32,7 @@ export function PetDetail({
   onSignIn,
   onEditTags,
   onManageCollections,
+  onCollect,
   onToggleNsfw,
   onShadowbanOwner,
   onDelete
@@ -54,6 +55,7 @@ export function PetDetail({
   onSignIn: () => void;
   onEditTags: (pet: Pet) => void;
   onManageCollections: (pet: Pet) => void;
+  onCollect?: (pet: Pet) => void;
   onToggleNsfw: (pet: Pet) => void;
   onShadowbanOwner: (pet: Pet) => void;
   onDelete: (pet: Pet) => void;
@@ -157,6 +159,12 @@ export function PetDetail({
               >
                 <Icon name="cube" size={13} />
                 Playground
+              </button>
+            )}
+            {user && onCollect && (
+              <button className="btn btnSm" type="button" onClick={() => onCollect(pet)}>
+                <Icon name="package" size={13} />
+                Collect
               </button>
             )}
             {canDelete && (

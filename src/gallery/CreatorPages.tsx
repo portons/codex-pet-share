@@ -32,6 +32,7 @@ export function CreatorPage({
   onTagClick,
   onEditTags,
   onManageCollections,
+  onCollect,
   onToggleNsfw,
   onShadowbanOwner,
   onDelete,
@@ -57,6 +58,7 @@ export function CreatorPage({
   onTagClick: (tag: TagName, sourceTags: string[]) => void;
   onEditTags: (pet: Pet) => void;
   onManageCollections: (pet: Pet) => void;
+  onCollect?: (pet: Pet) => void;
   onToggleNsfw: (pet: Pet) => void;
   onShadowbanOwner: (pet: Pet) => void;
   onDelete: (pet: Pet) => void;
@@ -111,6 +113,7 @@ export function CreatorPage({
                 onTagClick={onTagClick}
                 onEditTags={onEditTags}
                 onManageCollections={onManageCollections}
+                onCollect={onCollect}
                 onToggleNsfw={onToggleNsfw}
                 onShadowbanOwner={onShadowbanOwner}
                 onDelete={onDelete}
@@ -144,6 +147,7 @@ export function FavoritesPage({
   onTagClick,
   onEditTags,
   onManageCollections,
+  onCollect,
   onToggleNsfw,
   onShadowbanOwner,
   onDelete,
@@ -165,6 +169,7 @@ export function FavoritesPage({
   onTagClick: (tag: TagName, sourceTags: string[]) => void;
   onEditTags: (pet: Pet) => void;
   onManageCollections: (pet: Pet) => void;
+  onCollect?: (pet: Pet) => void;
   onToggleNsfw: (pet: Pet) => void;
   onShadowbanOwner: (pet: Pet) => void;
   onDelete: (pet: Pet) => void;
@@ -212,6 +217,7 @@ export function FavoritesPage({
                 onTagClick={onTagClick}
                 onEditTags={onEditTags}
                 onManageCollections={onManageCollections}
+                onCollect={onCollect}
                 onToggleNsfw={onToggleNsfw}
                 onShadowbanOwner={onShadowbanOwner}
                 onDelete={onDelete}

@@ -31,6 +31,7 @@ export async function refreshAfterAuthRoute({
   loadCreator,
   loadCreators,
   loadCollections,
+  loadUserCollections,
   loadCollectionDetail,
   loadAdminCollections
 }: {
@@ -52,6 +53,7 @@ export async function refreshAfterAuthRoute({
   loadCreator: (id: string, page?: number, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCreators: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCollections: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
+  loadUserCollections: (currentUser?: User | null, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadAdminCollections: (authSession?: AuthSession | null, currentUser?: User | null) => Promise<void>;
 }) {
@@ -63,7 +65,12 @@ export async function refreshAfterAuthRoute({
   if (route.name === "favorites") await loadFavorites(nextUser, nextSession);
   if (route.name === "user") await loadCreator(route.id, creatorMeta.page, nextSession, contentMode);
   if (route.name === "creators") await loadCreators(nextSession, contentMode);
-  if (route.name === "collections") await loadCollections(nextSession, contentMode);
+  if (route.name === "collections") {
+    await Promise.all([
+      loadCollections(nextSession, contentMode),
+      loadUserCollections(nextUser, nextSession, contentMode)
+    ]);
+  }
   if (route.name === "collection") await loadCollectionDetail(route.slug, nextSession, contentMode);
   if (nextUser.isAdmin && route.name === "admin") await loadAdminCollections(nextSession);
 }
