@@ -43,7 +43,7 @@ The build (`npm run build`) fails fast if any required env var is missing or mal
 
 ## Deploy to production
 
-Start with **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)**. If you are handing the repo to an AI coding agent, also point it at **[skills/petshare-setup/SKILL.md](skills/petshare-setup/SKILL.md)**:
+Start with **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)**. If you are handing the repo to an AI coding agent, also point it at **[.agents/skills/petshare-setup/SKILL.md](.agents/skills/petshare-setup/SKILL.md)**:
 
 1. Fill the provider-neutral public env vars.
 2. Bring up a backend adapter.

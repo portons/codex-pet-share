@@ -1,0 +1,4 @@
+interface:
+  display_name: "Petshare Setup"
+  short_description: "Build and adapt Codex Pet Share"
+  default_prompt: "Use $petshare-setup to spin up or adapt a Codex Pet Share fork safely."
