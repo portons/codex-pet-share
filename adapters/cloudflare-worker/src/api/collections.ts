@@ -41,9 +41,10 @@ export async function handleCreators(ctx: AppContext, parts: string[]) {
   if (ctx.request.method === "GET" && parts.length === 1 && parts[0] === "leaderboard") {
     const viewer = await currentUser(ctx);
     const pets = (await listPets(ctx, "", undefined, [], viewer, "new", undefined, parseContentMode(ctx.url.searchParams.get("content")))).pets;
+    const shadowbannedCreators = await shadowbannedUserIds(ctx);
     const byCreator = new Map<string, { id: string; handle: string | null; displayName: string; petCount: number; viewCount: number; likeCount: number; topPets: typeof pets }>();
     for (const pet of pets) {
-      if (!pet.ownerId) continue;
+      if (!pet.ownerId || shadowbannedCreators.has(pet.ownerId)) continue;
       const item = byCreator.get(pet.ownerId) || { id: pet.ownerId, handle: pet.ownerHandle, displayName: pet.ownerName, petCount: 0, viewCount: 0, likeCount: 0, topPets: [] };
       item.petCount += 1; item.viewCount += pet.viewCount; item.likeCount += pet.likeCount; item.topPets.push(pet);
       byCreator.set(pet.ownerId, item);
@@ -227,6 +228,11 @@ async function userTarget(ctx: AppContext, value: string) {
       ? ctx.env.DB.prepare("select id, email from users where email = ?").bind(value)
       : ctx.env.DB.prepare("select id, email from users where id = ?").bind(value)
   );
+}
+
+async function shadowbannedUserIds(ctx: AppContext) {
+  const rows = await all<{ id: string }>(ctx.env.DB.prepare("select id from users where shadowbanned_at is not null"));
+  return new Set(rows.map((row) => row.id));
 }
 
 async function setProfileShadowban(ctx: AppContext, userId: string, shadowbanned: boolean) {
