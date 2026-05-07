@@ -24,7 +24,7 @@ export function NpcSearchPopover({
   }, []);
 
   const trimmed = query.trim().toLowerCase();
-  const noFavorites = peers.length === 0;
+  const noPets = peers.length === 0;
   const matches = peers
     .filter((peer) => !excludeIds.includes(peer.id))
     .filter((peer) => trimmed.length === 0 || peer.displayName.toLowerCase().includes(trimmed));
@@ -35,10 +35,10 @@ export function NpcSearchPopover({
         ref={inputRef}
         type="text"
         className="playgroundNpcSearchInput"
-        placeholder={noFavorites ? "No favorites yet…" : "Search favorites…"}
+        placeholder={noPets ? "No pets available…" : "Search pets…"}
         value={query}
         onChange={(event) => onQueryChange(event.target.value)}
-        disabled={noFavorites}
+        disabled={noPets}
         onKeyDown={(event) => {
           if (event.key === "Escape") {
             event.preventDefault();
@@ -50,12 +50,12 @@ export function NpcSearchPopover({
         }}
       />
       <ul className="playgroundNpcSearchList">
-        {noFavorites && (
+        {noPets && (
           <li className="playgroundNpcSearchEmpty">
-            Heart pets you like to spawn them here.
+            No pets available.
           </li>
         )}
-        {!noFavorites && matches.length === 0 && (
+        {!noPets && matches.length === 0 && (
           <li className="playgroundNpcSearchEmpty">No matches</li>
         )}
         {matches.map((peer) => (
