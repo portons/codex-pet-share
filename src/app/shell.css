@@ -19,7 +19,7 @@
   min-height: 60px;
   padding: 12px 0;
   border-bottom: 1px solid var(--border-strong);
-  background: rgba(248, 246, 240, 0.88);
+  background: var(--nav-bg);
   backdrop-filter: saturate(140%) blur(14px);
   -webkit-backdrop-filter: saturate(140%) blur(14px);
 }
@@ -257,6 +257,28 @@
 }
 
 .appFooter .footerSocialLinks a:active {
+  transform: translateY(1px);
+}
+
+.themeToggle {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--muted);
+  transition: transform 160ms var(--ease-out), border-color 180ms var(--ease-out), color 180ms var(--ease-out), background 180ms var(--ease-out);
+}
+
+.themeToggle:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.themeToggle:active {
   transform: translateY(1px);
 }
 

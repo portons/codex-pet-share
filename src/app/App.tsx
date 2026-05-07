@@ -12,6 +12,7 @@ import { usePetEditors } from "../pets/usePetEditors";
 import { usePetMutations } from "../pets/usePetMutations";
 import { useGalleryBrowser } from "../gallery/useGalleryBrowser";
 import { useUserCollections } from "../collections/useUserCollections";
+import { useTheme } from "./useTheme";
 import { refreshAfterAuthRoute, refreshAppSession } from "./appRefreshActions";
 import type {
   AuthSession,
@@ -26,6 +27,7 @@ export type { CollectionSummary, Pet, User } from "../domain/types";
 
 function App() {
   const [route, setRoute] = useState<Route>(() => routeFromHash());
+  const { theme, toggleTheme } = useTheme();
   const { session, user, setUser, apiFetch, applySession, loadMe, refreshSession } = useSessionApi();
   const {
     pets,
@@ -385,7 +387,7 @@ function App() {
   });
 
   const viewProps = {
-    nav: { route, user, onLogout: logout, onSignIn: openAuth, onAccount: openSettings },
+    nav: { route, user, theme, onLogout: logout, onSignIn: openAuth, onAccount: openSettings, onThemeToggle: toggleTheme },
     routes: {
       route, user, session, pets, galleryMeta, loading, query, activeTags, activeSort, activeView, activeKind,
       contentMode, deletingPetId, shadowbanBusyOwnerId, nsfwBusyId, collections, userCollections,

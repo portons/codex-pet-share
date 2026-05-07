@@ -7,15 +7,19 @@ import { Icon } from "../ui/Icon";
 export function AppNav({
   route,
   user,
+  theme,
   onLogout,
   onSignIn,
-  onAccount
+  onAccount,
+  onThemeToggle
 }: {
   route: Route;
   user: User | null;
+  theme: "light" | "dark";
   onLogout: () => void;
   onSignIn: () => void;
   onAccount: () => void;
+  onThemeToggle: () => void;
 }) {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
@@ -68,6 +72,15 @@ export function AppNav({
         </a>
       </nav>
       <div className="accountAction">
+        <button
+          className="themeToggle"
+          type="button"
+          aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+          title={theme === "dark" ? "Light theme" : "Dark theme"}
+          onClick={onThemeToggle}
+        >
+          <Icon name={theme === "dark" ? "sun" : "moon"} size={14} />
+        </button>
         {user ? (
           <div
             ref={accountMenuRef}
