@@ -122,6 +122,16 @@ export function AppNav({
 export function AppFooter() {
   return (
     <footer className="appFooter">
+      <div className="footerSocialLinks" aria-label="Project links">
+        <a href="https://x.com/mosesbabychrist" target="_blank" rel="noopener noreferrer">
+          <Icon name="x" size={13} />
+          <span>@mosesbabychrist</span>
+        </a>
+        <a href="https://github.com/portons/codex-pet-share" target="_blank" rel="noopener noreferrer">
+          <Icon name="github" size={14} />
+          <span>GitHub</span>
+        </a>
+      </div>
       <span>
         Pets are shared by the community. Some may be inspired by existing characters or brands. We don&apos;t claim rights to those characters or brands.
       </span>

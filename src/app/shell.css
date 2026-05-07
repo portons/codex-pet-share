@@ -213,7 +213,8 @@
 
 .appFooter {
   display: grid;
-  gap: 4px;
+  justify-items: center;
+  gap: 7px;
   margin-top: 48px;
   padding: 22px 0 0;
   border-top: 1px solid var(--border-soft);
@@ -221,6 +222,42 @@
   font-size: 13px;
   line-height: 1.45;
   text-align: center;
+}
+
+.footerSocialLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.appFooter .footerSocialLinks a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 0 11px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  text-underline-offset: 3px;
+  transition: transform 180ms var(--ease-out), border-color 180ms var(--ease-out), background 180ms var(--ease-out);
+}
+
+.appFooter .footerSocialLinks a:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.appFooter .footerSocialLinks a:active {
+  transform: translateY(1px);
 }
 
 .appFooter a {

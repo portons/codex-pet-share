@@ -8,6 +8,7 @@ export type IconName =
   | "cube"
   | "download"
   | "eye"
+  | "github"
   | "heart"
   | "more"
   | "package"
@@ -19,6 +20,7 @@ export type IconName =
   | "trash"
   | "upload"
   | "user"
+  | "x"
   | "play"
   | "link"
   | "sparkle";
@@ -62,6 +64,12 @@ export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
       <>
         <path d="M1.8 8 C3.3 4.9 5.3 3.5 8 3.5 C10.7 3.5 12.7 4.9 14.2 8 C12.7 11.1 10.7 12.5 8 12.5 C5.3 12.5 3.3 11.1 1.8 8 Z" />
         <circle cx="8" cy="8" r="2" />
+      </>
+    ),
+    github: (
+      <>
+        <path d="M5.8 13.5 C3.2 14.3 3.2 12.2 2.1 11.9" />
+        <path d="M11.8 13.5 V11.1 C11.85 10.35 11.55 9.75 11.1 9.35 C12.6 9.15 14.2 8.6 14.2 6.1 C14.2 5.35 13.9 4.65 13.35 4.1 C13.5 3.5 13.5 2.8 13.15 2.1 C13.15 2.1 12.5 1.9 11.05 2.9 C9.8 2.55 8.45 2.55 7.2 2.9 C5.75 1.9 5.1 2.1 5.1 2.1 C4.75 2.8 4.75 3.5 4.9 4.1 C4.35 4.65 4.05 5.35 4.05 6.1 C4.05 8.6 5.65 9.15 7.15 9.35 C6.75 9.7 6.5 10.2 6.45 10.8 V13.5" />
       </>
     ),
     heart: (
@@ -134,6 +142,12 @@ export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
       <>
         <circle cx="8" cy="6" r="2.5" />
         <path d="M3.5 13 C4.5 10.5 11.5 10.5 12.5 13" />
+      </>
+    ),
+    x: (
+      <>
+        <path d="M3 3 L13 13" />
+        <path d="M13 3 L3 13" />
       </>
     ),
     play: (
