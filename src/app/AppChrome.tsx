@@ -57,11 +57,10 @@ export function AppNav({
           Gallery
         </a>
         <a
-          className={`navCollectionsLink ${route.name === "collections" || route.name === "collection" ? "active" : ""}`}
+          className={route.name === "collections" || route.name === "collection" ? "active" : ""}
           href="#/collections"
         >
           Collections
-          <span className="navNewBadge">NEW</span>
         </a>
         <a className={route.name === "creators" ? "active" : ""} href="#/creators">
           Creators

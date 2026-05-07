@@ -125,10 +125,10 @@
   height: 40px;
   gap: 9px;
   padding: 0 12px;
-  border: 1px solid #2a2926;
+  border: 1px solid var(--terminal-border);
   border-radius: var(--radius-sm);
-  background: var(--ink);
-  color: #e8e6e0;
+  background: var(--terminal-bg);
+  color: var(--terminal-fg);
 }
 
 .commandCopyButton {

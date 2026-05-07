@@ -184,23 +184,6 @@
   transform: scaleX(0);
 }
 
-.navLinks .navCollectionsLink {
-  padding-right: 24px;
-}
-
-.navNewBadge {
-  position: absolute;
-  top: 3px;
-  right: 6px;
-  color: var(--danger);
-  font-family: var(--font-mono);
-  font-size: 7px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0;
-  pointer-events: none;
-}
-
 .navLinks .navUploadLink {
   gap: 5px;
   margin-left: 10px;

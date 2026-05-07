@@ -41,6 +41,13 @@
   transition: color 200ms var(--ease-out), background 200ms var(--ease-out);
 }
 
+.accountAction > .accountButton {
+  border: 1px solid var(--border);
+  background: var(--nav-action-bg);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+}
+
 .accountButton::before {
   content: "";
   position: absolute;
@@ -57,6 +64,11 @@
 .accountButton:hover {
   color: var(--ink);
   background: transparent;
+}
+
+.accountAction > .accountButton:hover {
+  border-color: var(--border-strong);
+  background: var(--nav-action-bg-hover);
 }
 
 .accountButton:hover::before {
