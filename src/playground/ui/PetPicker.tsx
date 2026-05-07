@@ -30,19 +30,35 @@ export function PetPicker({
     (async () => {
       try {
         if (collectionSlug) {
-          const res = await apiFetch(`/api/collections/${collectionSlug}`);
+          const [res, mineRes, favRes] = await Promise.all([
+            apiFetch(`/api/collections/${collectionSlug}`),
+            apiFetch("/api/pets/mine"),
+            apiFetch("/api/pets/favorites").catch(() => null as Response | null)
+          ]);
           if (cancelled) return;
           if (!res.ok) {
             setError("Couldn't load this collection.");
             return;
           }
+          if (!mineRes.ok) {
+            setError("Couldn't load your pets.");
+            return;
+          }
           const body = await res.json() as { collection?: { displayName?: string; topPets?: Pet[] }; pets?: Pet[] };
+          const mineBody = await mineRes.json() as { pets: Pet[] };
+          const own = (mineBody.pets || []).map(normalizePet);
+          let favs: Pet[] = [];
+          if (favRes && favRes.ok) {
+            const favBody = await favRes.json() as { pets: Pet[] };
+            const ownIds = new Set(own.map((p) => p.id));
+            favs = (favBody.pets || []).map(normalizePet).filter((p) => !ownIds.has(p.id));
+          }
           const pets = ((body.pets ?? body.collection?.topPets ?? []) as Pet[]).map(normalizePet);
           if (cancelled) return;
           setCollectionPets(pets);
           setCollectionLabel(body.collection?.displayName || collectionSlug);
-          setOwnPets([]);
-          setFavoritePets([]);
+          setOwnPets(own);
+          setFavoritePets(favs);
           return;
         }
         const [mineRes, favRes] = await Promise.all([
@@ -74,11 +90,9 @@ export function PetPicker({
   }, [apiFetch, collectionSlug]);
 
   const loaded = collectionSlug
-    ? collectionPets !== null
-    : (ownPets !== null && favoritePets !== null);
-  const totalCount = collectionSlug
-    ? (collectionPets?.length ?? 0)
-    : (ownPets?.length ?? 0) + (favoritePets?.length ?? 0);
+    ? collectionPets !== null && ownPets !== null && favoritePets !== null
+    : ownPets !== null && favoritePets !== null;
+  const totalCount = (collectionPets?.length ?? 0) + (ownPets?.length ?? 0) + (favoritePets?.length ?? 0);
 
   const [fallbackPets, setFallbackPets] = useState<Pet[] | null>(null);
   const needsFallback = !collectionSlug && loaded && totalCount === 0;
@@ -141,7 +155,7 @@ export function PetPicker({
         </header>
         <p className="roomGateLead">
           {collectionSlug
-            ? `Pick a pet from ${collectionLabel ? `the “${collectionLabel}” collection` : "this collection"}.`
+            ? `Pick a pet from ${collectionLabel ? `the “${collectionLabel}” collection` : "this collection"} or your own uploads.`
             : "Pick the pet you'll show up as."}
         </p>
         {error && <p className="status">{error}</p>}
@@ -156,13 +170,13 @@ export function PetPicker({
             </div>
           </div>
         )}
-        {loaded && collectionSlug && collectionPets && collectionPets.length === 0 && (
+        {loaded && collectionSlug && totalCount === 0 && (
           <div className="roomGateEmpty">
             <p>This collection has no pets yet.</p>
             <button className="btn btnGhost" type="button" onClick={onClose}>Close</button>
           </div>
         )}
-        {loaded && !collectionSlug && ownPets && ownPets.length > 0 && (
+        {loaded && ownPets && ownPets.length > 0 && (
           <div className="roomPetSection">
             <h3 className="roomPetSectionLabel">Yours</h3>
             <div className="roomPetGrid">
@@ -170,7 +184,7 @@ export function PetPicker({
             </div>
           </div>
         )}
-        {loaded && !collectionSlug && favoritePets && favoritePets.length > 0 && (
+        {loaded && favoritePets && favoritePets.length > 0 && (
           <div className="roomPetSection">
             <h3 className="roomPetSectionLabel">Favorites</h3>
             <div className="roomPetGrid">

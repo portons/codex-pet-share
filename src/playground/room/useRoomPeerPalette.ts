@@ -17,21 +17,47 @@ export function useRoomPeerPalette({
     (async () => {
       try {
         if (collectionSlug) {
-          const res = await apiFetch(`/api/collections/${collectionSlug}`);
+          const [res, mineRes, favRes] = await Promise.all([
+            apiFetch(`/api/collections/${collectionSlug}`),
+            apiFetch("/api/pets/mine").catch(() => null as Response | null),
+            apiFetch("/api/pets/favorites").catch(() => null as Response | null)
+          ]);
           if (cancelled) return;
           if (!res.ok) {
             setPeers([]);
             return;
           }
           const body = await res.json() as { collection?: { topPets?: Pet[] }; pets?: Pet[] };
-          const pets = ((body.pets ?? body.collection?.topPets ?? []) as Pet[]).map(normalizePet);
+          const seen = new Set<string>();
+          const merged: PlaygroundPeer[] = [];
+          if (mineRes && mineRes.ok) {
+            const mineBody = await mineRes.json() as { pets: Pet[] };
+            for (const p of (mineBody.pets || []).map(normalizePet)) {
+              if (seen.has(p.id)) continue;
+              seen.add(p.id);
+              merged.push({ id: p.id, displayName: p.displayName, spritesheetUrl: p.spritesheetUrl, source: "own" });
+            }
+          }
+          if (favRes && favRes.ok) {
+            const favBody = await favRes.json() as { pets: Pet[] };
+            for (const p of (favBody.pets || []).map(normalizePet)) {
+              if (seen.has(p.id)) continue;
+              seen.add(p.id);
+              merged.push({ id: p.id, displayName: p.displayName, spritesheetUrl: p.spritesheetUrl, source: "favorite" });
+            }
+          }
+          for (const p of ((body.pets ?? body.collection?.topPets ?? []) as Pet[]).map(normalizePet)) {
+            if (seen.has(p.id)) continue;
+            seen.add(p.id);
+            merged.push({
+              id: p.id,
+              displayName: p.displayName,
+              spritesheetUrl: p.spritesheetUrl,
+              source: "collection"
+            });
+          }
           if (cancelled) return;
-          setPeers(pets.map((p) => ({
-            id: p.id,
-            displayName: p.displayName,
-            spritesheetUrl: p.spritesheetUrl,
-            source: "collection" as const
-          })));
+          setPeers(merged);
           return;
         }
 
