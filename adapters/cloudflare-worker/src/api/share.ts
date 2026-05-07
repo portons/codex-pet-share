@@ -2,6 +2,7 @@ import { collectionPets, collectionRow } from "./collections";
 import { currentUser, publicUser } from "./auth";
 import { getVisiblePet, listPets } from "./pets";
 import { slugPattern } from "./constants";
+import { collectionSocialPreviewImageUrl } from "./socialPreview";
 import { escapeHtml, html } from "../core/http";
 import { petAssetUrl } from "../storage/assets";
 import type { AppContext, Viewer } from "../core/types";
@@ -41,11 +42,7 @@ export async function handleEntityShare(ctx: AppContext, kind: "collections" | "
     const collection = await collectionRow(ctx, id);
     if (!collection) return html("<!doctype html><title>Collection not found</title>", 404);
     const pets = await collectionPets(ctx, collection.slug, "safe");
-    const featured = pets[0] || null;
-    const staticCollectionImage = `${ctx.env.PUBLIC_APP_ORIGIN}/assets/social/collections/${collection.slug}.png`;
-    const image = collection.owner_id
-      ? featured ? `${ctx.url.origin}/api/pets/${featured.id}/share-image` : `${ctx.env.PUBLIC_APP_ORIGIN}/assets/petshare-social-preview.png`
-      : staticCollectionImage;
+    const image = await collectionSocialPreviewImageUrl(ctx, collection, pets);
     return entityHtml(ctx, {
       title: collection.display_name,
       description: `${pets.length} pets in ${ctx.env.APP_NAME}`,

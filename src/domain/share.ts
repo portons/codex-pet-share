@@ -43,6 +43,11 @@ export function collectionCompositeUrl(slug: string): string {
   return `${publicAppOrigin}/assets/social/collections/${encodeURIComponent(slug)}.png`;
 }
 
+export function collectionSocialPreviewUrl(collection: { slug: string; ownerId?: string | null; updatedAt: string }) {
+  if (!collection.ownerId) return collectionCompositeUrl(collection.slug);
+  return `${publicAppOrigin}/api/collections/${encodeURIComponent(collection.slug)}/social-image?v=${encodeURIComponent(collection.updatedAt)}`;
+}
+
 export function creatorCompositeUrl(creator: { id: string; handle?: string | null }): string {
   return `${publicAppOrigin}/assets/social/creators/${encodeURIComponent(creator.handle || creator.id)}.png`;
 }

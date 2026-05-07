@@ -35,13 +35,20 @@ export async function onRequestGet(context) {
   const compositeUrl = compositeManifest.has(collection.slug)
     ? `${appOrigin}/assets/social/collections/${collection.slug}.png?v=${cardVersion}`
     : null;
-  const imageUrl = compositeUrl
+  const personalImageUrl = collection.ownerId
+    ? `${apiBase}/api/collections/${encodeURIComponent(collection.slug)}/social-image?v=${encodeURIComponent(collection.updatedAt)}`
+    : null;
+  const imageUrl = personalImageUrl
+    || compositeUrl
     || (featured ? `${apiBase}/api/pets/${featured.id}/share-image` : fallbackImageUrl);
-  const imageAlt = compositeUrl
-    ? `${collection.displayName}, a curated ${appName} collection`
-    : (featured
-      ? `${featured.displayName}, a pet from the ${collection.displayName} collection`
-      : `${collection.displayName} on ${appName}`);
+  const imageType = personalImageUrl ? "image/svg+xml" : "image/png";
+  const imageAlt = personalImageUrl
+    ? `${collection.displayName}, a custom ${appName} collection`
+    : (compositeUrl
+      ? `${collection.displayName}, a curated ${appName} collection`
+      : (featured
+        ? `${featured.displayName}, a pet from the ${collection.displayName} collection`
+        : `${collection.displayName} on ${appName}`));
 
   return html(`<!doctype html>
 <html lang="en">
@@ -57,7 +64,7 @@ export async function onRequestGet(context) {
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:image" content="${escapeHtml(imageUrl)}">
   <meta property="og:image:secure_url" content="${escapeHtml(imageUrl)}">
-  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:type" content="${escapeHtml(imageType)}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${escapeHtml(imageAlt)}">
