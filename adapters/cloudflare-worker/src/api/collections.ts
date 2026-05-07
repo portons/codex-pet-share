@@ -171,6 +171,7 @@ function collectionSummary(ctx: AppContext, row: CollectionRow, pets: PetRow[], 
   return {
     slug: row.slug,
     displayName: row.display_name,
+    updatedAt: row.updated_at,
     ownerId,
     editable: Boolean(ownerId && viewer?.id === ownerId),
     petCount: pets.length,

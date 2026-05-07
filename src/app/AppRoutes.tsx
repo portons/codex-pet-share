@@ -13,9 +13,9 @@ import {
 } from "../gallery/GalleryPages";
 import { UploadPage, YourUploads } from "../uploads/UploadPages";
 import {
-  collectionCompositeUrl,
   collectionPlayShareUrl,
   collectionShareUrl,
+  collectionSocialPreviewUrl,
   creatorCompositeUrl,
   creatorShareUrl
 } from "../domain/share";
@@ -281,9 +281,7 @@ export function AppRoutes({
               title: collectionDetail.displayName,
               subtitle,
               shareUrl: collectionShareUrl(collectionDetail),
-              imageUrl: collectionDetail.ownerId
-                ? (collectionPets[0]?.shareImageUrl || collectionCompositeUrl(collectionDetail.slug))
-                : collectionCompositeUrl(collectionDetail.slug),
+              imageUrl: collectionSocialPreviewUrl(collectionDetail),
               shareText: `${collectionDetail.displayName} on ${APP_NAME}`,
               ariaLabel: `Share ${collectionDetail.displayName}`
             });
@@ -401,8 +399,6 @@ export function AppRoutes({
   );
 }
 
-function collectionPreviewImage(collection: { slug: string; ownerId?: string | null; topPets?: Array<{ shareImageUrl: string }> }) {
-  return collection.ownerId
-    ? (collection.topPets?.[0]?.shareImageUrl || collectionCompositeUrl(collection.slug))
-    : collectionCompositeUrl(collection.slug);
+function collectionPreviewImage(collection: { slug: string; ownerId?: string | null; updatedAt: string }) {
+  return collectionSocialPreviewUrl(collection);
 }

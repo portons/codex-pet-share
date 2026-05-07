@@ -119,6 +119,7 @@ export type CreatorsLeaderboardResponse = {
 export type CollectionSummary = {
   slug: string;
   displayName: string;
+  updatedAt: string;
   ownerId: string | null;
   editable?: boolean;
   petCount: number;

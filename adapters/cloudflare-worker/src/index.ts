@@ -3,6 +3,7 @@ import { handleAdmin, handleCollections, handleCreators, handleUsers } from "./a
 import { handlePets } from "./api/pets";
 import { handleRooms, roomAuth } from "./api/rooms";
 import { handleEntityShare, handleSharePet } from "./api/share";
+import { handleCollectionSocialImage } from "./api/socialPreview";
 import { isMaintenancePassthrough, maintenanceResponse } from "./maintenance";
 import { RoomDurableObject } from "./realtime/RoomDurableObject";
 import { HttpError, json, secureResponse } from "./core/http";
@@ -89,6 +90,7 @@ async function route(ctx: AppContext, parts: string[]) {
   if (parts[1] === "pets") return handlePets(ctx, parts.slice(2));
   if (parts[1] === "users") return handleUsers(ctx, parts.slice(2));
   if (parts[1] === "creators") return handleCreators(ctx, parts.slice(2));
+  if (ctx.request.method === "GET" && parts[1] === "collections" && parts[3] === "social-image" && parts.length === 4) return handleCollectionSocialImage(ctx, parts[2]);
   if (parts[1] === "collections") return handleCollections(ctx, parts.slice(2));
   if (parts[1] === "rooms") return handleRooms(ctx, parts.slice(2));
   return json({ error: "not found" }, 404);
