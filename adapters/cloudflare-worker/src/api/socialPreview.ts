@@ -1,7 +1,7 @@
 import { collectionPets, collectionRow } from "./collections";
 import { first } from "../core/db";
 import { HttpError, html } from "../core/http";
-import { petAssetKey, petAssetUrl } from "../storage/assets";
+import { getAssetBytes, petAssetKey } from "../storage/assets";
 import type { AppContext, CollectionRow, PetRow } from "../core/types";
 
 const cardWidth = 1200;
@@ -11,6 +11,7 @@ const previewFrameHeight = 104;
 const previewStripWidth = 5472;
 const previewStripHeight = 104;
 const maxPets = 8;
+const rendererVersion = "2";
 
 type CollectionOwner = {
   handle: string;
@@ -30,7 +31,7 @@ export async function handleCollectionSocialImage(ctx: AppContext, slug?: string
   if (cached?.customMetadata?.version === version) {
     return socialImageResponse(cached.body, cached.httpEtag, version);
   }
-  const svg = collectionSocialPreviewSvg(ctx, { collection, owner, pets });
+  const svg = await collectionSocialPreviewSvg(ctx, { collection, owner, pets });
   await ctx.env.PET_ASSETS.put(key, svg, {
     httpMetadata: {
       contentType: "image/svg+xml; charset=utf-8",
@@ -74,6 +75,7 @@ async function collectionOwner(ctx: AppContext, ownerId: string) {
 
 function collectionSocialPreviewVersion(collection: CollectionRow, owner: CollectionOwner | null, pets: PetRow[]) {
   return hashVersion([
+    rendererVersion,
     collection.slug,
     collection.display_name,
     collection.updated_at,
@@ -85,7 +87,7 @@ function collectionSocialPreviewVersion(collection: CollectionRow, owner: Collec
   ].join("|"));
 }
 
-function collectionSocialPreviewSvg(ctx: AppContext, {
+async function collectionSocialPreviewSvg(ctx: AppContext, {
   collection,
   owner,
   pets
@@ -99,7 +101,7 @@ function collectionSocialPreviewSvg(ctx: AppContext, {
   const ownerLabel = owner ? `by ${owner.display_name}` : "curated collection";
   const subtitle = `${ownerLabel} / ${pets.length} ${pets.length === 1 ? "pet" : "pets"}`;
   const collectionUrl = collectionUrlLabel(ctx, collection.slug);
-  const petLayers = featuredPets.length ? petSpriteLayers(ctx, featuredPets) : emptyPetLayer();
+  const petLayers = featuredPets.length ? await petSpriteLayers(ctx, featuredPets) : emptyPetLayer();
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${cardWidth}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
@@ -132,23 +134,23 @@ function collectionSocialPreviewSvg(ctx: AppContext, {
 </svg>`;
 }
 
-function petSpriteLayers(ctx: AppContext, pets: PetRow[]) {
+async function petSpriteLayers(ctx: AppContext, pets: PetRow[]) {
   const layout = socialGridLayout(pets.length);
   const tileWidth = Math.round(previewFrameWidth * layout.scale);
   const tileHeight = Math.round(previewFrameHeight * layout.scale);
   const gridWidth = layout.cols * tileWidth + (layout.cols - 1) * layout.gap;
   const startX = Math.round(cardWidth - gridWidth - 96);
-  return pets.slice(0, layout.cols * layout.rows).map((pet, index) => {
+  const layers = await Promise.all(pets.slice(0, layout.cols * layout.rows).map(async (pet, index) => {
     const col = index % layout.cols;
     const row = Math.floor(index / layout.cols);
     const x = startX + col * (tileWidth + layout.gap);
     const y = layout.top + row * (tileHeight + layout.gap);
-    const version = String(Date.parse(pet.updated_at || pet.created_at));
-    const url = petAssetUrl(ctx, `${pet.id}/preview.webp`, version);
+    const url = `data:image/webp;base64,${bytesToBase64(await getAssetBytes(ctx, `${pet.id}/preview.webp`))}`;
     return `<svg x="${x}" y="${y}" width="${tileWidth}" height="${tileHeight}" viewBox="0 0 ${previewFrameWidth} ${previewFrameHeight}" overflow="hidden">
       <image href="${escapeXml(url)}" x="0" y="0" width="${previewStripWidth}" height="${previewStripHeight}" image-rendering="pixelated"/>
     </svg>`;
-  }).join("\n    ");
+  }));
+  return layers.join("\n    ");
 }
 
 function emptyPetLayer() {
@@ -199,6 +201,15 @@ function hashVersion(input: string) {
     hash = Math.imul(hash, 16777619);
   }
   return (hash >>> 0).toString(36);
+}
+
+function bytesToBase64(bytes: Uint8Array) {
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.slice(offset, offset + chunkSize));
+  }
+  return btoa(binary);
 }
 
 function escapeXml(value: string) {
