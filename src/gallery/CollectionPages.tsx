@@ -357,6 +357,7 @@ function CollectionDetailPage({
   onEditTags,
   onManageCollections,
   onCollect,
+  onAddPet,
   onRemoveFromUserCollection,
   onStartRoom,
   onToggleNsfw,
@@ -387,6 +388,7 @@ function CollectionDetailPage({
   onEditTags: (pet: Pet) => void;
   onManageCollections: (pet: Pet) => void;
   onCollect?: (pet: Pet) => void;
+  onAddPet?: (collection: Omit<CollectionSummary, "topPets">) => void;
   onRemoveFromUserCollection?: (pet: Pet) => void;
   onStartRoom?: () => void;
   onToggleNsfw: (pet: Pet) => void;
@@ -440,6 +442,12 @@ function CollectionDetailPage({
               </button>
             </section>
             <div className="collectionHeaderButtons">
+              {collection.editable && onAddPet && (
+                <button className="btn btnSm" type="button" onClick={() => onAddPet(collection)} aria-label={`Add pet to ${collection.displayName}`}>
+                  <Icon name="package" size={13} />
+                  Add pet
+                </button>
+              )}
               <button className="btn btnSm btnGhost" type="button" onClick={onShareCollection} aria-label={`Share ${collection.displayName}`}>
                 <Icon name="share" size={13} />
                 Share
@@ -496,17 +504,12 @@ function CollectionDetailPage({
                 onEditTags={onEditTags}
                 onManageCollections={onManageCollections}
                 onCollect={onCollect}
+                onRemoveFromCollection={onRemoveFromUserCollection}
                 onToggleNsfw={onToggleNsfw}
                 onShadowbanOwner={onShadowbanOwner}
                 onDelete={onDelete}
                 onSignIn={onSignIn}
               />
-              {onRemoveFromUserCollection && (
-                <button className="btn btnSm btnGhost" type="button" onClick={() => onRemoveFromUserCollection(pet)}>
-                  <Icon name="trash" size={13} />
-                  Remove from collection
-                </button>
-              )}
             </div>
           ))}
         </div>

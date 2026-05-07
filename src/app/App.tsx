@@ -398,6 +398,7 @@ function App() {
       openPetCollector: userCollectionActions.openPetCollector,
       openCollectionCreator: userCollectionActions.openCollectionCreator,
       openUserCollectionEditor: userCollectionActions.openCollectionEditor,
+      openCollectionPetAdder: userCollectionActions.openCollectionPetAdder,
       deleteUserCollection: userCollectionActions.deleteUserCollection,
       removePetFromUserCollection: userCollectionActions.removePetFromCollection,
       startUserCollectionRoom: userCollectionActions.startCollectionRoom,
@@ -433,6 +434,14 @@ function App() {
       toggleCollectSlug: userCollectionActions.toggleCollectSlug,
       submitPetCollector: userCollectionActions.submitPetCollector,
       closePetCollector: userCollectionActions.closePetCollector,
+      collectionPetAdder: userCollectionActions.collectionPetAdder,
+      collectionPetAdderStatus: userCollectionActions.collectionPetAdderStatus,
+      collectionPetAdderLoading: userCollectionActions.collectionPetAdderLoading,
+      collectionPetAdderBusyId: userCollectionActions.collectionPetAdderBusyId,
+      setCollectionPetAdderQuery: userCollectionActions.setCollectionPetAdderQuery,
+      searchCollectionPetAdder: userCollectionActions.searchCollectionPetAdder,
+      addPetToCollection: userCollectionActions.addPetToCollection,
+      closeCollectionPetAdder: userCollectionActions.closeCollectionPetAdder,
       userCollections
     },
     playground: {

@@ -61,6 +61,7 @@ export type AppRoutesProps = {
   openPetCollector: (pet: Pet) => void | Promise<void>;
   openCollectionCreator: () => void | Promise<void>;
   openUserCollectionEditor: (collection: CollectionSummary) => void | Promise<void>;
+  openCollectionPetAdder: (collection: Omit<CollectionSummary, "topPets">) => void | Promise<void>;
   deleteUserCollection: (collection: CollectionSummary) => void | Promise<void>;
   removePetFromUserCollection: (collection: Omit<CollectionSummary, "topPets">, pet: Pet) => void | Promise<void>;
   startUserCollectionRoom: (collection: Omit<CollectionSummary, "topPets"> & { topPets?: CollectionSummary["topPets"] }, petId?: string) => void | Promise<void>;

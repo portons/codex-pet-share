@@ -2,7 +2,7 @@ import { useState, type Dispatch, type FormEvent, type SetStateAction } from "re
 import { readJson } from "../domain/http";
 import { normalizePet } from "../domain/pets";
 import { navigate } from "../domain/routing";
-import type { AuthSession, CollectionSummary, ContentMode, Pet, Route, User } from "../domain/types";
+import type { AuthSession, CollectionSummary, ContentMode, GalleryResponse, Pet, Route, User } from "../domain/types";
 
 type ApiFetch = (path: string, init?: RequestInit, authSession?: AuthSession | null) => Promise<Response>;
 
@@ -10,6 +10,14 @@ type CollectionEditorState = {
   mode: "create" | "edit";
   collection: CollectionSummary | null;
   displayName: string;
+};
+
+export type CollectionPetAdderState = {
+  collection: Omit<CollectionSummary, "topPets">;
+  query: string;
+  results: Pet[];
+  total: number;
+  searched: boolean;
 };
 
 export function useUserCollections({
@@ -47,6 +55,10 @@ export function useUserCollections({
   const [collectNewName, setCollectNewName] = useState("");
   const [collectStatus, setCollectStatus] = useState("");
   const [collectBusy, setCollectBusy] = useState(false);
+  const [collectionPetAdder, setCollectionPetAdder] = useState<CollectionPetAdderState | null>(null);
+  const [collectionPetAdderStatus, setCollectionPetAdderStatus] = useState("");
+  const [collectionPetAdderLoading, setCollectionPetAdderLoading] = useState(false);
+  const [collectionPetAdderBusyId, setCollectionPetAdderBusyId] = useState("");
 
   function openCollectionCreator() {
     if (!user) {
@@ -147,6 +159,11 @@ export function useUserCollections({
   async function submitPetCollector(event: FormEvent) {
     event.preventDefault();
     if (!collectPet || collectBusy || !user) return;
+    const newCollectionName = collectNewName.trim();
+    if (!userCollections.length && !newCollectionName) {
+      setCollectStatus("Name a collection to add this pet.");
+      return;
+    }
     setCollectBusy(true);
     setCollectStatus("");
     try {
@@ -163,11 +180,11 @@ export function useUserCollections({
           body: JSON.stringify({ petIds: nextPetIds })
         }, session));
       }
-      if (collectNewName.trim()) {
+      if (newCollectionName) {
         await readJson<{ collection: CollectionSummary }>(await apiFetch("/api/collections", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ displayName: collectNewName.trim(), petIds: [collectPet.id] })
+          body: JSON.stringify({ displayName: newCollectionName, petIds: [collectPet.id] })
         }, session));
       }
       await loadUserCollections(user, session, contentMode);
@@ -182,6 +199,97 @@ export function useUserCollections({
       setCollectStatus(error instanceof Error ? error.message : "Could not save collections.");
     } finally {
       setCollectBusy(false);
+    }
+  }
+
+  function openCollectionPetAdder(collection: Omit<CollectionSummary, "topPets">) {
+    if (!user) {
+      openAuth();
+      return;
+    }
+    setCollectionPetAdder({
+      collection,
+      query: "",
+      results: [],
+      total: 0,
+      searched: false
+    });
+    setCollectionPetAdderStatus("");
+    setCollectionPetAdderLoading(false);
+    setCollectionPetAdderBusyId("");
+  }
+
+  function closeCollectionPetAdder() {
+    if (collectionPetAdderLoading || collectionPetAdderBusyId) return;
+    setCollectionPetAdder(null);
+    setCollectionPetAdderStatus("");
+  }
+
+  function setCollectionPetAdderQuery(query: string) {
+    setCollectionPetAdder((current) => current ? { ...current, query } : current);
+  }
+
+  async function searchCollectionPetAdder(event: FormEvent) {
+    event.preventDefault();
+    if (!collectionPetAdder || collectionPetAdderLoading) return;
+    setCollectionPetAdderLoading(true);
+    setCollectionPetAdderStatus("");
+    try {
+      const params = new URLSearchParams();
+      params.set("page", "1");
+      params.set("pageSize", "60");
+      const query = collectionPetAdder.query.trim();
+      if (query) {
+        params.set("q", query);
+      }
+      if (contentMode === "all") {
+        params.set("content", "all");
+      }
+      const body = await readJson<GalleryResponse>(await apiFetch(`/api/pets?${params}`, {}, session));
+      setCollectionPetAdder((current) => current ? {
+        ...current,
+        results: body.pets.map(normalizePet),
+        total: body.total,
+        searched: true
+      } : current);
+    } catch (error) {
+      setCollectionPetAdderStatus(error instanceof Error ? error.message : "Could not search pets.");
+    } finally {
+      setCollectionPetAdderLoading(false);
+    }
+  }
+
+  async function addPetToCollection(pet: Pet) {
+    if (!collectionPetAdder || !user || collectionPetAdderBusyId) return;
+    const petIds = collectionPetAdder.collection.petIds;
+    if (!petIds) {
+      setCollectionPetAdderStatus("Collection data is not ready.");
+      return;
+    }
+    if (petIds.includes(pet.id)) return;
+    setCollectionPetAdderBusyId(pet.id);
+    setCollectionPetAdderStatus("");
+    try {
+      const body = await readJson<{ collection: CollectionSummary }>(await apiFetch(`/api/collections/${collectionPetAdder.collection.slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ petIds: [...petIds, pet.id] })
+      }, session));
+      const collection = normalizeCollection(body.collection);
+      replaceUserCollection(collection);
+      setCollectionDetail(collection);
+      setCollectionPetAdder((current) => current ? { ...current, collection } : current);
+      await Promise.all([
+        loadUserCollections(user, session, contentMode),
+        route.name === "collection" && route.slug === collection.slug
+          ? loadCollectionDetail(route.slug, session, contentMode)
+          : Promise.resolve()
+      ]);
+      setCollectionPetAdderStatus(`Added ${pet.displayName}.`);
+    } catch (error) {
+      setCollectionPetAdderStatus(error instanceof Error ? error.message : "Could not add pet.");
+    } finally {
+      setCollectionPetAdderBusyId("");
     }
   }
 
@@ -255,6 +363,15 @@ export function useUserCollections({
     closePetCollector,
     toggleCollectSlug,
     submitPetCollector,
+    collectionPetAdder,
+    collectionPetAdderStatus,
+    collectionPetAdderLoading,
+    collectionPetAdderBusyId,
+    setCollectionPetAdderQuery,
+    openCollectionPetAdder,
+    closeCollectionPetAdder,
+    searchCollectionPetAdder,
+    addPetToCollection,
     removePetFromCollection,
     deleteUserCollection,
     startCollectionRoom

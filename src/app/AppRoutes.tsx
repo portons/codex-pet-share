@@ -65,6 +65,7 @@ export function AppRoutes({
   openPetCollector,
   openCollectionCreator,
   openUserCollectionEditor,
+  openCollectionPetAdder,
   deleteUserCollection,
   removePetFromUserCollection,
   startUserCollectionRoom,
@@ -292,6 +293,7 @@ export function AppRoutes({
           onEditTags={openTagEditor}
           onManageCollections={openCollectionEditor}
           onCollect={openPetCollector}
+          onAddPet={collectionDetail?.editable ? openCollectionPetAdder : undefined}
           onRemoveFromUserCollection={collectionDetail?.editable ? (pet) => removePetFromUserCollection(collectionDetail, pet) : undefined}
           onStartRoom={collectionDetail?.ownerId ? () => startUserCollectionRoom(collectionDetail, collectionPets[0]?.id) : undefined}
           onToggleNsfw={togglePetNsfw}

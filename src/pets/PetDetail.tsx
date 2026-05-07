@@ -164,7 +164,7 @@ export function PetDetail({
             {user && onCollect && (
               <button className="btn btnSm" type="button" onClick={() => onCollect(pet)}>
                 <Icon name="package" size={13} />
-                Collect
+                Add to collection
               </button>
             )}
             {canDelete && (

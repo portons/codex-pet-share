@@ -1,7 +1,8 @@
 import type { Dispatch, FormEvent, SetStateAction } from "react";
 import { type AdminCollection } from "../admin/AdminPage";
 import { AuthModal, AccountSettingsModal } from "../auth/AuthModals";
-import { PetCollectorModal, UserCollectionEditorModal } from "../collections/UserCollectionModals";
+import { CollectionPetAdderModal, PetCollectorModal, UserCollectionEditorModal } from "../collections/UserCollectionModals";
+import type { CollectionPetAdderState } from "../collections/useUserCollections";
 import { DownloadModal } from "../downloads/DownloadModal";
 import { PetCollectionsModal, TagEditorModal } from "../pets/PetManagementModals";
 import { EntityShareModal, ShareModal } from "../share/ShareModals";
@@ -67,6 +68,14 @@ export function AppDialogs({
   toggleCollectSlug,
   submitPetCollector,
   closePetCollector,
+  collectionPetAdder,
+  collectionPetAdderStatus,
+  collectionPetAdderLoading,
+  collectionPetAdderBusyId,
+  setCollectionPetAdderQuery,
+  searchCollectionPetAdder,
+  addPetToCollection,
+  closeCollectionPetAdder,
   userCollections
 }: {
   authOpen: boolean;
@@ -127,6 +136,14 @@ export function AppDialogs({
   toggleCollectSlug: (slug: string) => void;
   submitPetCollector: (event: FormEvent) => void | Promise<void>;
   closePetCollector: () => void;
+  collectionPetAdder: CollectionPetAdderState | null;
+  collectionPetAdderStatus: string;
+  collectionPetAdderLoading: boolean;
+  collectionPetAdderBusyId: string;
+  setCollectionPetAdderQuery: (query: string) => void;
+  searchCollectionPetAdder: (event: FormEvent) => void | Promise<void>;
+  addPetToCollection: (pet: Pet) => void | Promise<void>;
+  closeCollectionPetAdder: () => void;
   userCollections: CollectionSummary[];
 }) {
   return (
@@ -213,6 +230,19 @@ export function AppDialogs({
           onNewName={setCollectNewName}
           onSubmit={submitPetCollector}
           onClose={closePetCollector}
+        />
+      )}
+
+      {collectionPetAdder && (
+        <CollectionPetAdderModal
+          adder={collectionPetAdder}
+          status={collectionPetAdderStatus}
+          loading={collectionPetAdderLoading}
+          busyPetId={collectionPetAdderBusyId}
+          onQuery={setCollectionPetAdderQuery}
+          onSearch={searchCollectionPetAdder}
+          onAdd={addPetToCollection}
+          onClose={closeCollectionPetAdder}
         />
       )}
     </>
