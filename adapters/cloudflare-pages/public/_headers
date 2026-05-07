@@ -1,0 +1,41 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' https://cdn.fontshare.com https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https: wss: https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/petshare-*
+  Cache-Control: public, max-age=86400
+
+/assets/social/*
+  Cache-Control: public, max-age=300, s-maxage=86400, must-revalidate
+
+/favicon.ico
+  Cache-Control: public, max-age=86400
+
+# Pages Function HTML for share/og unfurls — let Cloudflare cache at the
+# edge for an hour so X / Slack / etc. don't pay the full origin chain
+# (Pages Function -> Edge Function -> Postgres) on every cold fetch.
+/share/*
+  Cache-Control: public, max-age=300, s-maxage=3600, must-revalidate
+
+/collections/*
+  Cache-Control: public, max-age=300, s-maxage=3600, must-revalidate
+
+/users/*
+  Cache-Control: public, max-age=300, s-maxage=3600, must-revalidate
+
+/gallery/*
+  Cache-Control: public, max-age=300, s-maxage=3600, must-revalidate

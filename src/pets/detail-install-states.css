@@ -1,0 +1,195 @@
+/* Install card */
+.detailInstall {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  align-self: start;
+}
+
+.detailSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.detailSectionLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.detailSectionHint {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  letter-spacing: -0.005em;
+}
+
+.detailSectionHint code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink);
+}
+
+.detailInstall .commandHelperText {
+  display: none;
+}
+
+.detailInstallSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-decoration: none;
+  transition: color 180ms var(--ease-out);
+}
+
+.detailInstallSecondary:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.detailInstallSecondary code {
+  font-size: 11.5px;
+  color: inherit;
+}
+
+/* States card */
+.detailStates {
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.detailStatesActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.detailStatesActions .btn {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 11.5px;
+}
+
+.detailStatesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.detailStateTile {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  min-height: 200px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  transition: background 200ms var(--ease-out), border-color 200ms var(--ease-out),
+    transform 80ms var(--ease-out);
+}
+
+.detailStateTile:hover {
+  background: var(--surface-warm);
+  border-color: var(--border-strong);
+}
+
+.detailStateTile:active {
+  transform: translateY(1px);
+}
+
+.detailStateTile.active {
+  border-color: var(--ink);
+  background: var(--surface-warm);
+}
+
+.detailStateTileMain {
+  appearance: none;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  min-height: 200px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.detailStateTileMain .spriteFrame {
+  margin: 22px 12px 16px;
+}
+
+.detailStateTileLabel {
+  width: 100%;
+  border-top: 1px solid var(--border-soft);
+  background: var(--surface);
+  padding: 11px 8px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--ink);
+}
+
+.detailStateTileGif {
+  appearance: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: rgba(248, 246, 240, 0.94);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 180ms var(--ease-out), border-color 180ms var(--ease-out),
+    color 180ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.detailStateTileGif:hover {
+  background: var(--ink);
+  color: var(--accent);
+  border-color: var(--ink);
+}
+
+.detailStateTileGif:active {
+  transform: translateY(1px);
+}
+
+.detailStateTileGif:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.detailStatesStatus {
+  margin: 0;
+}

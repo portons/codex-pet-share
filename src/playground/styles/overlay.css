@@ -1,0 +1,91 @@
+/* ---- Floating overlay: identity badges + speech bubbles ----- */
+
+.roomOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  font-family: var(--font-mono);
+}
+
+.roomAnchor {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.roomBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 6px;
+  background: rgba(15, 15, 14, 0.86);
+  color: var(--bg);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 2px 8px rgba(15, 15, 14, 0.18);
+  animation: roomBadgeIn 280ms var(--ease-out);
+}
+
+.roomBadge .roomBadgeName {
+  color: #fff;
+}
+
+.roomBadge .roomBadgeSep {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.roomBadge .roomBadgePet {
+  color: var(--accent-soft);
+  letter-spacing: 0.04em;
+}
+
+.roomBadge::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px rgba(101, 163, 13, 0.4);
+}
+
+.roomBubble {
+  position: relative;
+  max-width: 240px;
+  padding: 8px 12px 9px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  text-align: left;
+  word-break: break-word;
+  box-shadow: var(--shadow-md);
+  animation: roomBubbleIn 280ms var(--ease-spring);
+}
+
+.roomBubble::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%) rotate(45deg);
+  width: 10px;
+  height: 10px;
+  background: var(--surface);
+  border-right: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+}

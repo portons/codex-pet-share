@@ -1,0 +1,49 @@
+{
+  "name": "codex-pet-share",
+  "version": "0.1.0",
+  "private": false,
+  "license": "MIT",
+  "description": "A shareable home for pixel pets — upload spritesheets, browse a gallery, and drop into multiplayer playground rooms with replaceable backend and hosting adapters.",
+  "keywords": [
+    "spritesheet",
+    "pixel-pets",
+    "react",
+    "vite",
+    "multiplayer",
+    "playground",
+    "self-hosted",
+    "provider-adapters"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "node scripts/check-public-build-env.mjs && tsc -b && vite build",
+    "adapter:cloudflare:typecheck": "tsc -p adapters/cloudflare-worker/tsconfig.json",
+    "adapter:cloudflare:dev": "wrangler dev -c adapters/cloudflare-worker/wrangler.toml",
+    "adapter:cloudflare:deploy": "wrangler deploy -c adapters/cloudflare-worker/wrangler.toml",
+    "adapter:cloudflare:migrate": "wrangler d1 migrations apply your-pet-share -c adapters/cloudflare-worker/wrangler.toml --remote",
+    "adapter:cloudflare:migrate:local": "wrangler d1 migrations apply your-pet-share -c adapters/cloudflare-worker/wrangler.toml --local",
+    "build:social-card": "node scripts/build-social-card.mjs",
+    "build:nav-mark": "node scripts/build-nav-mark.mjs"
+  },
+  "dependencies": {
+    "@types/three": "^0.184.0",
+    "@vitejs/plugin-react": "^5.1.2",
+    "bcryptjs": "^3.0.3",
+    "emoji-picker-react": "^4.19.1",
+    "fflate": "^0.8.2",
+    "gifenc": "^1.0.3",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "three": "^0.184.0",
+    "vite": "^7.3.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260507.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "sharp": "^0.34.5",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.88.0"
+  }
+}

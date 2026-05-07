@@ -1,0 +1,209 @@
+.shareModal {
+  width: min(620px, 100%);
+}
+
+.playgroundModal {
+  width: min(880px, 100%);
+}
+
+/* Native fullscreen — fill the viewport edge-to-edge, drop max-width
+   constraints, expand the canvas to remaining vertical space. The :fullscreen
+   pseudo lets us catch ALL paths into fullscreen (Esc-to-exit too). */
+.playgroundModal[data-fullscreen],
+.playgroundModal:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+}
+
+.playgroundModal[data-fullscreen] .playgroundCanvasWrapper,
+.playgroundModal:fullscreen .playgroundCanvasWrapper {
+  flex: 1 1 auto;
+  aspect-ratio: auto;
+  height: 100%;
+  min-height: 0;
+}
+
+/* The fullscreen ↗ / ↙ icon in the header. Same size + treatment as
+   .modalCloseButton (when in playground flow) so they read as a pair. */
+.playgroundHeaderIconBtn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 16px;
+  font-family: inherit;
+  transition: background 120ms var(--ease-out), border-color 120ms var(--ease-out);
+}
+
+.playgroundHeaderIconBtn:hover,
+.playgroundHeaderIconBtn:focus-visible {
+  background: var(--surface-warm);
+  border-color: var(--border-strong);
+}
+
+.playgroundHeaderIconBtn[data-active] {
+  background: var(--accent-soft);
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}
+
+/* ---- On-screen controls (touch only) ----------------------- */
+
+.playgroundTouchControls {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 12px;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.playgroundTouchControls > * {
+  pointer-events: auto;
+}
+
+.playgroundDpad {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  grid-template-rows: repeat(3, 52px);
+  gap: 4px;
+}
+
+.playgroundDpadBtn {
+  border: 1px solid var(--border-strong);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--ink);
+  font-size: 18px;
+  font-family: inherit;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.playgroundDpadBtn:active {
+  background: var(--accent-soft);
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}
+
+.playgroundDpadUp    { grid-column: 2; grid-row: 1; }
+.playgroundDpadLeft  { grid-column: 1; grid-row: 2; }
+.playgroundDpadRight { grid-column: 3; grid-row: 2; }
+.playgroundDpadDown  { grid-column: 2; grid-row: 3; }
+
+.playgroundActionButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 72px);
+  gap: 6px;
+}
+
+.playgroundActionBtn {
+  height: 44px;
+  border: 1px solid var(--border-strong);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  border-radius: 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.playgroundActionBtn.playgroundActionJump {
+  grid-column: 1 / span 2;
+  background: var(--accent);
+  color: var(--accent-on);
+  border-color: var(--accent-deep);
+  font-weight: 600;
+}
+
+.playgroundActionBtn.playgroundActionGhost {
+  grid-column: 1 / span 2;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.playgroundActionBtn:active {
+  background: var(--accent-soft);
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}
+
+/* ---- Responsive: shrink the modal on phones ---------------- */
+
+@media (max-width: 720px) {
+  /* Bumped specificity (compound class) so this beats the generic
+     .authModal mobile padding rule that also fires at this width. */
+  .authModal.playgroundModal {
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    border-radius: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .authModal.playgroundModal .modalHeader {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-right: 0;
+  }
+
+  .authModal.playgroundModal .playgroundHeaderActions {
+    flex-wrap: wrap;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .authModal.playgroundModal .modalTitle.compact {
+    flex: 1 1 100%;
+  }
+
+  .authModal.playgroundModal .playgroundCanvasWrapper {
+    aspect-ratio: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .authModal.playgroundModal .playgroundControlsHint {
+    display: none;
+  }
+
+  .authModal.playgroundModal .playgroundChatBar {
+    margin-top: 8px;
+  }
+
+  /* The backdrop's 24px ring eats too much real estate on phones. */
+  .modalBackdrop {
+    padding: 0;
+  }
+}

@@ -1,0 +1,329 @@
+/* Gallery grid */
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(264px, 1fr));
+  gap: 16px;
+}
+
+.galleryGrid.compact {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.revealItem {
+  opacity: 0;
+  animation: item-rise 540ms var(--ease-out) forwards;
+  animation-delay: var(--delay);
+}
+
+/* Pet card */
+.petCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  min-height: 340px;
+  height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color 220ms var(--ease-out), box-shadow 220ms var(--ease-out),
+    transform 220ms var(--ease-out);
+}
+
+.petCard.compact {
+  min-height: 236px;
+  border-radius: var(--radius-md);
+}
+
+.petCard:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.petCardPreview {
+  display: grid;
+  place-items: center;
+  min-height: 126px;
+  padding: 8px 18px;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(228, 225, 217, 0.74) 0%, #ffffff 72%),
+    #ffffff;
+  border: 0;
+  border-bottom: 1px solid var(--border-soft);
+  cursor: pointer;
+}
+
+.petCardQuickActions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: inline-flex;
+  gap: 4px;
+}
+
+.petCardQuickAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+
+.petCardQuickAction:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: var(--border-strong);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.petCardQuickAction.activeSoft {
+  background: var(--accent-soft);
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}
+
+/* Lightweight, fast-appearing tooltip used on small icon buttons. The
+   native `title` attribute is retained as a fallback for accessibility
+   while this custom popup gives immediate hover feedback. */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translate(-50%, 4px);
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: rgba(16, 16, 15, 0.92);
+  color: #f5f0dc;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms var(--ease-out), transform 120ms var(--ease-out);
+  z-index: 10;
+  box-shadow: var(--shadow-md);
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Tooltips on the right edge of the card flip below to avoid clipping
+   above the gallery row above the card. */
+.petCardQuickAction[data-tooltip]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+  transform: translate(-50%, -4px);
+}
+
+.petCardQuickAction[data-tooltip]:hover::after,
+.petCardQuickAction[data-tooltip]:focus-visible::after {
+  transform: translate(-50%, 0);
+}
+
+/* Right-aligned actions sometimes get clipped at the card edge — anchor
+   the last quick action's tooltip to its right edge. */
+.petCardQuickActions > .petCardQuickAction:last-child[data-tooltip]::after {
+  left: auto;
+  right: 0;
+  transform: translate(0, -4px);
+}
+
+.petCardQuickActions > .petCardQuickAction:last-child[data-tooltip]:hover::after,
+.petCardQuickActions > .petCardQuickAction:last-child[data-tooltip]:focus-visible::after {
+  transform: translate(0, 0);
+}
+
+.petCard.compact .petCardQuickActions {
+  top: 6px;
+  right: 6px;
+  gap: 3px;
+}
+
+.petCard.compact .petCardQuickAction {
+  width: 22px;
+  height: 22px;
+}
+
+.petCardPreview .galleryPreviewFrame {
+  width: 144px;
+  height: 156px;
+  margin: 8px 0;
+}
+
+.petCardPreview .galleryPreviewFrame .sprite {
+  transform: scale(0.75);
+  transform-origin: top left;
+}
+
+.petCard.compact .petCardPreview {
+  min-height: 94px;
+  padding: 6px 8px;
+}
+
+.petCard.compact .petCardPreview .galleryPreviewFrame {
+  width: 96px;
+  height: 104px;
+  margin: 0;
+}
+
+.petCard.compact .petCardPreview .galleryPreviewFrame .sprite {
+  transform: scale(0.5);
+  transform-origin: top left;
+}
+
+.petCardBody {
+  flex: 1;
+  width: 100%;
+  padding: 10px 18px 16px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  color: inherit;
+  text-align: left;
+}
+
+.petCard.compact .petCardBody {
+  padding: 8px 10px 6px;
+  gap: 5px;
+}
+
+.petCardBody.clickable {
+  cursor: pointer;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.petCardIdentity {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.cardMeta .petStats {
+  flex-shrink: 0;
+  padding-top: 3px;
+}
+
+.petCard.compact .cardMeta {
+  display: grid;
+  gap: 5px;
+}
+
+.petCard.compact .cardMeta .petStats {
+  padding-top: 0;
+}
+
+.petCardBody h2 {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.025em;
+  line-height: 1.18;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.petCard.compact .petCardBody h2 {
+  font-size: 15px;
+}
+
+.collectionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.collectionCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 172px;
+  color: inherit;
+  text-align: left;
+  transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+  overflow: hidden;
+}
+
+.collectionCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.collectionCardBody {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  flex: 1 1 auto;
+  padding: 16px 18px 12px;
+  color: inherit;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.collectionCardTitle {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.08;
+}
+
+.collectionCardFooter {
+  /* Meta on the left, actions on the right — single row, never wraps.
+     The live-presence chip used to live here and pushed cards to
+     uneven heights when present; it's now an absolute overlay on the
+     card body so footer geometry stays identical for every card. */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px 12px 18px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.collectionCardMeta {
+  margin: 0;
+  min-width: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  /* Truncate to one line under pressure — guarantees the right-aligned
+     action group stays on the same row at narrow card widths. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

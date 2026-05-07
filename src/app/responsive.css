@@ -1,0 +1,357 @@
+@media (max-width: 1100px) {
+  .appShell {
+    width: min(100vw - 48px, 1080px);
+  }
+
+  .galleryGrid.compact {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .appShell {
+    width: min(100vw - 32px, 1080px);
+  }
+
+  .galleryGrid.compact {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .appNav {
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    padding: 14px 0 16px;
+  }
+
+  .navLinks {
+    grid-column: 1 / -1;
+    order: 3;
+    justify-content: flex-start;
+    gap: 4px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .detailSurface {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "hero"
+      "install"
+      "states"
+      "admin"
+      "more";
+  }
+
+  .detailInstall {
+    position: static;
+  }
+
+  .detailMoreGrid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .detailStatesGrid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .uploadsHead,
+  .uploadsTable colgroup {
+    display: none;
+  }
+
+  .uploadsTable,
+  .uploadsTable tbody,
+  .uploadsRow {
+    display: block;
+  }
+
+  .uploadsRow {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .uploadsRow:last-child {
+    border-bottom: 0;
+  }
+
+  .uploadsRow td {
+    display: contents;
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .uploadsPackage {
+    display: contents;
+  }
+
+  .uploadsRow .monoText,
+  .uploadsRow .petStats,
+  .rowActions {
+    grid-column: 2 / -1;
+  }
+
+  .creatorRow .ownerLink {
+    grid-column: 1 / -1;
+  }
+
+  .creatorsTable .uploadsRow {
+    grid-template-columns: 1fr;
+  }
+
+  .creatorsTable .uploadsRow .monoText {
+    grid-column: 1;
+  }
+
+  .creatorRow .leaderboardMetric {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .leaderMetricLabel {
+    display: inline;
+    min-width: 56px;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 12px;
+  }
+
+  .rowActions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 680px) {
+  .appShell {
+    width: calc(100vw - 24px);
+    padding: 12px 0 64px;
+  }
+
+  .appNav {
+    position: static;
+    grid-template-columns: 1fr;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .accountAction {
+    justify-content: flex-start;
+  }
+
+  .accountMenuList {
+    right: auto;
+    left: 0;
+  }
+
+  .galleryToolbar {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .galleryToolbar .btnLg {
+    width: 100%;
+  }
+
+  .galleryFilterRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sortControls {
+    width: 100%;
+  }
+
+  .galleryControlGroup {
+    width: 100%;
+  }
+
+  .sortControls,
+  .viewControls,
+  .kindControls {
+    width: 100%;
+  }
+
+  .sortControls button,
+  .viewControls button,
+  .kindControls button {
+    justify-content: center;
+    flex: 1;
+  }
+
+  .resultBar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .resultBar span:last-child {
+    text-align: left;
+  }
+
+  .tagDropdown,
+  .tagDropdownTrigger {
+    width: 100%;
+  }
+
+  .tagDropdownTrigger {
+    justify-content: space-between;
+  }
+
+  .tagDropdownMenu {
+    left: 0;
+    right: auto;
+    width: min(100%, 320px);
+  }
+
+  .galleryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .galleryGrid.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sectionHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 36px 0 20px;
+  }
+
+  .collectionCommand {
+    width: 100%;
+  }
+
+  .detailHero {
+    padding: 22px;
+    gap: 22px;
+  }
+
+  .detailShowcase .spriteFrame.large {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  .detailHeroFooter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .detailSocialActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .detailPreviewSkeleton {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  .detailTitle {
+    font-size: clamp(36px, 9vw, 48px);
+  }
+
+  .detailLede {
+    font-size: 15px;
+  }
+
+  .detailStates {
+    padding: 20px;
+  }
+
+  .detailStatesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .detailStatesActions {
+    width: 100%;
+  }
+
+  .detailStatesActions .btn {
+    flex: 1 1 calc(50% - 6px);
+  }
+
+  .importCommand,
+  .validationCard,
+  .validationCard.compact {
+    grid-template-columns: 1fr;
+  }
+
+  .validationCard div {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .validationCard div:last-child {
+    border-bottom: 0;
+  }
+
+  .importCommand .btn {
+    width: 100%;
+    border-left: 0;
+    border-top: 1px solid #2a2926;
+  }
+
+  .authModal {
+    padding: 24px 22px 20px;
+  }
+
+  .shareCopyRow {
+    grid-template-columns: 1fr;
+  }
+
+  .socialShareActions {
+    grid-template-columns: 1fr;
+  }
+
+  .shareCopyRow .btn {
+    width: 100%;
+  }
+
+  .modalTitle h2 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 380px) {
+  .detailShowcase .spriteFrame.large {
+    max-width: 260px;
+  }
+
+  .detailShowcase .large .sprite {
+    transform: scale(1.25);
+  }
+
+  .detailPreviewSkeleton {
+    max-width: 260px;
+  }
+}
+
+.uploadTagSection .kindControls {
+  width: fit-content;
+  max-width: 100%;
+  justify-self: start;
+}
+
+.uploadTagSection .kindControls button {
+  flex: 0 0 auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}

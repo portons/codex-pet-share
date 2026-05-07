@@ -1,0 +1,160 @@
+.shareStack {
+  display: grid;
+  gap: 12px;
+}
+
+.socialShareActions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sharePreviewImage {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1200 / 630;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.shareCreator {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.shareCopyRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-warm);
+  padding: 12px;
+}
+
+.shareCopyRow > div {
+  min-width: 0;
+}
+
+.shareCopyRow .fieldLabel {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.downloadCommandRow {
+  padding: 10px;
+}
+
+.downloadCommandRow > div {
+  display: grid;
+  gap: 8px;
+}
+
+.commandModeSwitch {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 12px;
+  width: fit-content;
+}
+
+.commandModeSwitch button {
+  padding: 0 0 3px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+.commandModeSwitch button.active {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.commandModeSwitch button:hover:not(.active) {
+  color: var(--ink);
+}
+
+.commandHelperText,
+.downloadInstructions {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+.downloadInstructions code {
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.downloadOptionDivider {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.downloadOptionDivider::before,
+.downloadOptionDivider::after {
+  content: "";
+  height: 1px;
+  background: var(--border);
+}
+
+.terminalCommandLine {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 40px;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid #2a2926;
+  border-radius: var(--radius-sm);
+  background: var(--ink);
+  color: #e8e6e0;
+}
+
+.commandCopyButton {
+  height: 40px;
+  align-self: end;
+}
+
+.terminalCommandLine span {
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.shareCopyRow code {
+  display: block;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminalCommandLine code {
+  color: inherit;
+}
+
+/* Spinner */

@@ -1,0 +1,29 @@
+node_modules/
+dist/
+.vite/
+data/
+tmp/
+*-pet-run/
+.claude/
+.wrangler/
+.deno/
+adapters/cloudflare-pages/.wrangler/
+*.mp4
+*.mov
+*.webm
+*.tsbuildinfo
+.DS_Store
+.env*
+!.env.example
+.idea
+.vscode/
+
+# Local pet-test scratch (seed inputs you're iterating on locally)
+hatch-runs/
+
+# Editor / OS noise
+*.swp
+*~
+
+# Local session handoff notes (Claude Code)
+.claude-handoff.md

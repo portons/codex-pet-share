@@ -1,0 +1,178 @@
+.spinner {
+  flex: 0 0 auto;
+  animation: spin 720ms linear infinite;
+}
+
+/* Skeleton */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  transform: translateX(-100%);
+  animation: skel 1.4s infinite var(--ease-out);
+}
+
+.previewSkeleton {
+  min-height: 168px;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.detailPreviewSkeleton {
+  width: 420px;
+  height: 440px;
+}
+
+.commandSkeleton {
+  height: 84px;
+  border-radius: var(--radius-md);
+}
+
+.skeleton.detailStateTileGif {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 56px;
+  height: 22px;
+}
+
+.statePreviewSkeleton {
+  width: 96px;
+  height: 104px;
+}
+
+.rowPreviewSkeleton {
+  width: 56px;
+  height: 60px;
+}
+
+.actionSkeleton {
+  width: 130px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+}
+
+.actionSkeleton.small {
+  width: 70px;
+  height: 30px;
+}
+
+.line {
+  height: 12px;
+  margin-bottom: 9px;
+}
+
+.line.short {
+  width: 34%;
+}
+
+.line.title {
+  width: 58%;
+  height: 18px;
+}
+
+.line.title.wide {
+  width: min(420px, 80%);
+  height: 48px;
+}
+
+.line.medium {
+  width: 76%;
+}
+
+.skeletonTile {
+  pointer-events: none;
+}
+
+.skeletonTile::before {
+  content: none;
+}
+
+.skeletonTile .detailStateTileMain {
+  cursor: default;
+}
+
+.skeletonTile .detailStateTileMain .detailStateTileLabel .line {
+  margin: 0 auto;
+}
+
+/* Animations */
+@keyframes sprite-play {
+  from {
+    background-position: 0 var(--sprite-y);
+  }
+  to {
+    background-position: var(--sprite-end-x) var(--sprite-y);
+  }
+}
+
+@keyframes preview-strip-play {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: var(--preview-end-x) 0;
+  }
+}
+
+@keyframes skel {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes item-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive */

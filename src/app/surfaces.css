@@ -1,0 +1,199 @@
+/* Mono utilities */
+.metaText,
+.monoText,
+.fieldLabel,
+.accountName,
+.uploadsHead,
+.petStats {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum", "zero", "ss01";
+}
+
+.metaText,
+.fieldLabel,
+.accountName,
+.uploadsHead {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.accountName {
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  max-width: 180px;
+  font-size: 13.5px;
+  text-overflow: ellipsis;
+}
+
+.accountButton {
+  appearance: none;
+  border: 0;
+  position: relative;
+  display: inline-flex;
+  height: 30px;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  padding: 0 10px;
+  cursor: pointer;
+  transition: color 200ms var(--ease-out), background 200ms var(--ease-out);
+}
+
+.accountButton::before {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 4px;
+  left: 10px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 220ms var(--ease-out);
+}
+
+.accountButton:hover {
+  color: var(--ink);
+  background: transparent;
+}
+
+.accountButton:hover::before {
+  transform: scaleX(1);
+}
+
+.accountMenu {
+  position: relative;
+  display: inline-flex;
+}
+
+.accountMenuList {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 3px;
+  min-width: 188px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 18px 40px rgba(48, 40, 27, 0.13);
+}
+
+.accountMenuList button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.2;
+  padding: 0 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 180ms var(--ease-out), color 180ms var(--ease-out);
+}
+
+.accountMenuList button:hover {
+  background: var(--surface-warm);
+}
+
+.accountMenuList .dangerMenuItem {
+  color: var(--danger);
+}
+
+.ownerLink {
+  display: inline;
+  width: fit-content;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ownerLink:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.shadowbanIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  color: #9f2f22;
+  vertical-align: -2px;
+}
+
+.monoText {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Surfaces */
+.surface,
+.detailSurface {
+  padding-top: 0;
+}
+
+.detailSurface {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr);
+  grid-template-areas:
+    "hero install"
+    "states states"
+    "admin admin"
+    "more more";
+  align-items: start;
+  gap: 18px;
+  padding-top: 32px;
+}
+
+.detailHero {
+  grid-area: hero;
+}
+
+.detailInstall {
+  grid-area: install;
+}
+
+.detailStates {
+  grid-area: states;
+}
+
+.detailAdminBar {
+  grid-area: admin;
+}
+
+.detailMore {
+  grid-area: more;
+  display: grid;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.detailMoreGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.uploadSurface {
+  max-width: 760px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}

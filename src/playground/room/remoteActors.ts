@@ -1,0 +1,51 @@
+import * as THREE from "three";
+
+export type RemotePet = {
+  userId: string;
+  displayName: string;
+  petDisplayName: string;
+  spritesheetUrl: string;
+  sprite: THREE.Sprite;
+  mat: THREE.SpriteMaterial;
+  tex: THREE.Texture;
+  imgReady: boolean;
+  loadingOrb: THREE.Sprite | null;
+  targetX: number;
+  targetY: number;
+  targetZ: number;
+  targetTime: number;
+  spawnTime: number;
+  scaleX: number;
+  scaleY: number;
+  vx: number;
+  vy: number;
+  vz: number;
+  row: number;
+  frame: number;
+  rowStart: number;
+  sprinting: boolean;
+  streakTimer: number;
+  afterImageTimer: number;
+  footstepTimer: number;
+};
+
+export type RemoteNpc = {
+  id: string;
+  petId: string;
+  spritesheetUrl: string;
+  sprite: THREE.Sprite;
+  mat: THREE.SpriteMaterial;
+  tex: THREE.Texture;
+  imgReady: boolean;
+  loadingOrb: THREE.Sprite | null;
+  targetX: number;
+  targetY: number;
+  targetZ: number;
+  targetTime: number;
+  vx: number;
+  vz: number;
+  row: number;
+  frames: number;
+  fps: number;
+  rowStart: number;
+};

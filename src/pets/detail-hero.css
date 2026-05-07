@@ -1,0 +1,173 @@
+/* Detail */
+.detailHero {
+  display: grid;
+  gap: 28px;
+  padding: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.detailHeader {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.detailSpecimen {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding-left: 16px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.detailSpecimen::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  animation: pulse 2.4s var(--ease-out) infinite;
+}
+
+.detailSpecimenItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.detailSpecimenItem strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.detailSpecimenSep {
+  color: var(--border-strong);
+}
+
+.detailSpecimenOwner {
+  color: var(--ink);
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.detailSpecimenOwner.ownerLink {
+  color: var(--ink);
+}
+
+.detailSpecimen .nsfwNotice {
+  margin-left: auto;
+}
+
+.detailTitle {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: clamp(40px, 5.6vw, 72px);
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  color: var(--ink);
+}
+
+.detailLede {
+  max-width: 62ch;
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+}
+
+.detailHeader .petTags {
+  margin-top: 2px;
+}
+
+.detailShowcase {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  padding: 14px 0 18px;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  background:
+    radial-gradient(circle at 50% 45%, rgba(216, 242, 90, 0.18), transparent 70%);
+}
+
+.detailShowcase .spriteFrame.large {
+  width: 210px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detailShowcase .spriteFrame.large .sprite {
+  transform-origin: center center;
+}
+
+.detailWalkButton {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: background 180ms var(--ease-out), border-color 180ms var(--ease-out),
+    color 180ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.detailWalkButton:hover {
+  background: var(--surface-warm);
+  border-color: var(--ink);
+}
+
+.detailWalkButton:active {
+  transform: translateY(1px);
+}
+
+.detailWalkButton.active {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+}
+
+.detailWalkButtonGlyph {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.detailHeroFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.detailSocialActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

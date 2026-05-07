@@ -1,0 +1,41 @@
+name = "your-pet-share"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+keep_vars = true
+# Uncomment and replace this after you add a custom domain in Cloudflare.
+# routes = [{ pattern = "your-app.example.com/*", zone_name = "your-app.example.com" }]
+
+[assets]
+directory = "../../dist"
+binding = "ASSETS"
+run_worker_first = ["/*"]
+
+[vars]
+APP_NAME = "Your Pet Share"
+APP_HANDLE = "your-pet-share"
+APP_TAGLINE = "A shareable home for your pixel pets."
+APP_REPO_URL = "https://github.com/your-org/your-pet-share"
+PUBLIC_APP_ORIGIN = "https://your-app.example.com"
+CORS_ALLOWED_ORIGINS = "https://your-app.example.com,http://localhost:5173,http://127.0.0.1:5173"
+ASSET_PUBLIC_BASE_URL = "https://your-app.example.com/assets/pets"
+PET_BUCKET_PREFIX = "pets"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "your-pet-share"
+database_id = "replace-with-d1-database-id"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "PET_ASSETS"
+bucket_name = "your-pet-share-assets"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "RoomDurableObject"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RoomDurableObject"]

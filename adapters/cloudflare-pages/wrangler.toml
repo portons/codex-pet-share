@@ -1,0 +1,8 @@
+# Cloudflare Pages project name. Forkers: change this to match the
+# Pages project you create in the Cloudflare dashboard before
+# running `npx wrangler pages deploy`.
+name = "your-pet-share"
+compatibility_date = "2026-05-01"
+pages_build_output_dir = "dist"
+
+[env.production]

@@ -1,0 +1,344 @@
+/* ============================================================
+   Multiplayer Playground Rooms — "shared frequency"
+   ============================================================
+   Quiet broadcast vibe. Mono callsigns, a slow-pulsing live dot,
+   speech bubbles styled like transcripts, identity badges layered
+   like a film credit. Lime accent reserved for "presence."
+*/
+
+@keyframes roomPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.4; }
+}
+
+@keyframes roomBubbleIn {
+  0% { transform: translateY(4px) scale(0.94); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes roomBadgeIn {
+  0% { opacity: 0; transform: translateY(-2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Header actions: Open-as-Room CTA + status chip --------- */
+
+.playgroundHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.playgroundModal .modalTitle {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Pull the Close button into the flex row so the chip + Close sit
+   flush together at the right edge, instead of the absolute-positioned
+   Close hovering separately and creating a dead gap between them. */
+.playgroundModal .modalHeader {
+  padding-right: 0;
+}
+
+.playgroundModal .modalCloseButton {
+  position: static;
+  top: auto;
+  right: auto;
+}
+
+.openAsRoomBtn,
+.roomStatusChip {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.openAsRoomBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px 0 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 160ms var(--ease-out),
+              background 160ms var(--ease-out),
+              transform 160ms var(--ease-out),
+              box-shadow 160ms var(--ease-out);
+  box-shadow: var(--shadow-sm);
+}
+
+.openAsRoomBtn::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  animation: roomPulse 2.4s var(--ease-out) infinite;
+}
+
+.openAsRoomBtn:hover,
+.openAsRoomBtn:focus-visible {
+  border-color: var(--accent-deep);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  outline: none;
+}
+
+.openAsRoomWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.openAsRoomMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  width: 280px;
+  padding: 14px 14px 12px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: 12px;
+  box-shadow: 0 22px 44px -16px rgba(0, 0, 0, 0.28), 0 6px 18px -10px rgba(0, 0, 0, 0.2);
+  animation: roomShareMenuIn 140ms var(--ease-out);
+}
+
+.openAsRoomLabel {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.openAsRoomField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.openAsRoomField > span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.openAsRoomField input,
+.openAsRoomField select {
+  width: 100%;
+  padding: 7px 8px;
+  font-family: inherit;
+  font-size: 13px;
+  border: 1px solid var(--border-strong, rgba(0, 0, 0, 0.18));
+  border-radius: 6px;
+  background: var(--surface, #fff);
+  color: inherit;
+}
+
+.openAsRoomField input:focus,
+.openAsRoomField select:focus {
+  outline: none;
+  border-color: var(--accent-deep, #b15a16);
+  box-shadow: 0 0 0 2px var(--accent-soft, #ffe9d6);
+}
+
+.openAsRoomActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.openAsRoomActions .btn {
+  font-size: 12px;
+  padding: 7px 12px;
+}
+
+.roomStatusChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-warm);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.roomStatusChip[data-kind="host"] {
+  background: var(--accent-soft);
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}
+
+/* Permanent collection rooms: every member reads as "Joined" — the chip
+   stays neutral so the elected host's chrome doesn't masquerade as a
+   privileged role they didn't claim. */
+.roomStatusChip[data-permanent] {
+  background: var(--surface-warm);
+  border-color: var(--border);
+  color: var(--muted);
+}
+.roomStatusChip[data-permanent] .roomDot {
+  background: var(--muted);
+  box-shadow: 0 0 0 3px rgba(140, 110, 60, 0.12);
+}
+
+.roomStatusChip .roomDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  animation: roomPulse 2.4s var(--ease-out) infinite;
+}
+
+.roomStatusChip .roomCallsign {
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.06em;
+}
+
+.roomStatusChip .roomCallsignSep {
+  color: var(--subtle);
+}
+
+.roomShareBtn {
+  /* Always full-strength so it's obvious the button is interactive,
+     regardless of the parent chip's muted text color (guest chip inherits
+     --muted which made the button read as "disabled" at rest). */
+  margin-left: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 4px;
+  border: 1px solid var(--accent-deep, currentColor);
+  background: var(--accent-soft, transparent);
+  color: var(--accent-deep, inherit);
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 120ms var(--ease-out), transform 120ms var(--ease-out);
+}
+
+.roomShareBtn:hover,
+.roomShareBtn:focus-visible {
+  background: var(--accent, var(--accent-deep));
+  color: #fff;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.roomShareBtn[data-copied] {
+  opacity: 1;
+  background: var(--accent-soft);
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}
+
+.roomShareBtn[data-open] {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.roomShareWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.roomShareMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  min-width: 192px;
+  padding: 6px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: 10px;
+  box-shadow: 0 18px 38px -16px rgba(0, 0, 0, 0.24), 0 4px 14px -8px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: roomShareMenuIn 120ms var(--ease-out);
+}
+
+@keyframes roomShareMenuIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.roomShareMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 100ms var(--ease-out);
+}
+
+.roomShareMenuItem:hover,
+.roomShareMenuItem:focus-visible {
+  background: rgba(0, 0, 0, 0.05);
+  outline: none;
+}
+
+.roomShareMenuIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.7);
+  flex-shrink: 0;
+}
+
+.roomShareMenuIcon[data-tone="native"]   { background: var(--accent-soft, #ffe9d6); color: var(--accent-deep, #b15a16); }
+.roomShareMenuIcon[data-tone="x"]        { background: #111; color: #fff; }
+.roomShareMenuIcon[data-tone="bsky"]     { background: #1185fe; color: #fff; }
+.roomShareMenuIcon[data-tone="telegram"] { background: #229ed9; color: #fff; }
+.roomShareMenuIcon[data-tone="whatsapp"] { background: #25d366; color: #fff; }
+.roomShareMenuIcon[data-tone="email"]    { background: #6b7280; color: #fff; }
+.roomShareMenuIcon[data-tone="copy"]     { background: rgba(0, 0, 0, 0.08); color: rgba(0, 0, 0, 0.7); }

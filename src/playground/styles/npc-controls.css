@@ -1,0 +1,194 @@
+.playgroundNpcBar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+}
+
+.playgroundNpcChip {
+  appearance: none;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(16, 16, 15, 0.82);
+  color: #f5f0dc;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 120ms ease;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playgroundNpcChip:hover { background: rgba(216, 78, 78, 0.85); }
+
+.playgroundNpcChipX {
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.playgroundNpcAddBtn {
+  appearance: none;
+  border: 1px dashed rgba(245, 240, 220, 0.4);
+  background: rgba(16, 16, 15, 0.62);
+  color: #f5f0dc;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.playgroundNpcAddBtn:hover {
+  background: rgba(216, 242, 90, 0.18);
+  border-color: rgba(216, 242, 90, 0.75);
+  color: #d8f25a;
+}
+
+.playgroundResetBtn {
+  appearance: none;
+  border: 1px solid rgba(245, 240, 220, 0.25);
+  background: rgba(16, 16, 15, 0.72);
+  color: #f5f0dc;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.playgroundResetBtn svg { display: block; }
+
+.playgroundResetBtn:hover {
+  background: rgba(232, 74, 74, 0.22);
+  border-color: rgba(232, 74, 74, 0.65);
+  color: #f6a4a4;
+}
+
+/* Tooltip overrides for the playground chip + buttons — the canvas
+   wrapper has overflow:hidden, so tooltips that render *above* the
+   element get clipped at the wrapper's top edge. Flip them to render
+   below instead. Also reset text-transform so uppercase parent buttons
+   don't yell their tooltip back at the user. */
+.playgroundNpcBar [data-tooltip]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+  transform: translate(-50%, -4px);
+  text-transform: none;
+}
+
+.playgroundNpcBar [data-tooltip]:hover::after,
+.playgroundNpcBar [data-tooltip]:focus-visible::after {
+  transform: translate(-50%, 0);
+}
+
+/* The +NPC and reset buttons are at the right edge of the bar — anchor
+   their tooltips to the right edge so they don't get clipped. */
+.playgroundNpcAddBtn[data-tooltip]::after,
+.playgroundResetBtn[data-tooltip]::after {
+  left: auto;
+  right: 0;
+  transform: translate(0, -4px);
+}
+
+.playgroundNpcAddBtn[data-tooltip]:hover::after,
+.playgroundNpcAddBtn[data-tooltip]:focus-visible::after,
+.playgroundResetBtn[data-tooltip]:hover::after,
+.playgroundResetBtn[data-tooltip]:focus-visible::after {
+  transform: translate(0, 0);
+}
+
+.playgroundNpcSearch {
+  /* Position is set inline via style={{ top, right }} (fixed coords from
+     the +NPC button rect) so the popover escapes the canvas wrapper's
+     overflow:hidden. */
+  width: 260px;
+  background: rgba(16, 16, 15, 0.94);
+  border: 1px solid rgba(245, 240, 220, 0.18);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  z-index: 200;
+  font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+}
+
+.playgroundNpcSearchInput {
+  width: 100%;
+  appearance: none;
+  border: 1px solid rgba(245, 240, 220, 0.25);
+  background: rgba(0, 0, 0, 0.45);
+  color: #f5f0dc;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  outline: none;
+}
+
+.playgroundNpcSearchInput:focus {
+  border-color: #d8f25a;
+}
+
+.playgroundNpcSearchList {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  /* Slim themed scrollbar so the dark popover doesn't get a chunky
+     system scrollbar slapped onto its right edge. */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 240, 220, 0.25) transparent;
+}
+
+.playgroundNpcSearchList::-webkit-scrollbar { width: 6px; }
+.playgroundNpcSearchList::-webkit-scrollbar-track { background: transparent; }
+.playgroundNpcSearchList::-webkit-scrollbar-thumb {
+  background: rgba(245, 240, 220, 0.22);
+  border-radius: 3px;
+}
+.playgroundNpcSearchList::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 240, 220, 0.4);
+}
+
+.playgroundNpcSearchList > li { margin: 0; }
+
+.playgroundNpcSearchItem {
+  width: 100%;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #f5f0dc;
+  text-align: left;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.playgroundNpcSearchItem:hover { background: rgba(216, 242, 90, 0.18); }
+
+.playgroundNpcSearchEmpty {
+  padding: 8px;
+  color: rgba(245, 240, 220, 0.55);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}

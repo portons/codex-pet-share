@@ -1,0 +1,133 @@
+.creatorsTable .uploadsRow {
+  grid-template-columns: minmax(260px, 1fr) 120px 120px 120px;
+}
+
+.creatorRow .ownerLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.creatorLeaderboardCell {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+}
+
+.creatorLeaderboardStack {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.leaderRank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.leaderRank.rank1 {
+  border-color: #d6a529;
+  background: #fff4c7;
+  color: #8a5a00;
+}
+
+.leaderRank.rank2 {
+  border-color: #a9adb5;
+  background: #f0f2f5;
+  color: #555b66;
+}
+
+.leaderRank.rank3 {
+  border-color: #b77846;
+  background: #f6dfcc;
+  color: #7a3f17;
+}
+
+.leaderMetricLabel {
+  display: none;
+}
+
+.leaderPets {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 78px;
+}
+
+.leaderPetPreview {
+  width: 72px;
+  height: 78px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.tagPill {
+  transition: background 180ms var(--ease-out), border-color 180ms var(--ease-out),
+    color 180ms var(--ease-out);
+}
+
+.tagPill:hover {
+  border-color: var(--border-strong);
+  color: var(--ink);
+}
+
+.tagPill.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.petTags button,
+.petTags span {
+  background: transparent;
+  height: 24px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.petTags button {
+  cursor: pointer;
+  transition: border-color 180ms var(--ease-out), color 180ms var(--ease-out), background 180ms var(--ease-out);
+}
+
+.petTags button:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-warm);
+  color: var(--ink);
+}
+
+.petTags button.nsfwTag,
+.petTags span.nsfwTag,
+.nsfwNotice {
+  border-color: #9f2d20;
+  background: #ffe3df;
+  color: #7d2118;
+}
+
+.nsfwNotice {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  height: 24px;
+  margin: 0;
+  border: 1px solid #9f2d20;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+}

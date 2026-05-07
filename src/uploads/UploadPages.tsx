@@ -1,0 +1,250 @@
+import { type FormEvent } from "react";
+import { type TagName } from "../domain/config";
+import { formatDate } from "../domain/format";
+import { navigate } from "../domain/routing";
+import type { ContentMode, EditablePetKind, Pet, UploadState, User } from "../domain/types";
+import { EditableKindControls, TagFilters } from "../gallery/GalleryControls";
+import { CyclingPetPreview } from "../pets/PetPreview";
+import { OwnerLabel, PetStats, PetTags } from "../pets/PetMeta";
+import { EmptyState } from "../ui/EmptyState";
+import { Icon } from "../ui/Icon";
+import { SignInGate } from "../ui/SignInGate";
+import { UploadsSkeleton } from "../ui/Skeletons";
+import { Spinner } from "../ui/Spinner";
+import { FileField } from "./FileField";
+import { UploadValidationPreview } from "./UploadValidationPreview";
+
+export function YourUploads({
+  user,
+  pets,
+  loading,
+  deletingPetId,
+  deleteStatus,
+  contentMode,
+  onEditTags,
+  onTagClick,
+  onDownload,
+  onDelete,
+  onSignIn
+}: {
+  user: User | null;
+  pets: Pet[];
+  loading: boolean;
+  deletingPetId: string;
+  deleteStatus: string;
+  contentMode: ContentMode;
+  onEditTags: (pet: Pet) => void;
+  onTagClick: (tag: TagName, sourceTags: string[]) => void;
+  onDownload: (pet: Pet) => void;
+  onDelete: (pet: Pet) => void;
+  onSignIn: () => void;
+}) {
+  if (!user) {
+    return (
+      <section className="surface">
+        <SignInGate label="Sign in to view your uploads." onSignIn={onSignIn} />
+      </section>
+    );
+  }
+
+  return (
+    <section className="surface">
+      <header className="sectionHeader">
+        <div>
+          <p className="metaText">{user.displayName}</p>
+          <h1>Your uploads</h1>
+        </div>
+        <a className="btn btnPrimary" href="#/upload">
+          <Icon name="upload" size={13} />
+          Upload
+        </a>
+      </header>
+      {loading ? (
+        <UploadsSkeleton />
+      ) : pets.length ? (
+        <>
+          <table className="uploadsTable card">
+            <thead className="uploadsHead">
+              <tr>
+                <th scope="col">Package</th>
+                <th scope="col">Owner</th>
+                <th scope="col">Stats</th>
+                <th scope="col">Uploaded</th>
+                <th scope="col" aria-label="Actions" />
+              </tr>
+            </thead>
+            <tbody>
+              {pets.map((pet) => (
+                <tr className="uploadsRow" key={pet.id}>
+                  <td>
+                    <div className="uploadsPackage">
+                      <button className="rowPreview" type="button" onClick={() => navigate(`/pets/${pet.id}`)}>
+                        <CyclingPetPreview pet={pet} size="thumb" transparent />
+                      </button>
+                      <div className="uploadsName">
+                        <h2>{pet.displayName}</h2>
+                        <p>{pet.id}</p>
+                        <PetTags tags={pet.tags} onTagClick={onTagClick} />
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <OwnerLabel pet={pet} className="monoText" />
+                  </td>
+                  <td>
+                    <PetStats pet={pet} />
+                  </td>
+                  <td>
+                    <p className="monoText">{formatDate(pet.uploadedAt)}</p>
+                  </td>
+                  <td>
+                    <div className="rowActions">
+                      <button className="btn btnSm" type="button" onClick={() => navigate(`/pets/${pet.id}`)}>
+                        View
+                      </button>
+                      <button className="btn btnSm" type="button" onClick={() => onEditTags(pet)}>
+                        <Icon name="tag" size={13} />
+                        Tags
+                      </button>
+                      <button
+                        className="btn btnSm"
+                        type="button"
+                        aria-label={`Download ${pet.displayName}`}
+                        onClick={() => onDownload(pet)}
+                      >
+                        <Icon name="download" size={13} />
+                      </button>
+                      <button
+                        className="btn btnSm btnDanger"
+                        type="button"
+                        disabled={Boolean(deletingPetId)}
+                        onClick={() => onDelete(pet)}
+                      >
+                        <Icon name="trash" size={13} />
+                        {deletingPetId === pet.id ? "Deleting" : "Delete"}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {deleteStatus && (
+            <p className="status" role="alert">
+              {deleteStatus}
+            </p>
+          )}
+        </>
+      ) : (
+        <EmptyState text="No uploads yet." />
+      )}
+    </section>
+  );
+}
+
+export function UploadPage({
+  user,
+  uploadState,
+  uploadStatus,
+  uploadBusy,
+  setUploadState,
+  setUploadStatus,
+  onSubmit,
+  onSignIn
+}: {
+  user: User | null;
+  uploadState: UploadState;
+  uploadStatus: string;
+  uploadBusy: boolean;
+  setUploadState: (updater: (current: UploadState) => UploadState) => void;
+  setUploadStatus: (value: string) => void;
+  onSubmit: (event: FormEvent) => void;
+  onSignIn: () => void;
+}) {
+  if (!user) {
+    return (
+      <section className="surface">
+        <SignInGate label="Sign in to upload." onSignIn={onSignIn} />
+      </section>
+    );
+  }
+
+  return (
+    <section className="surface uploadSurface">
+      <header className="sectionHeader">
+        <div>
+          <p className="metaText">New pet</p>
+          <h1>Upload</h1>
+        </div>
+      </header>
+      <form className="uploadForm card" onSubmit={onSubmit}>
+        <FileField
+          accept="application/json,.json"
+          file={uploadState.manifest}
+          help="pet.json"
+          icon="package"
+          label="pet.json"
+          onFile={(file) => setUploadState((current) => ({ ...current, manifest: file }))}
+          onInvalidFile={setUploadStatus}
+        />
+        <FileField
+          accept="image/webp,.webp"
+          file={uploadState.spritesheet}
+          help="spritesheet.webp"
+          icon="sheet"
+          label="spritesheet.webp"
+          onFile={(file) => setUploadState((current) => ({ ...current, spritesheet: file }))}
+          onInvalidFile={setUploadStatus}
+        />
+        <UploadTagPicker
+          tags={uploadState.tags}
+          kind={uploadState.kind}
+          onKind={(kind) => setUploadState((current) => ({ ...current, kind }))}
+          onToggle={(tag) =>
+            setUploadState((current) => ({
+              ...current,
+              tags: current.tags.includes(tag)
+                ? current.tags.filter((value) => value !== tag)
+                : [...current.tags, tag]
+            }))
+          }
+        />
+        <UploadValidationPreview uploadState={uploadState} />
+        <button className="btn btnPrimary btnLg" type="submit" disabled={uploadBusy}>
+          {uploadBusy ? <Spinner size={14} /> : <Icon name="upload" size={14} />}
+          {uploadBusy ? "Uploading" : "Upload pet"}
+        </button>
+      </form>
+      {uploadStatus && (
+        <p className="status" role="alert">
+          {uploadStatus}
+        </p>
+      )}
+    </section>
+  );
+}
+
+function UploadTagPicker({
+  tags,
+  kind,
+  onKind,
+  onToggle
+}: {
+  tags: string[];
+  kind: EditablePetKind;
+  onKind: (kind: EditablePetKind) => void;
+  onToggle: (tag: TagName) => void;
+}) {
+  return (
+    <div className="uploadTags">
+      <div className="uploadTagSection">
+        <span className="fieldLabel">Kind</span>
+        <EditableKindControls value={kind} onChange={onKind} />
+      </div>
+      <div className="uploadTagSection">
+        <span className="fieldLabel">Tags</span>
+        <TagFilters activeTag={tags} onTag={onToggle} />
+      </div>
+    </div>
+  );
+}

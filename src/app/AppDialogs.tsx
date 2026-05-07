@@ -1,0 +1,161 @@
+import type { Dispatch, FormEvent, SetStateAction } from "react";
+import { type AdminCollection } from "../admin/AdminPage";
+import { AuthModal, AccountSettingsModal } from "../auth/AuthModals";
+import { DownloadModal } from "../downloads/DownloadModal";
+import { PetCollectionsModal, TagEditorModal } from "../pets/PetManagementModals";
+import { EntityShareModal, ShareModal } from "../share/ShareModals";
+import type { EditablePetKind, EntityShareTarget, Pet } from "../domain/types";
+import type { TagName } from "../domain/config";
+
+export function AppDialogs({
+  authOpen,
+  authMode,
+  selectAuthMode,
+  displayName,
+  setDisplayName,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  authStatus,
+  authBusy,
+  submitAuth,
+  closeAuth,
+  settingsOpen,
+  settingsDisplayName,
+  setSettingsDisplayName,
+  settingsStatus,
+  settingsBusy,
+  submitSettings,
+  closeSettings,
+  sharingPet,
+  setSharingPet,
+  sharingEntity,
+  setSharingEntity,
+  downloadPet,
+  setDownloadPet,
+  tagEditorPet,
+  tagEditorTags,
+  tagEditorKind,
+  tagEditorStatus,
+  tagEditorBusy,
+  setTagEditorKind,
+  toggleTagEditorTag,
+  submitTagEditor,
+  closeTagEditor,
+  collectionEditorPet,
+  adminCollections,
+  collectionEditorSlugs,
+  collectionEditorStatus,
+  collectionEditorBusy,
+  toggleCollectionEditorSlug,
+  submitCollectionEditor,
+  closeCollectionEditor
+}: {
+  authOpen: boolean;
+  authMode: "login" | "register";
+  selectAuthMode: (next: "login" | "register") => void;
+  displayName: string;
+  setDisplayName: Dispatch<SetStateAction<string>>;
+  email: string;
+  setEmail: Dispatch<SetStateAction<string>>;
+  password: string;
+  setPassword: Dispatch<SetStateAction<string>>;
+  authStatus: string;
+  authBusy: boolean;
+  submitAuth: (event: FormEvent) => void | Promise<void>;
+  closeAuth: () => void;
+  settingsOpen: boolean;
+  settingsDisplayName: string;
+  setSettingsDisplayName: Dispatch<SetStateAction<string>>;
+  settingsStatus: string;
+  settingsBusy: boolean;
+  submitSettings: (event: FormEvent) => void | Promise<void>;
+  closeSettings: () => void;
+  sharingPet: Pet | null;
+  setSharingPet: Dispatch<SetStateAction<Pet | null>>;
+  sharingEntity: EntityShareTarget | null;
+  setSharingEntity: Dispatch<SetStateAction<EntityShareTarget | null>>;
+  downloadPet: Pet | null;
+  setDownloadPet: Dispatch<SetStateAction<Pet | null>>;
+  tagEditorPet: Pet | null;
+  tagEditorTags: string[];
+  tagEditorKind: EditablePetKind;
+  tagEditorStatus: string;
+  tagEditorBusy: boolean;
+  setTagEditorKind: Dispatch<SetStateAction<EditablePetKind>>;
+  toggleTagEditorTag: (tag: TagName) => void;
+  submitTagEditor: (event: FormEvent) => void | Promise<void>;
+  closeTagEditor: () => void;
+  collectionEditorPet: Pet | null;
+  adminCollections: AdminCollection[];
+  collectionEditorSlugs: string[];
+  collectionEditorStatus: string;
+  collectionEditorBusy: boolean;
+  toggleCollectionEditorSlug: (slug: string) => void;
+  submitCollectionEditor: (event: FormEvent) => void | Promise<void>;
+  closeCollectionEditor: () => void;
+}) {
+  return (
+    <>
+      {authOpen && (
+        <AuthModal
+          mode={authMode}
+          setMode={selectAuthMode}
+          displayName={displayName}
+          setDisplayName={setDisplayName}
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          status={authStatus}
+          busy={authBusy}
+          onSubmit={submitAuth}
+          onClose={closeAuth}
+        />
+      )}
+
+      {settingsOpen && (
+        <AccountSettingsModal
+          displayName={settingsDisplayName}
+          setDisplayName={setSettingsDisplayName}
+          status={settingsStatus}
+          busy={settingsBusy}
+          onSubmit={submitSettings}
+          onClose={closeSettings}
+        />
+      )}
+
+      {sharingPet && <ShareModal pet={sharingPet} onClose={() => setSharingPet(null)} />}
+      {sharingEntity && <EntityShareModal target={sharingEntity} onClose={() => setSharingEntity(null)} />}
+      {downloadPet && <DownloadModal pet={downloadPet} onClose={() => setDownloadPet(null)} />}
+
+      {tagEditorPet && (
+        <TagEditorModal
+          pet={tagEditorPet}
+          tags={tagEditorTags}
+          kind={tagEditorKind}
+          status={tagEditorStatus}
+          busy={tagEditorBusy}
+          onKind={setTagEditorKind}
+          onToggle={toggleTagEditorTag}
+          onSubmit={submitTagEditor}
+          onClose={closeTagEditor}
+        />
+      )}
+
+      {collectionEditorPet && (
+        <PetCollectionsModal
+          pet={collectionEditorPet}
+          collections={adminCollections}
+          selectedSlugs={collectionEditorSlugs}
+          status={collectionEditorStatus}
+          busy={collectionEditorBusy}
+          onToggle={toggleCollectionEditorSlug}
+          onSubmit={submitCollectionEditor}
+          onClose={closeCollectionEditor}
+        />
+      )}
+    </>
+  );
+}

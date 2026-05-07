@@ -1,0 +1,174 @@
+/* "N LIVE" chip — appears next to the pet count when the collection
+   room has active members. Snapshot at page-load, not auto-updated.
+   The previous green-on-cream pill clashed with the rust-orange
+   palette; this version stays inside the warm family by using the
+   accent's softened cream as the pill ground and accent-deep for
+   text/border. The dot uses the full rust accent and breathes via a
+   transform+opacity pulse on a pseudo-element (no box-shadow glow,
+   hardware-accelerated). */
+.collectionCardLive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 2px 7px;
+  border-radius: 999px;
+  background: rgba(247, 226, 200, 0.55);
+  border: 1px solid rgba(177, 90, 22, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  color: var(--accent-deep, #8a4a16);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+/* Larger variant used in the detail-page header subhead row, where the
+   surrounding type is bigger so a 10px chip would feel orphaned. */
+.collectionCardLive[data-size="lg"] {
+  padding: 3px 10px 3px 9px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  gap: 7px;
+}
+
+.collectionCardLiveDot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent, #d97a18);
+  flex: 0 0 auto;
+}
+
+.collectionCardLive[data-size="lg"] .collectionCardLiveDot {
+  width: 7px;
+  height: 7px;
+}
+
+/* Halo: a second rust disc that scales up and fades out on a 1.8s
+   loop, so the dot reads as "live / heartbeat" without the cliché
+   neon glow ban. */
+.collectionCardLiveDot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent, #d97a18);
+  opacity: 0.5;
+  transform-origin: center;
+  animation: collectionLivePulse 1.8s ease-out infinite;
+}
+
+@keyframes collectionLivePulse {
+  0%   { transform: scale(1);    opacity: 0.5; }
+  70%  { transform: scale(2.4);  opacity: 0;   }
+  100% { transform: scale(2.4);  opacity: 0;   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collectionCardLiveDot::before {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Overlay placement on the card preview. Absolutely positioned so the
+   footer geometry stays identical for every card whether a live chip is
+   present or not — the user explicitly called out the "broken card"
+   when one card was taller than its neighbours. Top-right corner of
+   the card body, with a tiny inset gap so it never collides with the
+   pet thumbs. pointer-events:none keeps the underlying anchor link
+   reachable through the chip. */
+.collectionCard {
+  position: relative;
+}
+
+.collectionCardLiveOverlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  /* Slightly stronger materiality than the inline chip — it floats
+     over the preview, so a touch more contrast helps it read. */
+  background: rgba(255, 244, 222, 0.92);
+  border-color: rgba(177, 90, 22, 0.32);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  /* Interactive: clicking the pill jumps straight to the playground.
+     Strip default anchor/button chrome and use the chip's own visual
+     language for hover/active. */
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--font-mono);
+  transition:
+    background 140ms var(--ease-out),
+    border-color 140ms var(--ease-out),
+    transform 140ms var(--ease-out),
+    box-shadow 140ms var(--ease-out);
+}
+
+.collectionCardLiveOverlay:hover,
+.collectionCardLiveOverlay:focus-visible {
+  background: var(--accent-deep, #b15a16);
+  border-color: var(--accent-deep, #b15a16);
+  color: var(--surface, #fbf6e6);
+  outline: none;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px -10px rgba(177, 90, 22, 0.55);
+}
+
+.collectionCardLiveOverlay:hover .collectionCardLiveDot,
+.collectionCardLiveOverlay:focus-visible .collectionCardLiveDot {
+  background: var(--surface, #fbf6e6);
+}
+
+.collectionCardLiveOverlay:hover .collectionCardLiveDot::before,
+.collectionCardLiveOverlay:focus-visible .collectionCardLiveDot::before {
+  background: var(--surface, #fbf6e6);
+}
+
+.collectionCardLiveOverlay:active {
+  transform: translateY(0);
+}
+
+/* Reset native button chrome when the chip renders as a <button>. */
+button.collectionCardLiveOverlay {
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Detail-page subhead: pet count and the live chip co-exist on a
+   single line, with a hairline separator between them so the chip
+   reads as adjacent metadata, not crammed against the count. */
+.collectionDetailSubhead {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.collectionDetailSubhead > span:first-child {
+  /* Subtle vertical separator — only shows when the chip exists. */
+  position: relative;
+  padding-right: 12px;
+}
+
+.collectionDetailSubhead .collectionCardLive {
+  /* Pull the chip up by half a line-height so its centre aligns with
+     the optical centre of the surrounding subhead text. */
+  transform: translateY(-1px);
+}
+
+.collectionDetailSubhead > span:first-child:has(+ .collectionCardLive)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 25%;
+  bottom: 25%;
+  width: 1px;
+  background: rgba(140, 110, 60, 0.32);
+}

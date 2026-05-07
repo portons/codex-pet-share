@@ -1,0 +1,150 @@
+/* Sprite */
+.checker {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(216, 242, 90, 0.24), transparent 58%),
+    radial-gradient(circle at 50% 82%, rgba(16, 16, 15, 0.06), transparent 60%),
+    linear-gradient(180deg, #fffdf5, var(--surface-warm));
+  background-color: var(--tile-bg);
+}
+
+.previewSurface {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(216, 242, 90, 0.24), transparent 58%),
+    radial-gradient(circle at 50% 82%, rgba(16, 16, 15, 0.06), transparent 60%),
+    linear-gradient(180deg, #fffdf5, var(--surface-warm));
+  background-color: var(--tile-bg);
+}
+
+.spriteFrame {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background-color: var(--tile-bg);
+}
+
+.spriteFrame.transparent {
+  border-color: transparent;
+  background: transparent;
+}
+
+.spriteFrame.thumb {
+  width: 72px;
+  height: 78px;
+  border-radius: var(--radius-xs);
+}
+
+.spriteFrame.small {
+  width: 96px;
+  height: 104px;
+  border-radius: var(--radius-sm);
+}
+
+.spriteFrame.medium {
+  width: 160px;
+  height: 174px;
+  border-radius: var(--radius-sm);
+}
+
+.spriteFrame.large {
+  width: 200px;
+  height: 217px;
+  border-radius: var(--radius-md);
+}
+
+.sprite {
+  width: 192px;
+  height: 208px;
+  background-repeat: no-repeat;
+  background-position: 0 var(--sprite-y);
+  background-size: 1536px 1872px;
+  image-rendering: pixelated;
+  animation: sprite-play var(--sprite-duration) steps(var(--sprite-frames)) infinite;
+  will-change: background-position;
+}
+
+.previewStrip {
+  width: 96px;
+  height: 104px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto 104px;
+  image-rendering: pixelated;
+  animation: preview-strip-play var(--preview-duration) steps(var(--preview-frames)) infinite;
+}
+
+.previewStripFrame.medium .previewStrip {
+  transform: scale(1.667);
+  transform-origin: top left;
+}
+
+.previewStripFrame.large .previewStrip {
+  transform: scale(2.083);
+  transform-origin: top left;
+}
+
+.previewStripFrame.small .previewStrip {
+  transform-origin: top left;
+}
+
+.previewStripFrame.thumb .previewStrip {
+  transform: scale(0.75);
+  transform-origin: top left;
+}
+
+.thumb .sprite {
+  transform: scale(0.375);
+  transform-origin: top left;
+}
+
+.small .sprite {
+  transform: scale(0.5);
+  transform-origin: top left;
+}
+
+.medium .sprite {
+  transform: scale(0.833);
+  transform-origin: top left;
+}
+
+.large .sprite {
+  transform: scale(1);
+  transform-origin: top left;
+}
+
+/* Section header */
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 56px 0 24px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.sectionHeader > div {
+  display: grid;
+  gap: 8px;
+}
+
+.sectionHeader h1 {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: clamp(32px, 4vw, 48px);
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  color: var(--ink);
+}
+
+.sectionHeader .metaText {
+  margin: 0;
+}
+
+.sectionSubhead {
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0;
+}

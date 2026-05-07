@@ -1,0 +1,169 @@
+.petSwapSectionMore {
+  margin: 6px 0 0;
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: rgba(86, 56, 22, 0.55);
+  text-align: right;
+  font-style: italic;
+}
+
+.petSwapGrid {
+  /* Multi-row grid with strictly equal column widths. The previous
+     `repeat(4, 1fr)` produced visibly different tile widths because the
+     default min-track-size is `min-content` — long names like "American
+     Shorthair" stretched their column. `minmax(0, 1fr)` forces tracks to
+     shrink past min-content, letting the name's `text-overflow: ellipsis`
+     do its job and keeping every tile identical. */
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+/* Tile = miniature card-sleeve cell. Inset cream interior with a
+   subtle inner shadow giving "pocket" depth, and a faint rotation
+   hint on hover so it feels physical. */
+.petSwapTile {
+  /* min-width:0 lets the grid's minmax(0, 1fr) actually shrink the tile
+     past its intrinsic content size — without this the long-name tiles
+     hold the whole row open and the visible column widths drift. */
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 3px 4px;
+  background: linear-gradient(180deg, rgba(255, 250, 235, 0.85), rgba(255, 240, 210, 0.55));
+  border: 1px solid rgba(140, 110, 60, 0.18);
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--ink, #2c1f10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(140, 110, 60, 0.08);
+  transition:
+    background 140ms var(--ease-out),
+    border-color 140ms var(--ease-out),
+    transform 140ms var(--ease-out),
+    box-shadow 140ms var(--ease-out);
+}
+
+.petSwapTile:hover:not(:disabled),
+.petSwapTile:focus-visible:not(:disabled) {
+  background: linear-gradient(180deg, rgba(255, 233, 214, 0.95), rgba(255, 215, 175, 0.7));
+  border-color: var(--accent-deep, #b15a16);
+  outline: none;
+  transform: translateY(-1px) rotate(-0.4deg);
+  box-shadow:
+    0 6px 14px -8px rgba(177, 90, 22, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.petSwapTile:active:not(:disabled) {
+  transform: translateY(0) rotate(0deg);
+}
+
+.petSwapTile:disabled {
+  cursor: not-allowed;
+}
+
+.petSwapTile:disabled:not([data-active]) {
+  opacity: 0.4;
+  filter: saturate(0.7);
+}
+
+/* Active = "currently in play". Stronger orange edge + a tiny corner
+   notch (top-right) so it reads as a tabbed/dog-eared card. */
+.petSwapTile[data-active] {
+  border-color: var(--accent-deep, #b15a16);
+  background: linear-gradient(180deg, rgba(255, 220, 180, 0.95), rgba(255, 200, 140, 0.7));
+  box-shadow:
+    0 0 0 1px var(--accent-deep, #b15a16),
+    0 6px 14px -8px rgba(177, 90, 22, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.petSwapTile[data-active]::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 7px 7px 0;
+  border-color: transparent var(--accent-deep, #b15a16) transparent transparent;
+  border-top-right-radius: 7px;
+}
+
+/* Tile frame: cream cell that holds the sprite. The sprite floats
+   above a soft elliptical shadow so it reads like a figure on a
+   spotlit display, not a clipped corner of an atlas. */
+.petSwapTileFrame {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  background:
+    radial-gradient(60% 22% at 50% 92%, rgba(86, 56, 22, 0.18), transparent 70%),
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.5), transparent 60%);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.petSwapTileSprite {
+  display: block;
+  width: 36px;
+  height: 39px; /* preserves 192:208 cell aspect */
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 288px auto; /* 36px × 8 cols */
+  image-rendering: pixelated;
+}
+
+.petSwapTileName {
+  margin-top: 1px;
+  padding: 0 2px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  text-align: center;
+  color: rgba(86, 56, 22, 0.85);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.petSwapTile[data-active] .petSwapTileName {
+  color: var(--accent-deep, #8a4a16);
+  font-weight: 700;
+}
+
+.playgroundHeaderIconBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Inline spinner used inside buttons (Closing…, Opening…) so the action
+   has a clear "in flight" cue instead of feeling frozen. */
+.btnSpinner {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 6px;
+  vertical-align: -1px;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: btnSpin 720ms linear infinite;
+}
+
+@keyframes btnSpin {
+  to { transform: rotate(360deg); }
+}

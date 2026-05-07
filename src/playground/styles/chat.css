@@ -1,0 +1,311 @@
+/* ── Chat ribbon ──────────────────────────────────────────────────
+   Paper-prompt feel: cream interior, monospace caret, warm rust
+   accents on focus. Sits at the bottom of the playground modal as a
+   single horizontal ribbon — three slots (caret + input | emoji |
+   send) divided by hairline rules so the row reads like a labeled
+   terminal prompt rather than a generic input + button. */
+
+.playgroundChatBar {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-top: 12px;
+  border: 1px solid rgba(140, 110, 60, 0.28);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255, 250, 235, 0.92), rgba(255, 240, 210, 0.65));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -1px 0 rgba(140, 110, 60, 0.06);
+  /* overflow:visible so the emoji popover can escape upward past the
+     chat bar's rounded edge. */
+  transition: border-color 180ms var(--ease-out),
+              box-shadow 180ms var(--ease-out),
+              background 180ms var(--ease-out);
+}
+
+.playgroundChatBar:focus-within {
+  border-color: var(--accent-deep, #b15a16);
+  background: linear-gradient(180deg, rgba(255, 245, 225, 0.95), rgba(255, 230, 195, 0.7));
+  box-shadow:
+    0 0 0 3px rgba(217, 122, 24, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Decorative leading prompt — same `›` typewriter mark as the swap
+   menu search slot, ties the two chrome elements together. */
+.playgroundChatPrompt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(140, 110, 60, 0.55);
+  pointer-events: none;
+  user-select: none;
+  transition: color 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+
+.playgroundChatBar:focus-within .playgroundChatPrompt {
+  color: var(--accent-deep, #b15a16);
+  transform: translateX(1px);
+}
+
+/* Old terminal-prompt rules superseded by the new ribbon (the
+   prompt is now an inline <span> the JSX renders, and the focus ring
+   moved up to the wrapper above). */
+
+.playgroundChatInput {
+  flex: 1;
+  height: 38px;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 8px 0 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  outline: none;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  caret-color: var(--accent-deep, #b15a16);
+}
+
+.playgroundChatInput::placeholder {
+  color: rgba(140, 110, 60, 0.5);
+  font-style: italic;
+}
+
+/* Emoji picker — sits between the chat input and Send button. The
+   popover floats above the chat bar so it doesn't push layout. */
+.playgroundEmojiWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.playgroundEmojiBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 38px;
+  border: none;
+  border-left: 1px dashed rgba(140, 110, 60, 0.32);
+  background: transparent;
+  color: rgba(140, 110, 60, 0.55);
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+
+.playgroundEmojiBtn:hover,
+.playgroundEmojiBtn:focus-visible {
+  background: rgba(255, 233, 214, 0.55);
+  color: var(--accent-deep, #b15a16);
+  outline: none;
+  transform: scale(1.06);
+}
+
+.playgroundEmojiBtn[data-active] {
+  background: var(--accent-soft, #ffe9d6);
+  color: var(--accent-deep, #b15a16);
+}
+
+.playgroundEmojiPopover {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: -8px;
+  z-index: 14;
+  border-radius: 14px;
+  background: #fbf6e6;
+  padding: 4px;
+  border: 1px solid rgba(140, 110, 60, 0.22);
+  box-shadow:
+    0 22px 46px -18px rgba(86, 56, 22, 0.36),
+    0 8px 22px -12px rgba(86, 56, 22, 0.24),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  animation: petSwapMenuIn 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Decorative arrow tail under the popover so it visually anchors to
+   the emoji button below it. */
+.playgroundEmojiPopover::after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  right: 18px;
+  width: 12px;
+  height: 12px;
+  background: #fbf6e6;
+  border-right: 1px solid rgba(140, 110, 60, 0.22);
+  border-bottom: 1px solid rgba(140, 110, 60, 0.22);
+  transform: rotate(45deg);
+}
+
+/* Theme emoji-picker-react with the playground's cream + orange-rust
+   palette. Library uses --epr-* custom properties; we also reach in
+   for a few class selectors to soften the search slot, the category
+   nav, and the section headers so the picker reads as part of the
+   pocketbook system rather than a stock dropdown. */
+.playgroundEmojiPopover .EmojiPickerReact {
+  --epr-emoji-size: 24px;
+  --epr-emoji-padding: 5px;
+  --epr-bg-color: #fbf6e6;
+  --epr-category-label-bg-color: #fbf6e6;
+  --epr-picker-border-color: transparent;
+  --epr-search-border-color: rgba(140, 110, 60, 0.32);
+  --epr-search-bg-color: rgba(255, 250, 235, 0.6);
+  --epr-search-input-bg-color: rgba(255, 250, 235, 0.6);
+  --epr-search-input-bg-color-active: rgba(255, 245, 225, 0.95);
+  --epr-search-input-placeholder-color: rgba(140, 110, 60, 0.5);
+  --epr-search-input-text-color: #2c1f10;
+  --epr-hover-bg-color: rgba(255, 233, 214, 0.85);
+  --epr-focus-bg-color: rgba(255, 215, 175, 0.9);
+  --epr-highlight-color: var(--accent-deep, #b15a16);
+  --epr-text-color: #2c1f10;
+  --epr-category-icon-active-color: var(--accent-deep, #b15a16);
+  --epr-active-skin-tone-indicator-border-color: var(--accent-deep, #b15a16);
+  --epr-category-navigation-button-size: 28px;
+  --epr-header-padding: 8px 8px 6px;
+  --epr-horizontal-padding: 8px;
+  font-family: var(--font-mono) !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* Search slot: pill-shaped, leading magnifier hidden, mono italic. */
+.playgroundEmojiPopover .EmojiPickerReact .epr-search-container input.epr-search {
+  border-radius: 8px !important;
+  border: 1px solid rgba(140, 110, 60, 0.32) !important;
+  padding-left: 28px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  letter-spacing: 0.02em;
+  color: #2c1f10 !important;
+}
+.playgroundEmojiPopover .EmojiPickerReact .epr-search-container input.epr-search::placeholder {
+  font-style: italic;
+}
+.playgroundEmojiPopover .EmojiPickerReact .epr-search-container input.epr-search:focus {
+  border-color: var(--accent-deep, #b15a16) !important;
+  box-shadow: 0 0 0 3px rgba(217, 122, 24, 0.18) !important;
+}
+.playgroundEmojiPopover .EmojiPickerReact .epr-icn-search {
+  filter: brightness(0.6) saturate(2) hue-rotate(335deg);
+}
+
+/* Category nav row: warm divider under it + active icon gets a small
+   pill so the active state reads like a tabbed file. */
+.playgroundEmojiPopover .EmojiPickerReact .epr-category-nav {
+  border-bottom: 1px dashed rgba(140, 110, 60, 0.32);
+  margin: 0 4px;
+  padding: 4px 0 6px !important;
+}
+.playgroundEmojiPopover .EmojiPickerReact .epr-cat-btn {
+  border-radius: 6px !important;
+  transition: background 120ms ease;
+}
+.playgroundEmojiPopover .EmojiPickerReact .epr-cat-btn:hover {
+  background: rgba(255, 233, 214, 0.6) !important;
+}
+.playgroundEmojiPopover .EmojiPickerReact .epr-cat-btn.epr-active {
+  background: var(--accent-soft, #ffe9d6) !important;
+}
+
+/* Section labels: monospace caps with a leading rust rule, matching
+   the swap-menu pocketbook section labels. */
+.playgroundEmojiPopover .EmojiPickerReact .epr-emoji-category-label {
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  color: rgba(86, 56, 22, 0.7) !important;
+  background: linear-gradient(180deg, #fbf6e6 70%, rgba(251, 246, 230, 0.9)) !important;
+  padding: 8px 10px 4px !important;
+  position: relative;
+}
+.playgroundEmojiPopover .EmojiPickerReact .epr-emoji-category-label::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 1px;
+  background: rgba(177, 90, 22, 0.5);
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Emoji buttons: subtle rounded hover/focus that matches our tile
+   treatment instead of the stock blue ring. */
+.playgroundEmojiPopover .EmojiPickerReact .epr-emoji-img,
+.playgroundEmojiPopover .EmojiPickerReact button.epr-emoji {
+  border-radius: 6px !important;
+}
+.playgroundEmojiPopover .EmojiPickerReact button.epr-emoji:focus-visible {
+  outline: 2px solid var(--accent-deep, #b15a16) !important;
+  outline-offset: -2px !important;
+}
+
+/* Custom scrollbar in the picker body to match the popover. */
+.playgroundEmojiPopover .EmojiPickerReact .epr-body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(177, 90, 22, 0.35) transparent;
+}
+.playgroundEmojiPopover .EmojiPickerReact .epr-body::-webkit-scrollbar { width: 6px; }
+.playgroundEmojiPopover .EmojiPickerReact .epr-body::-webkit-scrollbar-track { background: transparent; }
+.playgroundEmojiPopover .EmojiPickerReact .epr-body::-webkit-scrollbar-thumb {
+  background: rgba(177, 90, 22, 0.32);
+  border-radius: 3px;
+}
+
+.playgroundEmojiLoading {
+  width: 304px;
+  height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(86, 56, 22, 0.55);
+}
+
+.playgroundChatSend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 38px;
+  border: none;
+  border-left: 1px dashed rgba(140, 110, 60, 0.32);
+  background: rgba(255, 240, 210, 0.55);
+  color: var(--accent-deep, #8a4a16);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0 9px 9px 0;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.playgroundChatSend:hover,
+.playgroundChatSend:focus-visible {
+  background: var(--accent-deep, #b15a16);
+  color: #fff7e3;
+  outline: none;
+}
+
+.playgroundChatSend kbd {
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.7;
+  padding: 1px 4px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  letter-spacing: 0;
+}

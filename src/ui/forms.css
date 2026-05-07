@@ -1,0 +1,337 @@
+/* Import command — dark accent block */
+.importCommand {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 0;
+  max-width: 760px;
+  margin-top: 4px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  box-shadow: 0 14px 32px -22px rgba(15, 15, 14, 0.5);
+}
+
+.commandLine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  height: 48px;
+  background: var(--ink);
+  color: var(--subtle);
+  padding: 0 18px;
+  border: 0;
+}
+
+.commandLine .icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.commandLine code {
+  overflow: hidden;
+  min-width: 0;
+  color: #e8e6e0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.importCommand .btn {
+  height: 48px;
+  border-radius: 0;
+  border: 0;
+  border-left: 1px solid #2a2926;
+  background: var(--ink);
+  color: #e8e6e0;
+  padding: 0 18px;
+  font-size: 12px;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+.importCommand .btn:hover:not(:disabled) {
+  background: #1f1f1c;
+  color: var(--accent);
+  border-color: #2a2926;
+}
+
+/* Validation card */
+.validationCard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.validationCard.compact {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 0;
+}
+
+.validationCard div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 16px;
+  background: transparent;
+  border-right: 1px solid var(--border-soft);
+}
+
+.validationCard div:last-child {
+  border-right: 0;
+}
+
+.validationCard span {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.validationCard strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  font-feature-settings: "tnum", "zero";
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.validationCard.compact div {
+  gap: 6px;
+  padding: 14px 16px;
+}
+
+/* Status */
+.status {
+  margin: 12px 0 0;
+  color: #b91c1c;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+/* Modal */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: rgba(15, 15, 14, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 24px;
+  animation: fade-in 220ms var(--ease-out);
+}
+
+.authModal {
+  position: relative;
+  width: min(420px, 100%);
+  padding: 32px 28px 24px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-modal);
+  border: 1px solid var(--border);
+  animation: modal-in 320ms var(--ease-spring);
+}
+
+.modalHeader,
+.authTabs {
+  display: flex;
+  gap: 0;
+}
+
+.modalHeader {
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 22px;
+  padding-right: 86px;
+}
+
+.modalCloseButton {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+}
+
+.authTabs {
+  gap: 6px;
+  padding: 4px;
+  background: var(--surface-soft);
+  border-radius: var(--radius-sm);
+}
+
+.authTabs .btn {
+  height: 28px;
+  padding: 0 14px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-xs);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  box-shadow: none;
+}
+
+.authTabs .btn:hover:not(:disabled) {
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+}
+
+.authTabs .btnPrimary {
+  background: var(--surface);
+  color: var(--ink);
+  border: 0;
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
+}
+
+.authTabs .btnPrimary:hover:not(:disabled) {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.modalTitle {
+  margin-bottom: 22px;
+}
+
+.modalTitle.compact {
+  margin-bottom: 0;
+}
+
+.modalTitle .metaText {
+  margin: 0 0 6px;
+}
+
+.modalTitle h2 {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 28px;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  color: var(--ink);
+}
+
+.stackForm {
+  display: grid;
+  gap: 14px;
+}
+
+.adminActions {
+  display: grid;
+  gap: 8px;
+}
+
+.adminPage {
+  gap: 18px;
+}
+
+.adminSection {
+  display: grid;
+  gap: 12px;
+}
+
+.adminSectionHeader h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.adminCollectionList {
+  display: grid;
+  gap: 14px;
+}
+
+.adminCollectionForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.35fr);
+  gap: 12px;
+  padding: 16px;
+}
+
+.adminCollectionForm label {
+  display: grid;
+  gap: 7px;
+}
+
+.adminCollectionForm label:has(textarea) {
+  grid-column: 1 / -1;
+}
+
+.adminCollectionForm .rowActions {
+  grid-column: 1 / -1;
+}
+
+.collectionCheckboxList {
+  display: grid;
+  gap: 8px;
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.collectionCheckbox {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-warm);
+  padding: 10px;
+}
+
+.collectionCheckbox span {
+  display: grid;
+  min-width: 0;
+}
+
+.collectionCheckbox strong,
+.collectionCheckbox small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collectionCheckbox small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.stackForm label,
+.stackField {
+  display: grid;
+  gap: 7px;
+}
+
+.modalFootnote {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+  text-align: center;
+}

@@ -1,0 +1,41 @@
+/* Admin / moderation bar */
+.detailAdminBar {
+  display: grid;
+  gap: 8px;
+  padding: 18px 24px;
+  background: var(--surface-warm);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+}
+
+/* Cursor preview overlay */
+.cursorPetPreview {
+  position: fixed;
+  z-index: 80;
+  pointer-events: none;
+  transform: rotate(var(--cursor-rotation, 0deg));
+  transform-origin: 50% 80%;
+  transition: transform 150ms var(--ease-out);
+  filter: drop-shadow(0 12px 20px rgba(15, 15, 14, 0.18));
+}
+
+.cursorPetLoader {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 65% 35%, rgba(216, 242, 90, 0.48), transparent 42%),
+    rgba(248, 246, 240, 0.94);
+  color: var(--ink);
+  box-shadow: 0 12px 24px rgba(16, 16, 15, 0.12);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .detailWalkButton,
+  .cursorPetPreview {
+    display: none;
+  }
+}

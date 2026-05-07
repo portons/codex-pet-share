@@ -1,0 +1,131 @@
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 36px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--foreground);
+  padding: 0 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: background 180ms var(--ease-out), border-color 180ms var(--ease-out),
+    color 180ms var(--ease-out), transform 80ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--ink);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--surface);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.btnPrimary:hover:not(:disabled) {
+  border-color: var(--ink);
+  background: #1f1f1c;
+  color: var(--surface);
+}
+
+.btnGhost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+}
+
+.btnGhost:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.btn.activeSoft,
+.likeButton.active {
+  border-color: var(--accent-deep);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+.btnDanger {
+  border-color: #e6b5aa;
+  color: #9f2f22;
+}
+
+.btnDanger:hover:not(:disabled) {
+  border-color: #9f2f22;
+  background: #fff3f0;
+  color: #7f1d1d;
+}
+
+.btnSm {
+  height: 30px;
+  padding: 0 11px;
+  font-size: 12px;
+}
+
+.btnLg {
+  height: 42px;
+  padding: 0 18px;
+  font-size: 13.5px;
+  border-radius: var(--radius-md);
+}
+
+.icon {
+  flex: 0 0 auto;
+}
+
+/* Inputs */
+.input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  background: var(--surface);
+  color: var(--foreground);
+  padding: 0 14px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  transition: border-color 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+
+.input:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(15, 15, 14, 0.06);
+}
+
+.input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.input::placeholder {
+  color: var(--subtle);
+}
+
+.inputLg {
+  height: 46px;
+  font-size: 15px;
+}

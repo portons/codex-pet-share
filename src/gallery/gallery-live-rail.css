@@ -1,0 +1,389 @@
+/* Live Collections Rail (gallery home, sidebar layout).
+   Fixed in the right gutter on roomy viewports. Hidden below 1280px
+   to avoid overlapping the gallery (the rail is a peripheral signal
+   — the gallery is the primary surface, so we don't fight for space
+   with it on smaller screens). On wide viewports, the rail sits in
+   the natural gutter space outside the 1080px content column. */
+.liveCollectionsRail {
+  /* Hidden by default; revealed on viewports with gutter space. */
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .liveCollectionsRail {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: fixed;
+    /* Anchor to the right edge of the 1080px content column, then
+       offset 16px further into the gutter. (100vw - 1080)/2 - 16
+       lands the rail just outside the column without overlapping. */
+    right: max(16px, calc((100vw - 1080px) / 2 - 240px));
+    top: 96px;
+    width: 224px;
+    max-height: calc(100vh - 120px);
+    padding: 12px 12px 10px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid var(--border-soft, #efede5);
+    border-radius: 14px;
+    /* Diffusion shadow tinted toward the warm background — never a
+       cold neutral drop shadow that would feel grafted in. */
+    box-shadow: 0 18px 42px -28px rgba(96, 76, 38, 0.32);
+    /* Subtle backdrop softness so the rail picks up some of the
+       surface warmth behind it without being a full glassmorphism
+       cliché — plus a 1px inner highlight to suggest edge refraction. */
+    backdrop-filter: saturate(110%) blur(6px);
+    -webkit-backdrop-filter: saturate(110%) blur(6px);
+    z-index: 4;
+    overflow: auto;
+    scrollbar-width: thin;
+  }
+}
+
+/* When the gutter is wider, push the rail farther out so it doesn't
+   crowd the right edge of the gallery. Anchored relative to the
+   1280px breakpoint where it first appears. */
+@media (min-width: 1440px) {
+  .liveCollectionsRail {
+    right: max(24px, calc((100vw - 1080px) / 2 - 256px));
+  }
+}
+
+/* Caption — uppercase mono, the dot is the only chromatic element. */
+.liveCollectionsRailCaption {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  padding: 0 2px;
+  color: var(--muted-strong, #4a4944);
+}
+
+.liveCollectionsRailDot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent, #d97a18);
+  flex: 0 0 auto;
+}
+
+.liveCollectionsRailDot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent, #d97a18);
+  opacity: 0.5;
+  animation: collectionLivePulse 1.8s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liveCollectionsRailDot::before { animation: none; opacity: 0; }
+}
+
+.liveCollectionsRailList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Each row is a thin horizontal pill — avatar stack, name + count,
+   trailing arrow. Borders only appear on hover so the resting state
+   stays as quiet as possible. */
+.liveCollectionsRailRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 8px 8px 6px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  text-align: left;
+  text-decoration: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  width: 100%;
+  transition:
+    background 160ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color 160ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.liveCollectionsRailRow:hover,
+.liveCollectionsRailRow:focus-visible {
+  outline: none;
+  background: rgba(247, 226, 200, 0.45);
+  border-color: rgba(177, 90, 22, 0.22);
+}
+
+/* Avatar stack: 2 thumbs at 36px, overlapping by 14px. Pets stay
+   small enough to stay subordinate to the typography. */
+.liveCollectionsRailAvatars {
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 36px;
+  width: 58px;
+  position: relative;
+}
+
+.liveCollectionsRailAvatarSlot {
+  display: inline-flex;
+  position: absolute;
+  top: 0;
+  left: calc(var(--slot-index, 0) * 22px);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--surface-soft, #efede5);
+  border: 1.5px solid var(--surface, #ffffff);
+  z-index: calc(10 - var(--slot-index, 0));
+}
+
+/* Override the cycling preview's thumb dimensions inside the avatar
+   slot — we want a static 36x36 round crop, not a 72x78 looping
+   strip. */
+.liveCollectionsRailAvatarSlot .previewStripFrame.thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-soft, #efede5);
+}
+
+/* Stop the looping animation: pets in the rooms preview hold the
+   first frame so the rail stays calm. The accent dot and arrow are
+   the only motion in this region. */
+.liveCollectionsRailAvatarSlot .previewStripFrame.thumb .previewStrip {
+  animation: none;
+  /* The previewStrip is 96x104 with an 8-frame horizontal
+     spritesheet; scale 0.375 lands frame 0 at 36x39, which fits the
+     round crop with the bottom-strip clipped by overflow:hidden. */
+  transform: scale(0.375);
+  transform-origin: top left;
+  background-position: 0 0 !important;
+}
+
+.liveCollectionsRailMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.liveCollectionsRailName {
+  font-family: var(--font-display, "Cabinet Grotesk", system-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--ink, #0f0f0e);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.liveCollectionsRailSub {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--muted, #6f6f69);
+  font-variant-numeric: tabular-nums;
+}
+
+.liveCollectionsRailCount {
+  color: var(--accent-deep, #8a4a16);
+  font-weight: 700;
+}
+
+.liveCollectionsRailWord {
+  /* Lowercase, lighter — the count is the load-bearing token. */
+  color: var(--muted, #6f6f69);
+  font-weight: 500;
+}
+
+.liveCollectionsRailArrow {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 14px;
+  color: var(--muted, #6f6f69);
+  opacity: 0;
+  transform: translateX(-2px);
+  transition:
+    opacity 180ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+    transform 180ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+    color 160ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.liveCollectionsRailRow:hover .liveCollectionsRailArrow,
+.liveCollectionsRailRow:focus-visible .liveCollectionsRailArrow {
+  opacity: 1;
+  transform: translateX(2px);
+  color: var(--accent-deep, #8a4a16);
+}
+
+.liveCollectionsRailRow:hover .liveCollectionsRailName,
+.liveCollectionsRailRow:focus-visible .liveCollectionsRailName {
+  color: var(--accent-deep, #8a4a16);
+}
+
+.collectionCardShare {
+  flex: 0 0 auto;
+}
+
+.collectionCardActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.collectionCardActions .btn {
+  /* Compress to a tighter footprint specifically inside the card footer.
+     Two pills + meta have to fit comfortably at ~260px without wrapping. */
+  height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+  gap: 5px;
+}
+
+.collectionCardPlay {
+  /* Softened primary — cream pill with a rust border + rust label, fills
+     to solid rust on hover. The default btnPrimary uses near-black ink
+     which over-asserts in the gallery surface. */
+  padding-right: 12px;
+  border-color: var(--accent-deep, #b15a16);
+  background: var(--accent-soft, #f7e2c8);
+  color: var(--accent-deep, #b15a16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.collectionCardPlay:hover:not(:disabled),
+.collectionCardPlay:focus-visible:not(:disabled) {
+  border-color: var(--accent-deep, #b15a16);
+  background: var(--accent-deep, #b15a16);
+  color: var(--surface, #fbf6e6);
+  outline: none;
+  box-shadow: 0 6px 14px -8px rgba(177, 90, 22, 0.5);
+}
+
+.collectionCardPlay .icon {
+  /* The play triangle uses a fill, not a stroke. Drop the inherited
+     stroke so the glyph reads as a solid arrow rather than an outlined
+     blob. Also nudge it 0.5px right so the visual centre matches the
+     letterform baseline of "Play". */
+  stroke-width: 0;
+  margin-left: 1px;
+  transform: translateY(-0.5px);
+}
+
+.collectionCardPlay:hover {
+  transform: translateY(-1px);
+}
+
+.collectionCardPlay:active {
+  transform: translateY(0);
+}
+
+.collectionHeaderButtons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.collectionPreviewStack {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 4px;
+  min-height: 82px;
+}
+
+.collectionPreviewStack:empty {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-warm);
+}
+
+.collectionCardCopy {
+  display: grid;
+  gap: 5px;
+}
+
+.collectionCardCopy h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.08;
+}
+
+.collectionCardCopy p {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.collectionCommand {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  width: min(500px, 44vw);
+  padding: 12px;
+  text-align: left;
+}
+
+.collectionCommand .commandHelperText {
+  grid-column: 1 / -1;
+}
+
+.collectionCommand .terminalCommandLine code {
+  font-size: 12px;
+}
+
+.petCardOwner {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-feature-settings: "tnum", "zero", "ss01";
+  letter-spacing: 0;
+}
+
+.petCardOwner .ownerLink {
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.petCardOwner .ownerLink:hover {
+  color: var(--ink);
+}
+
+.petCardDescription {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
