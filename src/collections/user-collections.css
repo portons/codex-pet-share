@@ -1,0 +1,233 @@
+.userCollectionsBand {
+  margin-bottom: 28px;
+  padding-bottom: 26px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.userCollectionsHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.userCollectionsHeader h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  line-height: 1;
+}
+
+.userCollectionsActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.userCollectionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.userCollectionCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  padding: 14px;
+  gap: 12px;
+}
+
+.userCollectionCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.userCollectionCardTitle {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+
+.userCollectionCardMeta {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.userCollectionPreview {
+  display: flex;
+  align-items: flex-end;
+  min-height: 92px;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.userCollectionPreview .collectionPreviewStack {
+  width: 100%;
+}
+
+.userCollectionEmptyPreview {
+  width: 100%;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.userCollectionCardActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.userCollectionModal .collectionCheckboxList {
+  max-height: min(320px, 45vh);
+  overflow: auto;
+}
+
+.collectionPetAdderModal {
+  width: min(760px, calc(100vw - 32px));
+}
+
+.collectionPetAdderSearch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.collectionPetAdderSearch .petSwapSearchPrefix {
+  left: 12px;
+}
+
+.collectionPetAdderSearchButton {
+  min-height: 36px;
+}
+
+.collectionPetAdderResultsHeader {
+  margin-top: 0;
+}
+
+.collectionPetAdderGrid {
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+  max-height: min(420px, 48vh);
+  overflow: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 35%, transparent) transparent;
+}
+
+.collectionPetAdderGrid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.collectionPetAdderGrid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.collectionPetAdderGrid::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  border-radius: 3px;
+}
+
+.collectionPetAdderModal .petSwapTile {
+  background: var(--surface-soft);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.collectionPetAdderModal .petSwapTile:hover:not(:disabled),
+.collectionPetAdderModal .petSwapTile:focus-visible:not(:disabled) {
+  background: color-mix(in srgb, var(--accent-soft) 52%, var(--surface));
+  border-color: var(--accent-deep);
+}
+
+.collectionPetAdderModal .petSwapTileFrame {
+  background:
+    radial-gradient(60% 22% at 50% 92%, var(--preview-ground), transparent 70%),
+    radial-gradient(120% 90% at 50% 0%, var(--inset-highlight), transparent 60%);
+}
+
+.collectionPetAdderModal .petSwapTileName {
+  color: var(--muted);
+}
+
+.collectionPetAdderModal .petSwapTile[data-active] {
+  background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface-soft));
+  border-color: var(--accent-deep);
+}
+
+.collectionPetAdderModal .petSwapTile[data-active] .petSwapTileName {
+  color: var(--accent-deep);
+}
+
+.collectionPetAdderModal .petSwapMenuHeader {
+  border-bottom-color: var(--border);
+}
+
+.collectionPetAdderModal .petSwapMenuCount {
+  color: var(--muted);
+  border-color: var(--border);
+  background: var(--surface-soft);
+}
+
+.collectionPetAdderModal .petSwapEmpty {
+  color: var(--muted);
+}
+
+.collectionPetAdderModal .petSwapEmptyMark {
+  color: var(--accent-deep);
+}
+
+.userCollectionPreviewStrip {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.userCollectionPreviewSlot {
+  width: 52px;
+  height: 58px;
+  display: grid;
+  place-items: end center;
+  flex: 0 0 auto;
+}
+
+.collectionOwnerLine {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .userCollectionsHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .userCollectionsActions {
+    justify-content: flex-start;
+  }
+
+  .collectionPetAdderSearch {
+    grid-template-columns: 1fr;
+  }
+}

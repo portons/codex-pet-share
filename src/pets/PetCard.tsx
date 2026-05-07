@@ -129,6 +129,8 @@ export function PetCard({
   onTagClick,
   onEditTags,
   onManageCollections,
+  onCollect,
+  onRemoveFromCollection,
   onPreview,
   previewActive = false,
   onToggleNsfw,
@@ -152,6 +154,8 @@ export function PetCard({
   onTagClick: (tag: TagName, sourceTags: string[]) => void;
   onEditTags: (pet: Pet) => void;
   onManageCollections: (pet: Pet) => void;
+  onCollect?: (pet: Pet) => void;
+  onRemoveFromCollection?: (pet: Pet) => void;
   onPreview?: (pet: Pet) => void;
   previewActive?: boolean;
   onToggleNsfw: (pet: Pet) => void;
@@ -268,6 +272,30 @@ export function PetCard({
           <Icon name="share" size={13} />
           {!compact && "Share"}
         </button>
+        {user && onCollect && (
+          <button
+            className="btn btnSm"
+            type="button"
+            aria-label="Add to collection"
+            title="Add to collection"
+            onClick={() => onCollect(pet)}
+          >
+            <Icon name="package" size={13} />
+            {!compact && "Add to collection"}
+          </button>
+        )}
+        {onRemoveFromCollection && (
+          <button
+            className="btn btnSm btnDanger"
+            type="button"
+            aria-label="Remove from collection"
+            title="Remove from collection"
+            onClick={() => onRemoveFromCollection(pet)}
+          >
+            <Icon name="trash" size={13} />
+            {!compact && "Remove"}
+          </button>
+        )}
         {user?.isAdmin && (
           <AdminPetMenu
             pet={pet}

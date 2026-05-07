@@ -26,6 +26,7 @@ type LoadGallery = (
 
 export function useAppNavigationActions({
   route,
+  user,
   session,
   contentMode,
   setContentMode,
@@ -49,9 +50,11 @@ export function useAppNavigationActions({
   loadCreator,
   loadCreators,
   loadCollections,
+  loadUserCollections,
   loadCollectionDetail
 }: {
   route: Route;
+  user: User | null;
   session: AuthSession | null;
   contentMode: ContentMode;
   setContentMode: Dispatch<SetStateAction<ContentMode>>;
@@ -83,6 +86,7 @@ export function useAppNavigationActions({
   loadCreator: (id: string, page?: number, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCreators: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCollections: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
+  loadUserCollections: (currentUser?: User | null, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
 }) {
   async function selectContentMode(mode: ContentMode) {
@@ -108,7 +112,10 @@ export function useAppNavigationActions({
       await loadCreators(session, mode);
     }
     if (route.name === "collections") {
-      await loadCollections(session, mode);
+      await Promise.all([
+        loadCollections(session, mode),
+        loadUserCollections(user, session, mode)
+      ]);
     }
     if (route.name === "collection") {
       await loadCollectionDetail(route.slug, session, mode);

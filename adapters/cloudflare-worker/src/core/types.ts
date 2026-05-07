@@ -81,6 +81,7 @@ export type PetRow = {
 export type CollectionRow = {
   slug: string;
   display_name: string;
+  owner_id: string | null;
   created_at: string;
   updated_at: string;
 };

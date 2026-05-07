@@ -38,6 +38,8 @@ export type AppRoutesProps = {
   shadowbanBusyOwnerId: string;
   nsfwBusyId: string;
   collections: CollectionSummary[];
+  userCollections: CollectionSummary[];
+  userCollectionsLoading: boolean;
   setQuery: SetState<string>;
   selectTag: (tag: TagName) => void | Promise<void>;
   clearTags: () => void | Promise<void>;
@@ -56,6 +58,13 @@ export type AppRoutesProps = {
   selectVisibleTag: (tag: TagName, sourceTags: string[]) => void | Promise<void>;
   openTagEditor: (pet: Pet) => void;
   openCollectionEditor: (pet: Pet) => void | Promise<void>;
+  openPetCollector: (pet: Pet) => void | Promise<void>;
+  openCollectionCreator: () => void | Promise<void>;
+  openUserCollectionEditor: (collection: CollectionSummary) => void | Promise<void>;
+  openCollectionPetAdder: (collection: Omit<CollectionSummary, "topPets">) => void | Promise<void>;
+  deleteUserCollection: (collection: CollectionSummary) => void | Promise<void>;
+  removePetFromUserCollection: (collection: Omit<CollectionSummary, "topPets">, pet: Pet) => void | Promise<void>;
+  startUserCollectionRoom: (collection: Omit<CollectionSummary, "topPets"> & { topPets?: CollectionSummary["topPets"] }, petId?: string) => void | Promise<void>;
   togglePetNsfw: (pet: Pet) => void | Promise<void>;
   toggleOwnerShadowban: (pet: Pet) => void | Promise<void>;
   deleteUpload: (pet: Pet) => void | Promise<void>;

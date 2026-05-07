@@ -90,6 +90,14 @@
   color: var(--accent-deep);
 }
 
+.petCardActions .btnDanger {
+  color: var(--danger-fg);
+}
+
+.petCardActions .btnDanger:hover:not(:disabled) {
+  color: var(--danger-fg-hover);
+}
+
 .petCardActions .likeButton.active .icon {
   color: #d92d20;
   fill: #d92d20;

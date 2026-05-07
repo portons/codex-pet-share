@@ -31,6 +31,7 @@ export function useAppRouteEffects({
   playgroundPet,
   refresh,
   loadCollections,
+  loadUserCollections,
   setAuthStatus,
   applyGalleryState,
   setLoading,
@@ -57,6 +58,7 @@ export function useAppRouteEffects({
   playgroundPet: Pet | null;
   refresh: (authSession?: AuthSession | null) => Promise<void>;
   loadCollections: (authSession?: AuthSession | null, content?: "safe" | "all") => Promise<void>;
+  loadUserCollections: (currentUser?: User | null, authSession?: AuthSession | null, content?: "safe" | "all") => Promise<void>;
   setAuthStatus: Dispatch<SetStateAction<string>>;
   applyGalleryState: (nextState: ReturnType<typeof galleryUrlStateFromHash>) => void;
   setLoading: Dispatch<SetStateAction<boolean>>;
@@ -122,6 +124,9 @@ export function useAppRouteEffects({
       loadCollections().catch((error) =>
         setAuthStatus(error instanceof Error ? error.message : "failed to load collections")
       );
+      loadUserCollections(user, session).catch((error) =>
+        setAuthStatus(error instanceof Error ? error.message : "failed to load your collections")
+      );
     }
     if (route.name === "collection") {
       setCollectionDetail(null);
@@ -146,6 +151,11 @@ export function useAppRouteEffects({
     if (route.name === "admin") {
       loadAdminCollections(session, user).catch((error) =>
         setAdminStatus(error instanceof Error ? error.message : "failed to load admin collections")
+      );
+    }
+    if (user) {
+      loadUserCollections(user, session).catch((error) =>
+        setAuthStatus(error instanceof Error ? error.message : "failed to load your collections")
       );
     }
   }, [route, user, session]);

@@ -48,8 +48,8 @@
   min-height: 126px;
   padding: 8px 18px;
   background:
-    radial-gradient(circle at 50% 48%, rgba(228, 225, 217, 0.74) 0%, #ffffff 72%),
-    #ffffff;
+    radial-gradient(circle at 50% 48%, var(--preview-halo) 0%, var(--preview-surface) 72%),
+    var(--preview-surface);
   border: 0;
   border-bottom: 1px solid var(--border-soft);
   cursor: pointer;
@@ -72,7 +72,7 @@
   height: 28px;
   padding: 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--floating-control-bg);
   border: 1px solid var(--border);
   color: var(--muted);
   cursor: pointer;
@@ -82,7 +82,7 @@
 }
 
 .petCardQuickAction:hover:not(:disabled) {
-  background: #ffffff;
+  background: var(--floating-control-bg-hover);
   border-color: var(--border-strong);
   color: var(--ink);
   transform: translateY(-1px);

@@ -1,4 +1,4 @@
-import { collectionRow, publicCollections } from "./collections";
+import { collectionPets, collectionRow } from "./collections";
 import { currentUser, publicUser } from "./auth";
 import { getVisiblePet, listPets } from "./pets";
 import { slugPattern } from "./constants";
@@ -40,15 +40,19 @@ export async function handleEntityShare(ctx: AppContext, kind: "collections" | "
   if (kind === "collections" && id) {
     const collection = await collectionRow(ctx, id);
     if (!collection) return html("<!doctype html><title>Collection not found</title>", 404);
-    const collections = await publicCollections(ctx);
-    const summary = collections.find((item) => item.slug === id);
+    const pets = await collectionPets(ctx, collection.slug, "safe");
+    const featured = pets[0] || null;
+    const staticCollectionImage = `${ctx.env.PUBLIC_APP_ORIGIN}/assets/social/collections/${collection.slug}.png`;
+    const image = collection.owner_id
+      ? featured ? `${ctx.url.origin}/api/pets/${featured.id}/share-image` : `${ctx.env.PUBLIC_APP_ORIGIN}/assets/petshare-social-preview.png`
+      : staticCollectionImage;
     return entityHtml(ctx, {
       title: collection.display_name,
-      description: `${summary?.petCount || 0} pets in ${ctx.env.APP_NAME}`,
+      description: `${pets.length} pets in ${ctx.env.APP_NAME}`,
       canonical: `${ctx.env.PUBLIC_APP_ORIGIN}/#/collections/${collection.slug}`,
       shareUrl: `${ctx.env.PUBLIC_APP_ORIGIN}/collections/${collection.slug}`,
-      image: `${ctx.env.PUBLIC_APP_ORIGIN}/assets/social/collections/${collection.slug}.png`,
-      body: `<h1>${escapeHtml(collection.display_name)}</h1><p>${summary?.petCount || 0} pets</p>`
+      image,
+      body: `<h1>${escapeHtml(collection.display_name)}</h1><p>${pets.length} pets</p>`
     });
   }
   if (kind === "users" && id) {

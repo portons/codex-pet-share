@@ -35,16 +35,16 @@
 }
 
 .btnPrimary {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--surface);
+  border-color: var(--primary-bg);
+  background: var(--primary-bg);
+  color: var(--primary-fg);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btnPrimary:hover:not(:disabled) {
-  border-color: var(--ink);
-  background: #1f1f1c;
-  color: var(--surface);
+  border-color: var(--primary-bg-hover);
+  background: var(--primary-bg-hover);
+  color: var(--primary-fg);
 }
 
 .btnGhost {
@@ -68,14 +68,15 @@
 }
 
 .btnDanger {
-  border-color: #e6b5aa;
-  color: #9f2f22;
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-fg);
 }
 
 .btnDanger:hover:not(:disabled) {
-  border-color: #9f2f22;
-  background: #fff3f0;
-  color: #7f1d1d;
+  border-color: var(--danger-border-hover);
+  background: var(--danger-bg-hover);
+  color: var(--danger-fg-hover);
 }
 
 .btnSm {

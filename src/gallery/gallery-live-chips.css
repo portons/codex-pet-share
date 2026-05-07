@@ -12,9 +12,9 @@
   gap: 6px;
   padding: 2px 8px 2px 7px;
   border-radius: 999px;
-  background: rgba(247, 226, 200, 0.55);
-  border: 1px solid rgba(177, 90, 22, 0.22);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-glow);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
   color: var(--accent-deep, #8a4a16);
   font-family: var(--font-mono);
   font-size: 10px;
@@ -93,8 +93,8 @@
   z-index: 1;
   /* Slightly stronger materiality than the inline chip — it floats
      over the preview, so a touch more contrast helps it read. */
-  background: rgba(255, 244, 222, 0.92);
-  border-color: rgba(177, 90, 22, 0.32);
+  background: var(--floating-control-bg);
+  border-color: var(--border-strong);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   /* Interactive: clicking the pill jumps straight to the playground.

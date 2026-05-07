@@ -119,8 +119,11 @@ export type CreatorsLeaderboardResponse = {
 export type CollectionSummary = {
   slug: string;
   displayName: string;
+  ownerId: string | null;
+  editable?: boolean;
   petCount: number;
   topPets: Array<Pet>;
+  petIds?: Array<string>;
 };
 
 export type CollectionDetailResponse = {

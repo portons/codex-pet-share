@@ -6,6 +6,11 @@
   --surface: #ffffff;
   --surface-warm: #f4f2eb;
   --surface-soft: #efede5;
+  --nav-bg: rgba(248, 246, 240, 0.88);
+  --nav-action-bg: rgba(255, 255, 255, 0.78);
+  --nav-action-bg-hover: #ffffff;
+  --noise-opacity: 0.035;
+  --noise-blend: multiply;
 
   --ink: #0f0f0e;
   --foreground: #1c1c1a;
@@ -21,9 +26,29 @@
   --accent-soft: #ecfccb;
   --accent-glow: rgba(101, 163, 13, 0.16);
   --danger: #d92d20;
+  --danger-bg: transparent;
+  --danger-bg-hover: #fff3f0;
+  --danger-border: #e6b5aa;
+  --danger-border-hover: #9f2f22;
+  --danger-fg: #9f2f22;
+  --danger-fg-hover: #7f1d1d;
+  --primary-bg: var(--ink);
+  --primary-bg-hover: #1f1f1c;
+  --primary-fg: var(--surface);
+  --terminal-bg: #11110f;
+  --terminal-border: #2a2926;
+  --terminal-fg: #e8e6e0;
 
   --tile-grid: rgba(180, 174, 158, 0.4);
   --tile-bg: #ffffff;
+  --preview-surface: #ffffff;
+  --preview-halo: rgba(228, 225, 217, 0.74);
+  --preview-soft-top: #fffdf5;
+  --preview-ground: rgba(16, 16, 15, 0.06);
+  --floating-control-bg: rgba(255, 255, 255, 0.92);
+  --floating-control-bg-hover: #ffffff;
+  --rail-bg: rgba(255, 255, 255, 0.72);
+  --inset-highlight: rgba(255, 255, 255, 0.55);
 
   --font-sans: "Cabinet Grotesk", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -48,6 +73,61 @@
   font-feature-settings: "ss01", "ss03", "cv01";
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+}
+
+html[data-theme="dark"] {
+  --bg: #10110f;
+  --surface: #191a16;
+  --surface-warm: #202017;
+  --surface-soft: #26261d;
+  --nav-bg: rgba(16, 17, 15, 0.9);
+  --nav-action-bg: rgba(31, 32, 25, 0.78);
+  --nav-action-bg-hover: #26261d;
+  --noise-opacity: 0.08;
+  --noise-blend: screen;
+
+  --ink: #fbf8eb;
+  --foreground: #eeeada;
+  --muted: #aaa48f;
+  --subtle: #7d7664;
+
+  --border: #343226;
+  --border-soft: #28271e;
+  --border-strong: #45412f;
+
+  --accent: #a3e635;
+  --accent-deep: #84cc16;
+  --accent-soft: rgba(163, 230, 53, 0.16);
+  --accent-glow: rgba(163, 230, 53, 0.18);
+  --danger: #fb7185;
+  --danger-bg: rgba(251, 113, 133, 0.08);
+  --danger-bg-hover: rgba(251, 113, 133, 0.14);
+  --danger-border: rgba(251, 113, 133, 0.24);
+  --danger-border-hover: rgba(251, 113, 133, 0.42);
+  --danger-fg: #fda4af;
+  --danger-fg-hover: #ffe4e6;
+  --primary-bg: color-mix(in srgb, var(--accent) 26%, var(--surface-soft));
+  --primary-bg-hover: color-mix(in srgb, var(--accent) 34%, var(--surface-soft));
+  --primary-fg: var(--ink);
+  --terminal-bg: #10110d;
+  --terminal-border: #303424;
+  --terminal-fg: #e7e3d5;
+
+  --tile-grid: rgba(219, 211, 173, 0.18);
+  --tile-bg: #171813;
+  --preview-surface: #202118;
+  --preview-halo: rgba(98, 105, 76, 0.42);
+  --preview-soft-top: #24251b;
+  --preview-ground: rgba(0, 0, 0, 0.24);
+  --floating-control-bg: rgba(25, 26, 22, 0.92);
+  --floating-control-bg-hover: #26261d;
+  --rail-bg: rgba(25, 26, 22, 0.74);
+  --inset-highlight: rgba(255, 255, 255, 0.08);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 8px 18px -10px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 28px 60px -26px rgba(0, 0, 0, 0.68);
+  --shadow-modal: 0 60px 120px -42px rgba(0, 0, 0, 0.84);
 }
 
 * {
@@ -75,8 +155,8 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  opacity: 0.035;
-  mix-blend-mode: multiply;
+  opacity: var(--noise-opacity);
+  mix-blend-mode: var(--noise-blend);
 }
 
 button,

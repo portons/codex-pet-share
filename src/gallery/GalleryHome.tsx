@@ -169,6 +169,7 @@ function Gallery({
   onTagClick,
   onEditTags,
   onManageCollections,
+  onCollect,
   onToggleNsfw,
   onShadowbanOwner,
   onDelete,
@@ -208,6 +209,7 @@ function Gallery({
   onTagClick: (tag: TagName, sourceTags: string[]) => void;
   onEditTags: (pet: Pet) => void;
   onManageCollections: (pet: Pet) => void;
+  onCollect?: (pet: Pet) => void;
   onToggleNsfw: (pet: Pet) => void;
   onShadowbanOwner: (pet: Pet) => void;
   onDelete: (pet: Pet) => void;
@@ -278,6 +280,7 @@ function Gallery({
                 onTagClick={onTagClick}
                 onEditTags={onEditTags}
                 onManageCollections={onManageCollections}
+                onCollect={onCollect}
                 onPreview={canCursorPreview ? (previewTarget) =>
                   setPreviewPet((current) => (current?.id === previewTarget.id ? null : previewTarget))
                 : undefined}

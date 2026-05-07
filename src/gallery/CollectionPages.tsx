@@ -36,16 +36,30 @@ export function CollectionDetailPageWithPresence({
 // every other page.
 export function CollectionsPageWithPresence({
   collections,
+  userCollections,
   loading,
+  userCollectionsLoading,
   signedIn,
   session,
+  onCreateCollection,
+  onEditCollection,
+  onDeleteCollection,
+  onStartUserCollectionRoom,
+  onShareCollection,
   onShareRoom,
   onSignIn
 }: {
   collections: Array<CollectionSummary>;
+  userCollections: Array<CollectionSummary>;
   loading: boolean;
+  userCollectionsLoading: boolean;
   signedIn: boolean;
   session: AuthSession | null;
+  onCreateCollection: () => void;
+  onEditCollection: (collection: CollectionSummary) => void;
+  onDeleteCollection: (collection: CollectionSummary) => void;
+  onStartUserCollectionRoom: (collection: CollectionSummary) => void;
+  onShareCollection: (collection: CollectionSummary) => void;
   onShareRoom: (collection: CollectionSummary) => void;
   onSignIn: () => void;
 }) {
@@ -54,9 +68,16 @@ export function CollectionsPageWithPresence({
   return (
     <CollectionsPage
       collections={collections}
+      userCollections={userCollections}
       loading={loading}
+      userCollectionsLoading={userCollectionsLoading}
       signedIn={signedIn}
       presenceCounts={presenceCounts}
+      onCreateCollection={onCreateCollection}
+      onEditCollection={onEditCollection}
+      onDeleteCollection={onDeleteCollection}
+      onStartUserCollectionRoom={onStartUserCollectionRoom}
+      onShareCollection={onShareCollection}
       onShareRoom={onShareRoom}
       onSignIn={onSignIn}
     />
@@ -65,14 +86,23 @@ export function CollectionsPageWithPresence({
 
 function CollectionsPage({
   collections,
+  userCollections,
   loading,
+  userCollectionsLoading,
   signedIn,
   presenceCounts,
+  onCreateCollection,
+  onEditCollection,
+  onDeleteCollection,
+  onStartUserCollectionRoom,
+  onShareCollection,
   onShareRoom,
   onSignIn
 }: {
   collections: Array<CollectionSummary>;
+  userCollections: Array<CollectionSummary>;
   loading: boolean;
+  userCollectionsLoading: boolean;
   signedIn: boolean;
   // One-shot snapshot of "people in the room" per slug at page-load
   // time. Empty when the user is signed out (private:true topics need
@@ -82,6 +112,11 @@ function CollectionsPage({
   // doubles as a way to find the collection itself, so a separate
   // collection-share action would just clutter the footer. Collection-
   // page share remains accessible from the detail page header.
+  onCreateCollection: () => void;
+  onEditCollection: (collection: CollectionSummary) => void;
+  onDeleteCollection: (collection: CollectionSummary) => void;
+  onStartUserCollectionRoom: (collection: CollectionSummary) => void;
+  onShareCollection: (collection: CollectionSummary) => void;
   onShareRoom: (collection: CollectionSummary) => void;
   onSignIn: () => void;
 }) {
@@ -94,6 +129,17 @@ function CollectionsPage({
           <p className="sectionSubhead">Curated packs you can browse, share, or jump into a permanent playground room with.</p>
         </div>
       </header>
+      <UserCollectionsSection
+        collections={userCollections}
+        loading={userCollectionsLoading}
+        signedIn={signedIn}
+        onCreate={onCreateCollection}
+        onEdit={onEditCollection}
+        onDelete={onDeleteCollection}
+        onStartRoom={onStartUserCollectionRoom}
+        onShare={onShareCollection}
+        onSignIn={onSignIn}
+      />
       {loading ? (
         <GallerySkeleton />
       ) : collections.length ? (
@@ -186,6 +232,110 @@ function CollectionsPage({
   );
 }
 
+function UserCollectionsSection({
+  collections,
+  loading,
+  signedIn,
+  onCreate,
+  onEdit,
+  onDelete,
+  onStartRoom,
+  onShare,
+  onSignIn
+}: {
+  collections: CollectionSummary[];
+  loading: boolean;
+  signedIn: boolean;
+  onCreate: () => void;
+  onEdit: (collection: CollectionSummary) => void;
+  onDelete: (collection: CollectionSummary) => void;
+  onStartRoom: (collection: CollectionSummary) => void;
+  onShare: (collection: CollectionSummary) => void;
+  onSignIn: () => void;
+}) {
+  return (
+    <section className="userCollectionsBand" aria-label="Your collections">
+      <header className="userCollectionsHeader">
+        <div>
+          <p className="metaText">Your collections</p>
+          <h2>Custom packs</h2>
+          <p className="sectionSubhead">Private to manage, public to share.</p>
+        </div>
+        <div className="userCollectionsActions">
+          {signedIn ? (
+            <button className="btn btnPrimary" type="button" onClick={onCreate}>
+              <Icon name="package" size={13} />
+              New collection
+            </button>
+          ) : (
+            <button className="btn btnPrimary" type="button" onClick={onSignIn}>
+              <Icon name="user" size={13} />
+              Sign in
+            </button>
+          )}
+        </div>
+      </header>
+      {!signedIn ? null : loading ? (
+        <GallerySkeleton />
+      ) : collections.length ? (
+        <div className="userCollectionsGrid">
+          {collections.map((collection) => (
+            <article className="userCollectionCard card" key={collection.slug}>
+              <div className="userCollectionCardHeader">
+                <div>
+                  <h3 className="userCollectionCardTitle">{collection.displayName}</h3>
+                  <p className="userCollectionCardMeta">
+                    {formatMetric(collection.petCount)} {collection.petCount === 1 ? "pet" : "pets"}
+                  </p>
+                </div>
+                <button className="btn btnSm btnGhost" type="button" onClick={() => onEdit(collection)} aria-label={`Edit ${collection.displayName}`}>
+                  <Icon name="sheet" size={13} />
+                </button>
+              </div>
+              <a className="userCollectionPreview" href={`#/collections/${collection.slug}`} aria-label={`Open ${collection.displayName}`}>
+                {collection.topPets.length ? (
+                  <div className="collectionPreviewStack">
+                    {collection.topPets.map((pet) => (
+                      <CyclingPetPreview key={pet.id} pet={pet} size="thumb" transparent />
+                    ))}
+                  </div>
+                ) : (
+                  <span className="userCollectionEmptyPreview">empty</span>
+                )}
+              </a>
+              <div className="userCollectionCardActions">
+                <a className="btn btnSm" href={`#/collections/${collection.slug}`}>
+                  <Icon name="eye" size={13} />
+                  Open
+                </a>
+                <button className="btn btnSm" type="button" onClick={() => onShare(collection)}>
+                  <Icon name="share" size={13} />
+                  Share
+                </button>
+                <button
+                  className="btn btnSm btnPrimary"
+                  type="button"
+                  disabled={collection.petCount === 0}
+                  onClick={() => onStartRoom(collection)}
+                >
+                  <Icon name="play" size={11} />
+                  Room
+                </button>
+                <button className="btn btnSm btnDanger" type="button" onClick={() => onDelete(collection)}>
+                  <Icon name="trash" size={13} />
+                  Delete
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <EmptyState text="No custom collections yet." />
+      )}
+    </section>
+  );
+}
+
 function CollectionDetailPage({
   collection,
   pets,
@@ -206,6 +356,10 @@ function CollectionDetailPage({
   onTagClick,
   onEditTags,
   onManageCollections,
+  onCollect,
+  onAddPet,
+  onRemoveFromUserCollection,
+  onStartRoom,
   onToggleNsfw,
   onShadowbanOwner,
   onDelete,
@@ -233,6 +387,10 @@ function CollectionDetailPage({
   onTagClick: (tag: TagName, sourceTags: string[]) => void;
   onEditTags: (pet: Pet) => void;
   onManageCollections: (pet: Pet) => void;
+  onCollect?: (pet: Pet) => void;
+  onAddPet?: (collection: Omit<CollectionSummary, "topPets">) => void;
+  onRemoveFromUserCollection?: (pet: Pet) => void;
+  onStartRoom?: () => void;
   onToggleNsfw: (pet: Pet) => void;
   onShadowbanOwner: (pet: Pet) => void;
   onDelete: (pet: Pet) => void;
@@ -284,18 +442,37 @@ function CollectionDetailPage({
               </button>
             </section>
             <div className="collectionHeaderButtons">
+              {collection.editable && onAddPet && (
+                <button className="btn btnSm" type="button" onClick={() => onAddPet(collection)} aria-label={`Add pet to ${collection.displayName}`}>
+                  <Icon name="package" size={13} />
+                  Add pet
+                </button>
+              )}
               <button className="btn btnSm btnGhost" type="button" onClick={onShareCollection} aria-label={`Share ${collection.displayName}`}>
                 <Icon name="share" size={13} />
                 Share
               </button>
-              <a
-                className="btn btnSm btnPrimary collectionCardPlay"
-                href={`#/collections/${collection.slug}/play`}
-                aria-label={`Join ${collection.displayName} playground`}
-              >
-                <Icon name="play" size={11} />
-                Join
-              </a>
+              {collection.ownerId ? (
+                <button
+                  className="btn btnSm btnPrimary collectionCardPlay"
+                  type="button"
+                  disabled={!pets.length}
+                  onClick={onStartRoom}
+                  aria-label={`Start ${collection.displayName} room`}
+                >
+                  <Icon name="play" size={11} />
+                  Room
+                </button>
+              ) : (
+                <a
+                  className="btn btnSm btnPrimary collectionCardPlay"
+                  href={`#/collections/${collection.slug}/play`}
+                  aria-label={`Join ${collection.displayName} playground`}
+                >
+                  <Icon name="play" size={11} />
+                  Join
+                </a>
+              )}
             </div>
           </div>
         )}
@@ -326,6 +503,8 @@ function CollectionDetailPage({
                 onTagClick={onTagClick}
                 onEditTags={onEditTags}
                 onManageCollections={onManageCollections}
+                onCollect={onCollect}
+                onRemoveFromCollection={onRemoveFromUserCollection}
                 onToggleNsfw={onToggleNsfw}
                 onShadowbanOwner={onShadowbanOwner}
                 onDelete={onDelete}

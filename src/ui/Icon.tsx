@@ -10,6 +10,7 @@ export type IconName =
   | "eye"
   | "github"
   | "heart"
+  | "moon"
   | "more"
   | "package"
   | "search"
@@ -23,7 +24,8 @@ export type IconName =
   | "x"
   | "play"
   | "link"
-  | "sparkle";
+  | "sparkle"
+  | "sun";
 
 export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
   const paths: Record<IconName, ReactNode> = {
@@ -74,6 +76,9 @@ export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
     ),
     heart: (
       <path d="M8 13.3 C5.35 11.1 2.5 8.85 2.5 5.85 C2.5 4.15 3.7 3 5.25 3 C6.25 3 7.15 3.55 8 4.55 C8.85 3.55 9.75 3 10.75 3 C12.3 3 13.5 4.15 13.5 5.85 C13.5 8.85 10.65 11.1 8 13.3 Z" />
+    ),
+    moon: (
+      <path d="M12.5 10.8 C11.55 11.95 10.1 12.7 8.45 12.7 C5.6 12.7 3.3 10.4 3.3 7.55 C3.3 5.45 4.55 3.6 6.35 2.8 C6.05 3.55 5.9 4.35 5.9 5.2 C5.9 8.25 8.35 10.7 11.4 10.7 C11.78 10.7 12.15 10.67 12.5 10.8 Z" />
     ),
     more: (
       <>
@@ -163,6 +168,19 @@ export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
     sparkle: (
       <>
         <path d="M8 2 L9 6.5 L13.5 8 L9 9.5 L8 14 L7 9.5 L2.5 8 L7 6.5 Z" />
+      </>
+    ),
+    sun: (
+      <>
+        <circle cx="8" cy="8" r="3" />
+        <path d="M8 1.8 V3.2" />
+        <path d="M8 12.8 V14.2" />
+        <path d="M1.8 8 H3.2" />
+        <path d="M12.8 8 H14.2" />
+        <path d="M3.6 3.6 L4.6 4.6" />
+        <path d="M11.4 11.4 L12.4 12.4" />
+        <path d="M12.4 3.6 L11.4 4.6" />
+        <path d="M4.6 11.4 L3.6 12.4" />
       </>
     )
   };

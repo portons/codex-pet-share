@@ -2,16 +2,16 @@
 .checker {
   background:
     radial-gradient(circle at 50% 38%, rgba(216, 242, 90, 0.24), transparent 58%),
-    radial-gradient(circle at 50% 82%, rgba(16, 16, 15, 0.06), transparent 60%),
-    linear-gradient(180deg, #fffdf5, var(--surface-warm));
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    linear-gradient(180deg, var(--preview-soft-top), var(--surface-warm));
   background-color: var(--tile-bg);
 }
 
 .previewSurface {
   background:
     radial-gradient(circle at 50% 38%, rgba(216, 242, 90, 0.24), transparent 58%),
-    radial-gradient(circle at 50% 82%, rgba(16, 16, 15, 0.06), transparent 60%),
-    linear-gradient(180deg, #fffdf5, var(--surface-warm));
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    linear-gradient(180deg, var(--preview-soft-top), var(--surface-warm));
   background-color: var(--tile-bg);
 }
 

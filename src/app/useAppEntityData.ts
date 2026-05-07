@@ -78,6 +78,7 @@ export function useAppEntityData({
   const [creators, setCreators] = useState<CreatorLeaderboardItem[]>([]);
   const [creatorsTotal, setCreatorsTotal] = useState(0);
   const [collections, setCollections] = useState<Array<CollectionSummary>>([]);
+  const [userCollections, setUserCollections] = useState<Array<CollectionSummary>>([]);
   const [adminCollections, setAdminCollections] = useState<Array<AdminCollection>>([]);
   const [collectionDetail, setCollectionDetail] = useState<Omit<CollectionSummary, "topPets"> | null>(null);
   const [collectionPets, setCollectionPets] = useState<Array<Pet>>([]);
@@ -87,6 +88,7 @@ export function useAppEntityData({
   const [creatorLoading, setCreatorLoading] = useState(false);
   const [creatorsLoading, setCreatorsLoading] = useState(false);
   const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [userCollectionsLoading, setUserCollectionsLoading] = useState(false);
   const [adminCollectionsLoading, setAdminCollectionsLoading] = useState(false);
   const [collectionDetailLoading, setCollectionDetailLoading] = useState(false);
 
@@ -202,6 +204,28 @@ export function useAppEntityData({
     }
   }
 
+  async function loadUserCollections(currentUser = user, authSession = session, content = contentMode) {
+    if (!currentUser) {
+      setUserCollections([]);
+      return;
+    }
+    setUserCollectionsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (content === "all") {
+        params.set("content", "all");
+      }
+      const suffix = params.toString() ? `?${params}` : "";
+      const body = await readJson<CollectionsResponse>(await apiFetch(`/api/collections/mine${suffix}`, {}, authSession));
+      setUserCollections(body.collections.map((collection) => ({
+        ...collection,
+        topPets: collection.topPets.map(normalizePet)
+      })));
+    } finally {
+      setUserCollectionsLoading(false);
+    }
+  }
+
   async function loadCollectionDetail(slug: string, authSession = session, content = contentMode) {
     setCollectionDetailLoading(true);
     try {
@@ -256,7 +280,7 @@ export function useAppEntityData({
       refreshes.push(loadCreators(authSession, contentMode));
     }
     if (route.name === "collections") {
-      refreshes.push(loadCollections(authSession, contentMode));
+      refreshes.push(loadCollections(authSession, contentMode), loadUserCollections(currentUser, authSession, contentMode));
     }
     if (route.name === "collection") {
       refreshes.push(loadCollectionDetail(route.slug, authSession, contentMode));
@@ -282,6 +306,8 @@ export function useAppEntityData({
     creatorsTotal,
     collections,
     setCollections,
+    userCollections,
+    setUserCollections,
     adminCollections,
     setAdminCollections,
     collectionDetail,
@@ -294,6 +320,7 @@ export function useAppEntityData({
     creatorLoading,
     creatorsLoading,
     collectionsLoading,
+    userCollectionsLoading,
     adminCollectionsLoading,
     collectionDetailLoading,
     loadMine,
@@ -302,6 +329,7 @@ export function useAppEntityData({
     loadCreator,
     loadCreators,
     loadCollections,
+    loadUserCollections,
     loadCollectionDetail,
     loadAdminCollections,
     refreshPrimaryPetLists,
