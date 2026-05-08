@@ -162,10 +162,10 @@
   gap: 4px;
   height: 22px;
   padding: 0 8px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(248, 246, 240, 0.94);
-  color: var(--ink);
+  background: var(--floating-control-bg);
+  color: var(--muted);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 500;
@@ -176,9 +176,9 @@
 }
 
 .detailStateTileGif:hover {
-  background: var(--ink);
-  color: var(--accent);
-  border-color: var(--ink);
+  background: var(--floating-control-bg-hover);
+  color: var(--ink);
+  border-color: var(--border-strong);
 }
 
 .detailStateTileGif:active {
