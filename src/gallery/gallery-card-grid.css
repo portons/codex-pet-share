@@ -198,11 +198,11 @@
 
 .petCardPreview .galleryPreviewStillImage {
   display: block;
-  width: calc(var(--preview-frames) * 96px);
-  height: 104px;
+  width: 192px;
+  height: 208px;
   max-width: none;
   image-rendering: pixelated;
-  transform: scale(1.5);
+  transform: scale(0.75);
   transform-origin: top left;
 }
 
@@ -227,7 +227,7 @@
 }
 
 .petCard.compact .petCardPreview .galleryPreviewStillImage {
-  transform: scale(1);
+  transform: scale(0.5);
 }
 
 .petCardBody {

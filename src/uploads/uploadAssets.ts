@@ -159,6 +159,35 @@ export async function generatePreviewImage(spritesheet: File) {
   }
 }
 
+export async function generatePosterImage(spritesheet: File) {
+  const imageUrl = URL.createObjectURL(spritesheet);
+  try {
+    const image = new Image();
+    image.decoding = "async";
+    image.src = imageUrl;
+    await image.decode();
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 192;
+    canvas.height = 208;
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Could not create poster image.");
+    }
+
+    context.imageSmoothingEnabled = false;
+    context.drawImage(image, 0, 0, 192, 208, 0, 0, 192, 208);
+
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 1));
+    if (!blob) {
+      throw new Error("Could not create poster image.");
+    }
+    return new File([blob], "poster.webp", { type: "image/webp" });
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
 function wrapCanvasText(
   context: CanvasRenderingContext2D,
   text: string,

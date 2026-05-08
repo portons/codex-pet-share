@@ -77,6 +77,11 @@ export function validatePreviewImage(bytes: Uint8Array) {
   if (size.width !== 5472 || size.height !== 104) throw new HttpError("preview.webp must be 5472x104", 400);
 }
 
+export function validatePosterImage(bytes: Uint8Array) {
+  const size = webpSize(bytes);
+  if (size.width !== cell.width || size.height !== cell.height) throw new HttpError(`poster.webp must be ${cell.width}x${cell.height}`, 400);
+}
+
 export function validationFromBytes(manifest: Manifest, spritesheet: Uint8Array): ValidationReport {
   const size = webpSize(spritesheet);
   return {

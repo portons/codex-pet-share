@@ -352,7 +352,7 @@ async function deleteUserUploads(ctx: AppContext, userId: string, actor: AuthUse
   const pets = await all<PetRow>(ctx.env.DB.prepare("select * from pets where owner_id = ? and source = 'upload'").bind(userId));
   const deletedPets: string[] = [];
   for (const pet of pets) {
-    await Promise.all(["pet.json", "spritesheet.webp", "share.png", "preview.webp"].map((name) => deleteAsset(ctx, `${pet.id}/${name}`)));
+    await Promise.all(["pet.json", "spritesheet.webp", "share.png", "preview.webp", "poster.webp"].map((name) => deleteAsset(ctx, `${pet.id}/${name}`)));
     await ctx.env.DB.prepare("delete from pets where id = ?").bind(pet.id).run();
     deletedPets.push(pet.id);
     await auditAdminAction(ctx, actor, "pet.delete", {

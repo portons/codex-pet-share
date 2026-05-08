@@ -13,6 +13,7 @@ export type Pet = {
   spritesheetPath: string;
   kind: EditablePetKind;
   spritesheetUrl: string;
+  posterUrl: string;
   previewUrl: string;
   shareImageUrl: string;
   downloadUrl: string;

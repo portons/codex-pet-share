@@ -5,6 +5,7 @@ import { normalizePet } from "../domain/pets";
 import { navigate } from "../domain/routing";
 import type { Pet, UploadState } from "../domain/types";
 import {
+  generatePosterImage,
   generatePreviewImage,
   generateShareImage,
   normalizeUploadManifest,
@@ -41,14 +42,16 @@ export function useUploadWorkflow({
     const form = new FormData();
     try {
       const manifest = { ...normalizeUploadManifest(await readUploadManifest(uploadState.manifest)), kind: uploadState.kind };
-      const [shareImage, previewImage] = await Promise.all([
+      const [shareImage, previewImage, posterImage] = await Promise.all([
         generateShareImage(manifest, uploadState.spritesheet),
-        generatePreviewImage(uploadState.spritesheet)
+        generatePreviewImage(uploadState.spritesheet),
+        generatePosterImage(uploadState.spritesheet)
       ]);
       form.append("manifest", uploadManifestFile(manifest));
       form.append("spritesheet", uploadState.spritesheet);
       form.append("shareImage", shareImage);
       form.append("previewImage", previewImage);
+      form.append("posterImage", posterImage);
       form.append("kind", uploadState.kind);
       form.append("tags", JSON.stringify(uploadState.tags));
       const body = await readJson<{ pet: Pet }>(

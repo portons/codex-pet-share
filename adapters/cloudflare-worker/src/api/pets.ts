@@ -1,7 +1,7 @@
 import { currentUser, requireUser } from "./auth";
 import { auditAdminAction } from "./adminAudit";
 import { allowedTags, slugPattern } from "./constants";
-import { parseJson, parsePetKind, validateManifest, validatePreviewImage, validateShareImage, validateSpritesheet, validationFromBytes } from "./validation";
+import { parseJson, parsePetKind, validateManifest, validatePosterImage, validatePreviewImage, validateShareImage, validateSpritesheet, validationFromBytes } from "./validation";
 import { all, first, nowIso, tags, validationReport } from "../core/db";
 import { HttpError, json } from "../core/http";
 import { createZip } from "../core/zip";
@@ -32,6 +32,7 @@ export async function handlePets(ctx: AppContext, parts: string[]) {
   if (ctx.request.method === "GET" && parts[1] === "spritesheet") return visibleAsset(ctx, petId, user, `${petId}/spritesheet.webp`);
   if (ctx.request.method === "GET" && parts[1] === "share-image") return visibleAsset(ctx, petId, user, `${petId}/share.png`);
   if (ctx.request.method === "GET" && parts[1] === "preview") return visibleAsset(ctx, petId, user, `${petId}/preview.webp`);
+  if (ctx.request.method === "GET" && parts[1] === "poster") return visibleAsset(ctx, petId, user, `${petId}/poster.webp`);
   if (ctx.request.method === "GET" && parts[1] === "download") return downloadPet(ctx, petId, user);
   return json({ error: "not found" }, 404);
 }
@@ -87,6 +88,7 @@ export function serializePet(ctx: AppContext, row: PetRow, report?: ValidationRe
     ownerShadowbanned: Boolean(viewer?.isAdmin && ownerShadowbanned(row)),
     tags: tags(row),
     spritesheetUrl: petAssetUrl(ctx, `${row.id}/spritesheet.webp`, version),
+    posterUrl: petAssetUrl(ctx, `${row.id}/poster.webp`, version),
     previewUrl: petAssetUrl(ctx, `${row.id}/preview.webp`, version),
     shareImageUrl: petAssetUrl(ctx, `${row.id}/share.png`, version),
     downloadUrl: `/api/pets/${row.id}/download?v=${version}`,
@@ -108,15 +110,17 @@ async function uploadPet(ctx: AppContext, user: AuthUser) {
   const spritesheetFile = requireFile(form, "spritesheet");
   const shareImageFile = requireFile(form, "shareImage");
   const previewImageFile = requireFile(form, "previewImage");
+  const posterImageFile = requireFile(form, "posterImage");
   const manifest = validateManifest(parseJson(new TextDecoder().decode(manifestFile.bytes), "pet.json"));
   const kind = form.kind ? parsePetKind(form.kind) : manifest.kind;
   if (!kind) throw new HttpError("pet kind is required", 400);
   if (await getPet(ctx, manifest.id)) return json({ error: "pet id already exists" }, 409);
-  validateSpritesheet(spritesheetFile.bytes); validateShareImage(shareImageFile.bytes); validatePreviewImage(previewImageFile.bytes);
+  validateSpritesheet(spritesheetFile.bytes); validateShareImage(shareImageFile.bytes); validatePreviewImage(previewImageFile.bytes); validatePosterImage(posterImageFile.bytes);
   await putAsset(ctx, `${manifest.id}/pet.json`, new TextEncoder().encode(JSON.stringify(manifest, null, 2) + "\n"), "application/json");
   await putAsset(ctx, `${manifest.id}/spritesheet.webp`, spritesheetFile.bytes, "image/webp");
   await putAsset(ctx, `${manifest.id}/share.png`, shareImageFile.bytes, "image/png");
   await putAsset(ctx, `${manifest.id}/preview.webp`, previewImageFile.bytes, "image/webp");
+  await putAsset(ctx, `${manifest.id}/poster.webp`, posterImageFile.bytes, "image/webp");
   const report = validationFromBytes(manifest, spritesheetFile.bytes);
   await upsertPetRow(ctx, {
     id: manifest.id, displayName: manifest.displayName, description: manifest.description, spritesheetPath: manifest.spritesheetPath,
@@ -139,7 +143,7 @@ export async function upsertPetRow(ctx: AppContext, input: {
 async function deletePet(ctx: AppContext, petId: string, user: AuthUser) {
   const pet = await getPet(ctx, petId);
   if (!pet || (pet.owner_id !== user.id && !user.isAdmin)) return json({ error: "pet not found" }, 404);
-  await Promise.all(["pet.json", "spritesheet.webp", "share.png", "preview.webp"].map((name) => deleteAsset(ctx, `${petId}/${name}`)));
+  await Promise.all(["pet.json", "spritesheet.webp", "share.png", "preview.webp", "poster.webp"].map((name) => deleteAsset(ctx, `${petId}/${name}`)));
   await ctx.env.DB.prepare("delete from pets where id = ?").bind(petId).run();
   if (user.isAdmin) {
     await auditAdminAction(ctx, user, "pet.delete", {
@@ -318,6 +322,7 @@ async function readUploadForm(request: Request) {
     spritesheet: await uploadFileField(form, "spritesheet", 4 * 1024 * 1024),
     shareImage: await uploadFileField(form, "shareImage", 2 * 1024 * 1024),
     previewImage: await uploadFileField(form, "previewImage", 1024 * 1024),
+    posterImage: await uploadFileField(form, "posterImage", 512 * 1024),
     kind: stringField(form, "kind"),
     tags: stringField(form, "tags")
   };
@@ -332,7 +337,7 @@ function stringField(form: FormData, name: string) {
 
 function requireFile(form: Record<string, UploadFile | string | undefined>, name: string) {
   const value = form[name];
-  if (!value || typeof value === "string") throw new HttpError("upload pet.json, spritesheet.webp, share.png, and preview.webp", 400);
+  if (!value || typeof value === "string") throw new HttpError("upload pet.json, spritesheet.webp, share.png, preview.webp, and poster.webp", 400);
   return value;
 }
 

@@ -20,6 +20,7 @@ export function normalizePet(pet: Pet): Pet {
     likedByMe: Boolean(pet.likedByMe),
     ownerShadowbanned: Boolean(pet.ownerShadowbanned),
     spritesheetUrl: petAssetUrl(pet.spritesheetUrl),
+    posterUrl: petAssetUrl(pet.posterUrl),
     previewUrl: petAssetUrl(pet.previewUrl),
     shareImageUrl: petAssetUrl(pet.shareImageUrl),
     downloadUrl: petAssetUrl(pet.downloadUrl),

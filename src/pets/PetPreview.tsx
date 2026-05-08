@@ -84,7 +84,6 @@ export function GalleryPetPreview({ pet, compact }: { pet: Pet; compact: boolean
   const [interacting, setInteracting] = useState(false);
   const [fullSpriteRequested, setFullSpriteRequested] = useState(false);
   const [fullSpriteLoaded, setFullSpriteLoaded] = useState(false);
-  const previewWidth = previewFrameCount * 96;
   const animatedVisible = interacting && fullSpriteLoaded;
 
   useEffect(() => {
@@ -129,19 +128,14 @@ export function GalleryPetPreview({ pet, compact }: { pet: Pet; compact: boolean
     >
       <img
         className="galleryPreviewStillImage"
-        src={pet.previewUrl}
-        width={previewWidth}
-        height={104}
+        src={pet.posterUrl}
+        width={192}
+        height={208}
         loading="lazy"
         decoding="async"
         alt=""
         aria-hidden="true"
         draggable={false}
-        style={
-          {
-            "--preview-frames": previewFrameCount
-          } as CSSProperties
-        }
       />
       {fullSpriteRequested ? (
         <div
