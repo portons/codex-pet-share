@@ -27,8 +27,18 @@ export async function handleCollections(ctx: AppContext, parts: string[]) {
     const collection = await collectionRow(ctx, parts[0]);
     if (!collection) return json({ error: "collection not found" }, 404);
     const pets = await collectionPets(ctx, collection.slug, content);
+    const pagination = parsePagination(ctx.url);
+    const start = (pagination.page - 1) * pagination.pageSize;
+    const pagePets = pets.slice(start, start + pagination.pageSize);
     const petIds = collection.owner_id && user?.id === collection.owner_id ? await collectionPetIds(ctx, collection.slug) : undefined;
-    return json({ collection: collectionSummary(ctx, collection, pets, petIds, user), pets: pets.map((pet) => serializePet(ctx, pet, undefined, undefined, user)) });
+    return json({
+      collection: collectionSummary(ctx, collection, pets, petIds, user),
+      pets: pagePets.map((pet) => serializePet(ctx, pet, undefined, undefined, user)),
+      page: pagination.page,
+      pageSize: pagination.pageSize,
+      total: pets.length,
+      totalPages: Math.ceil(pets.length / pagination.pageSize)
+    });
   }
   return json({ error: "not found" }, 404);
 }

@@ -2,7 +2,7 @@ import { type CSSProperties, useState } from "react";
 import { APP_HANDLE } from "../branding/brand";
 import { type TagName } from "../domain/config";
 import { formatMetric } from "../domain/format";
-import type { AuthSession, CollectionSummary, ContentMode, Pet, User } from "../domain/types";
+import type { AuthSession, CollectionSummary, ContentMode, GalleryMeta, Pet, User } from "../domain/types";
 import { useCollectionPresenceCounts } from "../realtime/useCollectionPresenceCounts";
 import { PetCard } from "../pets/PetCard";
 import { CyclingPetPreview } from "../pets/PetPreview";
@@ -10,6 +10,7 @@ import { copyText } from "../ui/clipboard";
 import { EmptyState } from "../ui/EmptyState";
 import { Icon } from "../ui/Icon";
 import { GallerySkeleton } from "../ui/Skeletons";
+import { PaginationControls } from "./PaginationControls";
 
 export function CollectionDetailPageWithPresence({
   collection,
@@ -339,6 +340,7 @@ function UserCollectionsSection({
 function CollectionDetailPage({
   collection,
   pets,
+  meta,
   loading,
   user,
   likeBusyId,
@@ -363,10 +365,12 @@ function CollectionDetailPage({
   onToggleNsfw,
   onShadowbanOwner,
   onDelete,
-  onSignIn
+  onSignIn,
+  onPage
 }: {
   collection: Omit<CollectionSummary, "topPets"> | null;
   pets: Array<Pet>;
+  meta: GalleryMeta;
   loading: boolean;
   user: User | null;
   likeBusyId: string;
@@ -395,6 +399,7 @@ function CollectionDetailPage({
   onShadowbanOwner: (pet: Pet) => void;
   onDelete: (pet: Pet) => void;
   onSignIn: () => void;
+  onPage: (page: number) => void;
 }) {
   const [copiedCommand, setCopiedCommand] = useState(false);
   const collectionCommand = collection ? `npx ${APP_HANDLE} add-collection ${collection.slug}` : "";
@@ -516,6 +521,7 @@ function CollectionDetailPage({
       ) : (
         <EmptyState text="No pets in this collection." />
       )}
+      <PaginationControls meta={meta} loading={loading} onPage={onPage} />
     </section>
   );
 }

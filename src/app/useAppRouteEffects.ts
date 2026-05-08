@@ -1,5 +1,5 @@
 import { useEffect, type Dispatch, type SetStateAction } from "react";
-import { creatorPageFromHash, galleryUrlStateFromHash, routeFromHash } from "../domain/routing";
+import { collectionPageFromHash, creatorPageFromHash, galleryUrlStateFromHash, routeFromHash } from "../domain/routing";
 import type {
   AuthSession,
   Creator,
@@ -47,6 +47,7 @@ export function useAppRouteEffects({
   loadCreators,
   setCollectionDetail,
   setCollectionPets,
+  setCollectionMeta,
   loadCollectionDetail,
   loadAdminCollections,
   setAdminStatus
@@ -74,7 +75,8 @@ export function useAppRouteEffects({
   loadCreators: (authSession?: AuthSession | null, content?: "safe" | "all") => Promise<void>;
   setCollectionDetail: Dispatch<SetStateAction<Omit<import("../domain/types").CollectionSummary, "topPets"> | null>>;
   setCollectionPets: Dispatch<SetStateAction<Pet[]>>;
-  loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: "safe" | "all") => Promise<void>;
+  setCollectionMeta: Dispatch<SetStateAction<GalleryMeta>>;
+  loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: "safe" | "all", page?: number) => Promise<void>;
   loadAdminCollections: (authSession?: AuthSession | null, currentUser?: User | null) => Promise<void>;
   setAdminStatus: Dispatch<SetStateAction<string>>;
 }) {
@@ -131,7 +133,9 @@ export function useAppRouteEffects({
     if (route.name === "collection") {
       setCollectionDetail(null);
       setCollectionPets([]);
-      loadCollectionDetail(route.slug).catch((error) =>
+      const page = collectionPageFromHash();
+      setCollectionMeta((current) => ({ ...current, page }));
+      loadCollectionDetail(route.slug, session, undefined, page).catch((error) =>
         setAuthStatus(error instanceof Error ? error.message : "failed to load collection")
       );
     }

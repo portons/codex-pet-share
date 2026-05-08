@@ -128,7 +128,7 @@ export type CollectionSummary = {
   petIds?: Array<string>;
 };
 
-export type CollectionDetailResponse = {
+export type CollectionDetailResponse = GalleryMeta & {
   collection: Omit<CollectionSummary, "topPets">;
   pets: Array<Pet>;
 };

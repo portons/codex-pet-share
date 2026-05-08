@@ -201,19 +201,49 @@ function wrapCanvasText(
   let line = "";
   let lineCount = 0;
 
+  function writeLine(value: string) {
+    context.fillText(value, x, y + lineCount * lineHeight);
+    lineCount += 1;
+    return lineCount < maxLines;
+  }
+
   for (const word of words) {
-    const next = line ? `${line} ${word}` : word;
-    if (context.measureText(next).width > maxWidth && line) {
-      context.fillText(line, x, y + lineCount * lineHeight);
-      line = word;
-      lineCount += 1;
-      if (lineCount >= maxLines) return;
-    } else {
-      line = next;
+    let remaining = word;
+    while (remaining) {
+      const next = line ? `${line} ${remaining}` : remaining;
+      if (context.measureText(next).width <= maxWidth) {
+        line = next;
+        break;
+      }
+      if (line) {
+        if (!writeLine(line)) return;
+        line = "";
+        continue;
+      }
+      const split = splitCanvasWord(context, remaining, maxWidth);
+      if (!writeLine(split.head)) return;
+      remaining = split.tail;
     }
   }
 
   if (line && lineCount < maxLines) {
     context.fillText(line, x, y + lineCount * lineHeight);
   }
+}
+
+function splitCanvasWord(context: CanvasRenderingContext2D, word: string, maxWidth: number) {
+  const chars = Array.from(word);
+  let end = 0;
+  let head = "";
+  for (; end < chars.length; end += 1) {
+    const next = head + chars[end];
+    if (head && context.measureText(next).width > maxWidth) {
+      break;
+    }
+    head = next;
+  }
+  return {
+    head: head || chars[0] || "",
+    tail: chars.slice(Math.max(end, 1)).join("")
+  };
 }

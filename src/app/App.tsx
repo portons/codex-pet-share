@@ -86,6 +86,8 @@ function App() {
     setCollectionDetail,
     collectionPets,
     setCollectionPets,
+    collectionMeta,
+    setCollectionMeta,
     detailLoading,
     mineLoading,
     favoritesLoading,
@@ -353,12 +355,13 @@ function App() {
     loadCreators,
     setCollectionDetail,
     setCollectionPets,
+    setCollectionMeta,
     loadCollectionDetail,
     loadAdminCollections,
     setAdminStatus
   });
 
-  const { selectContentMode, selectCreatorPage, logout } = useAppNavigationActions({
+  const { selectContentMode, selectCreatorPage, selectCollectionPage, logout } = useAppNavigationActions({
     route,
     user,
     session,
@@ -371,12 +374,14 @@ function App() {
     activeKind,
     galleryMeta,
     creatorMeta,
+    collectionMeta,
     apiFetch,
     applySession,
     setUser,
     setMinePets,
     setFavoritePets,
     setCreatorMeta,
+    setCollectionMeta,
     setLoading,
     pushGalleryState,
     scrollPageTop,
@@ -408,10 +413,10 @@ function App() {
       deleteUpload, openAuth, favoritePets, favoritesLoading, minePets, mineLoading, deleteStatus,
       uploadState, uploadStatus, uploadBusy, setUploadState, setUploadStatus, submitUpload, creators,
       creatorsTotal, creatorsLoading, collectionsLoading, setAuthMode, setSharingEntity, collectionDetail,
-      collectionPets, collectionDetailLoading, adminCollections, adminCollectionsLoading,
+      collectionPets, collectionMeta, collectionDetailLoading, adminCollections, adminCollectionsLoading,
       adminCollectionBusySlug, adminModerationBusy, adminStatus, setAdminUserShadowban, removeAdminUser,
       createCollection, updateCollection, deleteCollection, creator, creatorPets, creatorMeta,
-      creatorLoading, selectCreatorPage, detailLoading, detailPet, morePets
+      creatorLoading, selectCreatorPage, selectCollectionPage, detailLoading, detailPet, morePets
     },
     dialogs: {
       authOpen, authMode, selectAuthMode, displayName, setDisplayName, email, setEmail, password,

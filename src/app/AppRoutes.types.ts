@@ -90,6 +90,7 @@ export type AppRoutesProps = {
   setSharingEntity: SetState<EntityShareTarget | null>;
   collectionDetail: Omit<CollectionSummary, "topPets"> | null;
   collectionPets: Pet[];
+  collectionMeta: GalleryMeta;
   collectionDetailLoading: boolean;
   adminCollections: AdminCollection[];
   adminCollectionsLoading: boolean;
@@ -106,6 +107,7 @@ export type AppRoutesProps = {
   creatorMeta: GalleryMeta;
   creatorLoading: boolean;
   selectCreatorPage: (page: number) => void | Promise<void>;
+  selectCollectionPage: (page: number) => void | Promise<void>;
   detailLoading: boolean;
   detailPet: Pet | null;
   morePets: Pet[];

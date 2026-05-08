@@ -45,11 +45,13 @@ The frontend expects an API under `VITE_APP_API_BASE_URL` with these groups:
 - `POST /api/auth/login`, `POST /api/auth/register`,
   `POST /api/auth/refresh`, `GET /api/auth/me`
 - `GET /api/users/:id/pets`, `GET /api/creators/leaderboard`
-- `GET /api/collections`, `GET /api/collections/:slug`
+- `GET /api/collections`, `GET /api/collections/:slug?page=<n>&pageSize=<n>`
 - `POST /api/rooms`, `GET /api/rooms/:id`, `POST /api/rooms/:id/close`
 - admin routes under `/api/admin/*`
 
-Responses should match the TypeScript types in `src/domain/types.ts`.
+Responses should match the TypeScript types in `src/domain/types.ts`. Collection
+detail responses include the same pagination metadata shape as gallery
+responses.
 
 ## Auth Contract
 

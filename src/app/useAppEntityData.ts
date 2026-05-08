@@ -82,6 +82,12 @@ export function useAppEntityData({
   const [adminCollections, setAdminCollections] = useState<Array<AdminCollection>>([]);
   const [collectionDetail, setCollectionDetail] = useState<Omit<CollectionSummary, "topPets"> | null>(null);
   const [collectionPets, setCollectionPets] = useState<Array<Pet>>([]);
+  const [collectionMeta, setCollectionMeta] = useState<GalleryMeta>({
+    page: 1,
+    pageSize: defaultPageSize,
+    total: 0,
+    totalPages: 0
+  });
   const [detailLoading, setDetailLoading] = useState(false);
   const [mineLoading, setMineLoading] = useState(false);
   const [favoritesLoading, setFavoritesLoading] = useState(false);
@@ -226,17 +232,24 @@ export function useAppEntityData({
     }
   }
 
-  async function loadCollectionDetail(slug: string, authSession = session, content = contentMode) {
+  async function loadCollectionDetail(slug: string, authSession = session, content = contentMode, page = collectionMeta.page) {
     setCollectionDetailLoading(true);
     try {
       const params = new URLSearchParams();
+      params.set("page", String(page));
+      params.set("pageSize", String(collectionMeta.pageSize));
       if (content === "all") {
         params.set("content", "all");
       }
-      const suffix = params.toString() ? `?${params}` : "";
-      const body = await readJson<CollectionDetailResponse>(await apiFetch(`/api/collections/${slug}${suffix}`, {}, authSession));
+      const body = await readJson<CollectionDetailResponse>(await apiFetch(`/api/collections/${slug}?${params}`, {}, authSession));
       setCollectionDetail(body.collection);
       setCollectionPets(body.pets.map(normalizePet));
+      setCollectionMeta({
+        page: body.page,
+        pageSize: body.pageSize,
+        total: body.total,
+        totalPages: body.totalPages
+      });
     } finally {
       setCollectionDetailLoading(false);
     }
@@ -314,6 +327,8 @@ export function useAppEntityData({
     setCollectionDetail,
     collectionPets,
     setCollectionPets,
+    collectionMeta,
+    setCollectionMeta,
     detailLoading,
     mineLoading,
     favoritesLoading,

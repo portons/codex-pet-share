@@ -96,6 +96,10 @@ export function creatorPageFromHash() {
   return parsePositivePage(hashParts().params.get("page"));
 }
 
+export function collectionPageFromHash() {
+  return parsePositivePage(hashParts().params.get("page"));
+}
+
 export function galleryHash(state: Partial<GalleryUrlState> = {}) {
   const next = { ...defaultGalleryUrlState, ...state };
   const params = new URLSearchParams();
@@ -124,4 +128,8 @@ export function galleryHash(state: Partial<GalleryUrlState> = {}) {
 
 export function creatorHash(id: string, page = 1) {
   return page > 1 ? `/users/${id}?page=${page}` : `/users/${id}`;
+}
+
+export function collectionHash(slug: string, page = 1) {
+  return page > 1 ? `/collections/${slug}?page=${page}` : `/collections/${slug}`;
 }

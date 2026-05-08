@@ -43,10 +43,7 @@ export async function handleCollectionSocialImage(ctx: AppContext, slug?: string
 }
 
 export async function collectionSocialPreviewImageUrl(ctx: AppContext, collection: CollectionRow, pets: PetRow[]) {
-  if (!collection.owner_id) {
-    return `${ctx.env.PUBLIC_APP_ORIGIN}/assets/social/collections/${encodeURIComponent(collection.slug)}.png`;
-  }
-  const owner = await collectionOwner(ctx, collection.owner_id);
+  const owner = collection.owner_id ? await collectionOwner(ctx, collection.owner_id) : null;
   const version = collectionSocialPreviewVersion(collection, owner, pets);
   return `${ctx.url.origin}/api/collections/${encodeURIComponent(collection.slug)}/social-image?v=${encodeURIComponent(version)}`;
 }
@@ -176,14 +173,24 @@ function wrapText(value: string, maxChars: number, maxLines: number) {
   const lines: string[] = [];
   let current = "";
   for (const word of words) {
-    const next = current ? `${current} ${word}` : word;
-    if (next.length > maxChars && current) {
-      lines.push(current);
-      current = word;
+    let remaining = word;
+    while (remaining) {
+      const next = current ? `${current} ${remaining}` : remaining;
+      if (next.length <= maxChars) {
+        current = next;
+        break;
+      }
+      if (current) {
+        lines.push(current);
+        current = "";
+        if (lines.length === maxLines) break;
+        continue;
+      }
+      lines.push(remaining.slice(0, maxChars));
+      remaining = remaining.slice(maxChars);
       if (lines.length === maxLines) break;
-    } else {
-      current = next;
     }
+    if (lines.length === maxLines) break;
   }
   if (current && lines.length < maxLines) lines.push(current);
   if (!lines.length) return ["Collection"];

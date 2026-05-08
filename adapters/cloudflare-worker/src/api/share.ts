@@ -198,6 +198,7 @@ function entityHtml(ctx: AppContext, input: { title: string; description: string
       color: var(--muted);
       font-size: 18px;
       line-height: 1.45;
+      overflow-wrap: anywhere;
     }
     .shareCopy p:last-of-type {
       margin-bottom: 28px;

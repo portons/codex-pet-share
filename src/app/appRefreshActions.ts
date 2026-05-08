@@ -1,4 +1,5 @@
 import { sessionNeedsRefresh } from "../domain/session";
+import { collectionPageFromHash } from "../domain/routing";
 import type { AuthSession, ContentMode, GalleryMeta, GallerySort, GalleryView, PetKind, Route, User } from "../domain/types";
 
 type LoadGallery = (
@@ -54,7 +55,7 @@ export async function refreshAfterAuthRoute({
   loadCreators: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCollections: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadUserCollections: (currentUser?: User | null, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
-  loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
+  loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: ContentMode, page?: number) => Promise<void>;
   loadAdminCollections: (authSession?: AuthSession | null, currentUser?: User | null) => Promise<void>;
 }) {
   await refresh(nextSession);
@@ -71,7 +72,7 @@ export async function refreshAfterAuthRoute({
       loadUserCollections(nextUser, nextSession, contentMode)
     ]);
   }
-  if (route.name === "collection") await loadCollectionDetail(route.slug, nextSession, contentMode);
+  if (route.name === "collection") await loadCollectionDetail(route.slug, nextSession, contentMode, collectionPageFromHash());
   if (nextUser.isAdmin && route.name === "admin") await loadAdminCollections(nextSession);
 }
 

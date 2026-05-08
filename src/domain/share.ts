@@ -36,15 +36,7 @@ export function socialShareUrls(shareText: string, shareUrl: string) {
   };
 }
 
-// Match the static composites baked by scripts/build-entity-cards.mjs and
-// served by the share-page adapter. The in-app share preview should look
-// exactly like the X/Slack/etc. unfurl, so it points at the same asset.
-export function collectionCompositeUrl(slug: string): string {
-  return `${publicAppOrigin}/assets/social/collections/${encodeURIComponent(slug)}.png`;
-}
-
 export function collectionSocialPreviewUrl(collection: { slug: string; ownerId?: string | null; updatedAt: string }) {
-  if (!collection.ownerId) return collectionCompositeUrl(collection.slug);
   return `${publicAppOrigin}/api/collections/${encodeURIComponent(collection.slug)}/social-image?v=${encodeURIComponent(collection.updatedAt)}`;
 }
 

@@ -342,14 +342,24 @@ function wrap(str, perLine, maxLines) {
   const lines = [];
   let current = "";
   for (const word of words) {
-    const candidate = current ? `${current} ${word}` : word;
-    if (candidate.length > perLine && current) {
-      lines.push(current);
-      current = word;
+    let remaining = word;
+    while (remaining) {
+      const candidate = current ? `${current} ${remaining}` : remaining;
+      if (candidate.length <= perLine) {
+        current = candidate;
+        break;
+      }
+      if (current) {
+        lines.push(current);
+        current = "";
+        if (lines.length === maxLines) break;
+        continue;
+      }
+      lines.push(remaining.slice(0, perLine));
+      remaining = remaining.slice(perLine);
       if (lines.length === maxLines) break;
-    } else {
-      current = candidate;
     }
+    if (lines.length === maxLines) break;
   }
   if (lines.length < maxLines && current) {
     lines.push(current);

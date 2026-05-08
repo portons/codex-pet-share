@@ -94,6 +94,7 @@ export function AppRoutes({
   setSharingEntity,
   collectionDetail,
   collectionPets,
+  collectionMeta,
   collectionDetailLoading,
   adminCollections,
   adminCollectionsLoading,
@@ -110,6 +111,7 @@ export function AppRoutes({
   creatorMeta,
   creatorLoading,
   selectCreatorPage,
+  selectCollectionPage,
   detailLoading,
   detailPet,
   morePets
@@ -265,6 +267,7 @@ export function AppRoutes({
         <CollectionDetailPageWithPresence
           collection={collectionDetail}
           pets={collectionPets}
+          meta={collectionMeta}
           loading={collectionDetailLoading}
           user={user}
           session={session}
@@ -302,6 +305,7 @@ export function AppRoutes({
           onShadowbanOwner={toggleOwnerShadowban}
           onDelete={deleteUpload}
           onSignIn={openAuth}
+          onPage={selectCollectionPage}
         />
       )}
 

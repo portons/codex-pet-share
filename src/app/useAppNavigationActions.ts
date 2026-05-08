@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import { creatorHash, navigate, pushHash } from "../domain/routing";
+import { collectionHash, creatorHash, navigate, pushHash } from "../domain/routing";
 import type {
   AuthSession,
   ContentMode,
@@ -37,12 +37,14 @@ export function useAppNavigationActions({
   activeKind,
   galleryMeta,
   creatorMeta,
+  collectionMeta,
   apiFetch,
   applySession,
   setUser,
   setMinePets,
   setFavoritePets,
   setCreatorMeta,
+  setCollectionMeta,
   setLoading,
   pushGalleryState,
   scrollPageTop,
@@ -65,12 +67,14 @@ export function useAppNavigationActions({
   activeKind: PetKind;
   galleryMeta: GalleryMeta;
   creatorMeta: GalleryMeta;
+  collectionMeta: GalleryMeta;
   apiFetch: ApiFetch;
   applySession: (next: AuthSession | null) => void;
   setUser: Dispatch<SetStateAction<User | null>>;
   setMinePets: Dispatch<SetStateAction<Pet[]>>;
   setFavoritePets: Dispatch<SetStateAction<Pet[]>>;
   setCreatorMeta: Dispatch<SetStateAction<GalleryMeta>>;
+  setCollectionMeta: Dispatch<SetStateAction<GalleryMeta>>;
   setLoading: Dispatch<SetStateAction<boolean>>;
   pushGalleryState: (state: {
     query: string;
@@ -87,7 +91,7 @@ export function useAppNavigationActions({
   loadCreators: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCollections: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadUserCollections: (currentUser?: User | null, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
-  loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
+  loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: ContentMode, page?: number) => Promise<void>;
 }) {
   async function selectContentMode(mode: ContentMode) {
     if (mode === contentMode) return;
@@ -118,7 +122,9 @@ export function useAppNavigationActions({
       ]);
     }
     if (route.name === "collection") {
-      await loadCollectionDetail(route.slug, session, mode);
+      pushHash(collectionHash(route.slug, 1));
+      setCollectionMeta((current) => ({ ...current, page: 1 }));
+      await loadCollectionDetail(route.slug, session, mode, 1);
     }
   }
 
@@ -127,6 +133,14 @@ export function useAppNavigationActions({
     pushHash(creatorHash(route.id, page));
     setCreatorMeta((current) => ({ ...current, page }));
     await loadCreator(route.id, page, session, contentMode);
+    scrollPageTop();
+  }
+
+  async function selectCollectionPage(page: number) {
+    if (route.name !== "collection" || page === collectionMeta.page) return;
+    pushHash(collectionHash(route.slug, page));
+    setCollectionMeta((current) => ({ ...current, page }));
+    await loadCollectionDetail(route.slug, session, contentMode, page);
     scrollPageTop();
   }
 
@@ -147,6 +161,7 @@ export function useAppNavigationActions({
   return {
     selectContentMode,
     selectCreatorPage,
+    selectCollectionPage,
     logout
   };
 }
