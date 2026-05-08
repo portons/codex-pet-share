@@ -122,6 +122,7 @@ export function PetCard({
   nsfwBusyId,
   contentMode,
   hasCollections,
+  collectionBadge,
   onLike,
   onShare,
   onPlayground,
@@ -147,6 +148,7 @@ export function PetCard({
   nsfwBusyId: string;
   contentMode: ContentMode;
   hasCollections: boolean;
+  collectionBadge?: { slug: string; displayName: string };
   onLike: (pet: Pet) => void;
   onShare: (pet: Pet) => void;
   onPlayground?: (pet: Pet) => void;
@@ -213,6 +215,18 @@ export function PetCard({
             </button>
           )}
         </div>
+      )}
+      {collectionBadge && (
+        <a
+          className="petCardCollectionPill"
+          href={`#/collections/${collectionBadge.slug}`}
+          onClick={stopCardPropagation}
+          onMouseOver={stopCardPropagation}
+          onPointerDown={stopCardPropagation}
+        >
+          <Icon name="package" size={12} />
+          <span>{collectionBadge.displayName}</span>
+        </a>
       )}
       <button className="petCardPreview" type="button" onClick={openPetPage}>
         <GalleryPetPreview pet={pet} compact={compact} />

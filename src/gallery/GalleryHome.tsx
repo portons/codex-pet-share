@@ -1,4 +1,4 @@
-import { type CSSProperties, type FormEvent, useEffect, useState } from "react";
+import { type CSSProperties, type FormEvent, useEffect, useMemo, useState } from "react";
 import { type TagName } from "../domain/config";
 import type { AuthSession, CollectionSummary, ContentMode, GalleryMeta, GallerySort, GalleryView, Pet, PetKind, User } from "../domain/types";
 import { useCollectionPresenceCounts } from "../realtime/useCollectionPresenceCounts";
@@ -159,6 +159,8 @@ function Gallery({
   onContentMode,
   onPage,
   onRandomize,
+  freshPetCount,
+  onFreshPets,
   onSearch,
   user,
   likeBusyId,
@@ -199,6 +201,8 @@ function Gallery({
   onContentMode: (value: ContentMode) => void;
   onPage: (page: number) => void;
   onRandomize: () => void;
+  freshPetCount: number;
+  onFreshPets: () => void;
   onSearch: (event: FormEvent) => void;
   user: User | null;
   likeBusyId: string;
@@ -220,6 +224,18 @@ function Gallery({
   const cursorPreviewEnabled = Boolean(previewPet && canCursorPreview);
   const cursorPreviewReady = useCursorPreviewAssets(previewPet, cursorPreviewEnabled);
   const { cursorPoint, cursorStateId, cursorRotationDeg } = useCursorPreviewMotion(cursorPreviewEnabled);
+  const publicCollectionByPetId = useMemo(() => {
+    const byPetId = new Map<string, Pick<CollectionSummary, "slug" | "displayName">>();
+    for (const collection of collections) {
+      if (collection.ownerId) continue;
+      for (const petId of collection.petIds ?? []) {
+        if (!byPetId.has(petId)) {
+          byPetId.set(petId, { slug: collection.slug, displayName: collection.displayName });
+        }
+      }
+    }
+    return byPetId;
+  }, [collections]);
 
   useEffect(() => {
     if (!canCursorPreview) {
@@ -252,46 +268,68 @@ function Gallery({
         onContentMode={onContentMode}
         onSubmit={onSearch}
       />
-      <ResultBar meta={meta} loading={loading} />
+      <div className={`galleryStatusRow ${freshPetCount > 0 ? "hasFresh" : ""}`}>
+        <ResultBar meta={meta} loading={loading} />
+        {freshPetCount > 0 && (
+          <div className="freshPetsNotice" role="status">
+            <div>
+              <p className="freshPetsEyebrow">
+                <span className="freshPetsDot" aria-hidden="true" />
+                New upload{freshPetCount === 1 ? "" : "s"}
+              </p>
+              <p className="freshPetsCopy">
+                {freshPetCount} new pet{freshPetCount === 1 ? "" : "s"} ready.
+              </p>
+            </div>
+            <button className="btn btnPrimary" type="button" disabled={loading} onClick={onFreshPets}>
+              <Icon name="sparkle" size={13} />
+              Show
+            </button>
+          </div>
+        )}
+      </div>
       {loading ? (
         <GallerySkeleton view={activeView} />
       ) : pets.length ? (
-        <div className={`galleryGrid ${activeView}`}>
-          {pets.map((pet, index) => (
-            <div
-              className="revealItem"
-              key={pet.id}
-              style={{ "--delay": `${index * 60}ms` } as CSSProperties}
-            >
-              <PetCard
-                pet={pet}
-                view={activeView}
-                user={user}
-                likeBusyId={likeBusyId}
-                deletingPetId={deletingPetId}
-                shadowbanBusyOwnerId={shadowbanBusyOwnerId}
-                nsfwBusyId={nsfwBusyId}
-                contentMode={contentMode}
-                hasCollections={hasCollections}
-                onLike={onLike}
-                onShare={onShare}
-                onPlayground={onPlayground}
-                onDownload={onDownload}
-                onTagClick={onTagClick}
-                onEditTags={onEditTags}
-                onManageCollections={onManageCollections}
-                onCollect={onCollect}
-                onPreview={canCursorPreview ? (previewTarget) =>
-                  setPreviewPet((current) => (current?.id === previewTarget.id ? null : previewTarget))
-                : undefined}
-                previewActive={previewPet?.id === pet.id}
-                onToggleNsfw={onToggleNsfw}
-                onShadowbanOwner={onShadowbanOwner}
-                onDelete={onDelete}
-                onSignIn={onSignIn}
-              />
-            </div>
-          ))}
+        <div className="galleryResultsShell">
+          <div className={`galleryGrid ${activeView}`}>
+            {pets.map((pet, index) => (
+              <div
+                className="revealItem"
+                key={pet.id}
+                style={{ "--delay": `${index * 60}ms` } as CSSProperties}
+              >
+                <PetCard
+                  pet={pet}
+                  view={activeView}
+                  user={user}
+                  likeBusyId={likeBusyId}
+                  deletingPetId={deletingPetId}
+                  shadowbanBusyOwnerId={shadowbanBusyOwnerId}
+                  nsfwBusyId={nsfwBusyId}
+                  contentMode={contentMode}
+                  hasCollections={hasCollections}
+                  collectionBadge={publicCollectionByPetId.get(pet.id)}
+                  onLike={onLike}
+                  onShare={onShare}
+                  onPlayground={onPlayground}
+                  onDownload={onDownload}
+                  onTagClick={onTagClick}
+                  onEditTags={onEditTags}
+                  onManageCollections={onManageCollections}
+                  onCollect={onCollect}
+                  onPreview={canCursorPreview ? (previewTarget) =>
+                    setPreviewPet((current) => (current?.id === previewTarget.id ? null : previewTarget))
+                  : undefined}
+                  previewActive={previewPet?.id === pet.id}
+                  onToggleNsfw={onToggleNsfw}
+                  onShadowbanOwner={onShadowbanOwner}
+                  onDelete={onDelete}
+                  onSignIn={onSignIn}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <EmptyState text="No pets found." />

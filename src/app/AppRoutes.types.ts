@@ -49,6 +49,8 @@ export type AppRoutesProps = {
   selectContentMode: (mode: ContentMode) => void | Promise<void>;
   selectPage: (page: number) => void | Promise<void>;
   randomizeGallery: () => void | Promise<void>;
+  freshPetCount: number;
+  showFreshPets: () => void | Promise<void>;
   submitSearch: (event: FormEvent) => void | Promise<void>;
   likeBusyId: string;
   toggleLike: (pet: Pet) => void | Promise<void>;

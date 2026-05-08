@@ -55,6 +55,8 @@ function App() {
     selectKind,
     selectPage,
     randomizeGallery,
+    freshPetCount,
+    showFreshPets,
     selectVisibleTag,
     removePetFromGallery
   } = useGalleryBrowser({ apiFetch, session, route, setRoute });
@@ -393,6 +395,7 @@ function App() {
       contentMode, deletingPetId, shadowbanBusyOwnerId, nsfwBusyId, collections, userCollections,
       userCollectionsLoading, setQuery, selectTag,
       clearTags, selectSort, selectView, selectKind, selectContentMode, selectPage, randomizeGallery,
+      freshPetCount, showFreshPets,
       submitSearch, likeBusyId, toggleLike, setSharingPet, setPlaygroundPet, setDownloadPet,
       selectVisibleTag, openTagEditor, openCollectionEditor, togglePetNsfw, toggleOwnerShadowban,
       openPetCollector: userCollectionActions.openPetCollector,

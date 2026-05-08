@@ -53,6 +53,8 @@ export function AppRoutes({
   selectContentMode,
   selectPage,
   randomizeGallery,
+  freshPetCount,
+  showFreshPets,
   submitSearch,
   likeBusyId,
   toggleLike,
@@ -140,6 +142,8 @@ export function AppRoutes({
           onContentMode={selectContentMode}
           onPage={selectPage}
           onRandomize={randomizeGallery}
+          freshPetCount={freshPetCount}
+          onFreshPets={showFreshPets}
           onSearch={submitSearch}
           user={user}
           likeBusyId={likeBusyId}

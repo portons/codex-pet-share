@@ -46,6 +46,114 @@
   text-align: right;
 }
 
+.galleryStatusRow {
+  position: relative;
+  min-height: 46px;
+  margin: 0 0 14px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.galleryStatusRow .resultBar {
+  min-height: 46px;
+  margin: 0;
+  padding: 10px 0;
+  border-top: 0;
+}
+
+.galleryStatusRow.hasFresh .resultBar {
+  padding-right: min(310px, 42vw);
+}
+
+.freshPetsNotice {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: 6;
+  width: fit-content;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 9px 10px 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 68%, transparent), transparent 62%),
+    color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: 0 16px 34px -28px var(--accent);
+  backdrop-filter: blur(10px);
+  transform: translateY(-50%);
+}
+
+.freshPetsNotice .btn {
+  height: 30px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.freshPetsEyebrow,
+.freshPetsCopy {
+  margin: 0;
+}
+
+.freshPetsEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.freshPetsDot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.freshPetsDot::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 1px solid var(--accent);
+  border-radius: inherit;
+  opacity: 0.22;
+  animation: fresh-pulse 1400ms var(--ease-out) infinite;
+}
+
+.freshPetsCopy {
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .freshPetsDot::after {
+    animation: none;
+  }
+}
+
+@keyframes fresh-pulse {
+  from {
+    opacity: 0.34;
+    transform: scale(0.72);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
 .searchShell {
   position: relative;
   display: block;
