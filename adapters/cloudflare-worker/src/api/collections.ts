@@ -140,7 +140,7 @@ export async function handleAdmin(ctx: AppContext, parts: string[]) {
 
 export async function publicCollections(ctx: AppContext, content = "safe") {
   const rows = await all<CollectionRow>(ctx.env.DB.prepare("select * from collections where owner_id is null order by display_name asc, slug asc"));
-  return Promise.all(rows.map((row) => collectionSummaryForRow(ctx, row, content)));
+  return Promise.all(rows.map((row) => collectionSummaryForRow(ctx, row, content, null, true)));
 }
 
 export async function collectionRow(ctx: AppContext, slug: string) {

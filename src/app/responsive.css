@@ -193,6 +193,22 @@
     text-align: left;
   }
 
+  .galleryStatusRow.hasFresh .resultBar {
+    padding-right: 0;
+  }
+
+  .freshPetsNotice {
+    top: auto;
+    right: 0;
+    bottom: 8px;
+    width: min(260px, 100%);
+    transform: none;
+  }
+
+  .freshPetsNotice .btn {
+    justify-content: center;
+  }
+
   .tagDropdown,
   .tagDropdownTrigger {
     width: 100%;

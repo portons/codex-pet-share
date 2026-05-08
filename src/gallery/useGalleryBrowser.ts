@@ -1,4 +1,4 @@
-import { useMemo, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
+import { useEffect, useMemo, useRef, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import {
   defaultGalleryUrlState,
   galleryPageSize,
@@ -48,6 +48,8 @@ export function useGalleryBrowser({
   const [activeKind, setActiveKind] = useState<PetKind>(initialGalleryState.kind);
   const [contentMode, setContentMode] = useState<ContentMode>(initialGalleryState.content);
   const [loading, setLoading] = useState(true);
+  const [freshPetCount, setFreshPetCount] = useState(0);
+  const freshBaselineRef = useRef<{ key: string; total: number } | null>(null);
 
   function applyGalleryState(nextState: GalleryUrlState) {
     setQuery(nextState.query);
@@ -110,6 +112,8 @@ export function useGalleryBrowser({
     const body = await readJson<GalleryResponse>(await apiFetch(`/api/pets${suffix}`, {}, authSession));
     const pageSize = galleryPageSize(view, sort);
     const nextPets = body.pets.map(normalizePet);
+    freshBaselineRef.current = { key: freshGalleryKey(search, tags, content, kind), total: body.total };
+    setFreshPetCount(0);
     setPets(nextPets);
     setGalleryMeta({
       page: body.page,
@@ -149,6 +153,8 @@ export function useGalleryBrowser({
     );
     const randomPets = firstBody.pets.map(normalizePet);
 
+    freshBaselineRef.current = { key: freshGalleryKey(search, tags, content, kind), total: firstBody.total };
+    setFreshPetCount(0);
     setPets(randomPets);
     setGalleryMeta({
       page: 1,
@@ -265,6 +271,45 @@ export function useGalleryBrowser({
     }
   }
 
+  async function showFreshPets() {
+    const nextState = { query, tags: activeTags, sort: "new" as const, page: 1, view: activeView, kind: activeKind, content: contentMode };
+    pushGalleryState(nextState);
+    setLoading(true);
+    try {
+      await loadGallery(nextState.query, nextState.tags, nextState.sort, nextState.page, session, nextState.content, nextState.view, nextState.kind);
+      scrollPageTop();
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (route.name !== "gallery") return;
+    const key = freshGalleryKey(query, activeTags, contentMode, activeKind);
+    const baseline = freshBaselineRef.current;
+    if (!baseline || baseline.key !== key) return;
+    const baselineTotal = baseline.total;
+    let cancelled = false;
+
+    async function checkFreshPets() {
+      const params = freshGalleryParams(query, activeTags, contentMode, activeKind);
+      const body = await readJson<GalleryResponse>(
+        await apiFetch(`/api/pets?${params}`, {}, session)
+      );
+      if (cancelled) return;
+      setFreshPetCount(Math.max(0, body.total - baselineTotal));
+    }
+
+    const intervalId = window.setInterval(() => {
+      void checkFreshPets().catch(() => {});
+    }, 20000);
+    void checkFreshPets().catch(() => {});
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [route, query, activeTags, contentMode, activeKind, apiFetch, session, galleryMeta.total]);
+
   async function selectVisibleTag(tag: TagName, sourceTags: string[]) {
     const nextContent = tag === "nsfw" || sourceTags.includes("nsfw") ? "all" : contentMode;
     const nextState = { query: "", tags: [tag], sort: activeSort, page: 1, view: activeView, kind: activeKind, content: nextContent };
@@ -324,7 +369,35 @@ export function useGalleryBrowser({
     selectKind,
     selectPage,
     randomizeGallery,
+    freshPetCount,
+    showFreshPets,
     selectVisibleTag,
     removePetFromGallery
   };
+}
+
+function freshGalleryKey(search: string, tags: string[], content: ContentMode, kind: PetKind) {
+  return JSON.stringify({
+    search,
+    tags: galleryRequestTags(tags),
+    content,
+    kind
+  });
+}
+
+function freshGalleryParams(search: string, tags: string[], content: ContentMode, kind: PetKind) {
+  const params = new URLSearchParams();
+  params.set("page", "1");
+  params.set("pageSize", "1");
+  if (search) {
+    params.set("q", search);
+  }
+  galleryRequestTags(tags).forEach((tag) => params.append("tag", tag));
+  if (kind !== "all") {
+    params.set("kind", kind);
+  }
+  if (content === "all") {
+    params.set("content", "all");
+  }
+  return params.toString();
 }
