@@ -27,10 +27,10 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   background:
-    radial-gradient(circle at 65% 35%, rgba(216, 242, 90, 0.48), transparent 42%),
-    rgba(248, 246, 240, 0.94);
+    radial-gradient(circle at 65% 35%, var(--accent-glow), transparent 42%),
+    var(--floating-control-bg);
   color: var(--ink);
-  box-shadow: 0 12px 24px rgba(16, 16, 15, 0.12);
+  box-shadow: var(--shadow-md);
 }
 
 @media (hover: none), (pointer: coarse) {

@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   petStates,
   previewFrameCount,
@@ -81,23 +81,87 @@ function pickGalleryPetState(petId: string): PetState {
 
 export function GalleryPetPreview({ pet, compact }: { pet: Pet; compact: boolean }) {
   const state = useMemo(() => pickGalleryPetState(pet.id), [pet.id]);
+  const [interacting, setInteracting] = useState(false);
+  const [fullSpriteRequested, setFullSpriteRequested] = useState(false);
+  const [fullSpriteLoaded, setFullSpriteLoaded] = useState(false);
+  const previewWidth = previewFrameCount * 96;
+  const animatedVisible = interacting && fullSpriteLoaded;
+
+  useEffect(() => {
+    setInteracting(false);
+    setFullSpriteRequested(false);
+    setFullSpriteLoaded(false);
+  }, [pet.id, pet.spritesheetUrl]);
+
+  useEffect(() => {
+    if (!fullSpriteRequested || fullSpriteLoaded) return;
+    let cancelled = false;
+    const image = new Image();
+    image.onload = () => {
+      if (!cancelled) setFullSpriteLoaded(true);
+    };
+    image.src = pet.spritesheetUrl;
+    if (image.complete) {
+      setFullSpriteLoaded(true);
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [fullSpriteLoaded, fullSpriteRequested, pet.spritesheetUrl]);
+
+  function startInteraction() {
+    setInteracting(true);
+    setFullSpriteRequested(true);
+  }
+
+  function stopInteraction() {
+    setInteracting(false);
+  }
+
   return (
     <div
-      className={`spriteFrame transparent galleryPreviewFrame ${compact ? "compact" : ""}`}
+      className={`spriteFrame transparent galleryPreviewFrame ${compact ? "compact" : ""} ${animatedVisible ? "isAnimating" : ""}`}
       aria-label={`${pet.displayName} animated preview`}
+      onFocus={startInteraction}
+      onBlur={stopInteraction}
+      onMouseEnter={startInteraction}
+      onMouseLeave={stopInteraction}
     >
-      <div
-        className="sprite"
+      <img
+        className="galleryPreviewStillImage"
+        src={pet.previewUrl}
+        width={previewWidth}
+        height={104}
+        loading="lazy"
+        decoding="async"
+        alt=""
+        aria-hidden="true"
+        draggable={false}
         style={
           {
-            backgroundImage: `url(${pet.spritesheetUrl})`,
-            "--sprite-y": `${state.row * -208}px`,
-            "--sprite-end-x": `${state.frames * -192}px`,
-            "--sprite-frames": state.frames,
-            "--sprite-duration": `${Math.max(state.frames * 260, 1400)}ms`
+            "--preview-frames": previewFrameCount
           } as CSSProperties
         }
       />
+      {fullSpriteRequested ? (
+        <div
+          className={`galleryPreviewSpriteLayer ${animatedVisible ? "active" : ""}`}
+          aria-hidden="true"
+        >
+          <div
+            className="sprite"
+            style={
+              {
+                backgroundImage: `url(${pet.spritesheetUrl})`,
+                "--sprite-y": `${state.row * -208}px`,
+                "--sprite-end-x": `${state.frames * -192}px`,
+                "--sprite-frames": state.frames,
+                "--sprite-duration": `${Math.max(state.frames * 260, 1400)}ms`
+              } as CSSProperties
+            }
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

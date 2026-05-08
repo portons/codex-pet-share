@@ -89,7 +89,7 @@ export function useCursorPreviewAssets(pet: Pet | null, enabled: boolean) {
       };
     }
 
-    Promise.all([preloadImage(pet.previewUrl), preloadImage(pet.spritesheetUrl)])
+    preloadImage(pet.spritesheetUrl)
       .then(() => {
         if (!cancelled) {
           setReady(true);
@@ -104,7 +104,7 @@ export function useCursorPreviewAssets(pet: Pet | null, enabled: boolean) {
     return () => {
       cancelled = true;
     };
-  }, [enabled, pet?.id, pet?.previewUrl, pet?.spritesheetUrl]);
+  }, [enabled, pet?.id, pet?.spritesheetUrl]);
 
   return ready;
 }
