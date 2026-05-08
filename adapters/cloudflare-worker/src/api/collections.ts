@@ -254,7 +254,7 @@ async function collectionSummaryForRow(ctx: AppContext, row: CollectionRow, cont
 }
 
 function collectionSummary(ctx: AppContext, row: CollectionRow, pets: PetRow[], petIds?: string[], viewer?: AuthUser | null) {
-  const topPets = [...pets].sort((a, b) => (b.like_count - a.like_count) || (b.view_count - a.view_count)).slice(0, 3);
+  const topPets = [...pets].sort((a, b) => (b.like_count - a.like_count) || (b.view_count - a.view_count) || a.display_name.localeCompare(b.display_name)).slice(0, 3);
   const ownerId = row.owner_id || null;
   return {
     slug: row.slug,
