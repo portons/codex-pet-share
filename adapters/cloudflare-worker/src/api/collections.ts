@@ -2,10 +2,23 @@ import { requireAdmin, requireUser, currentUser, publicUser } from "./auth";
 import { auditAdminAction } from "./adminAudit";
 import { parseContentMode, parsePagination, listPets, serializePet, getPet, getVisiblePet } from "./pets";
 import { slugPattern } from "./constants";
-import { all, first, nowIso } from "../core/db";
+import { all, first, nowIso, tags } from "../core/db";
 import { HttpError, json, readJsonBody } from "../core/http";
 import { deleteAsset } from "../storage/assets";
 import type { AppContext, AuthUser, CollectionRow, PetRow } from "../core/types";
+
+const sqlVariableChunkSize = 80;
+
+type CollectionPetJoinRow = PetRow & {
+  collection_slug: string;
+  collection_pet_id: string;
+  collection_pet_created_at: string;
+};
+
+type CollectionPetIdRow = {
+  collection_slug: string;
+  pet_id: string;
+};
 
 export async function handleCollections(ctx: AppContext, parts: string[]) {
   const user = await currentUser(ctx);
@@ -150,7 +163,7 @@ export async function handleAdmin(ctx: AppContext, parts: string[]) {
 
 export async function publicCollections(ctx: AppContext, content = "safe") {
   const rows = await all<CollectionRow>(ctx.env.DB.prepare("select * from collections where owner_id is null order by display_name asc, slug asc"));
-  return Promise.all(rows.map((row) => collectionSummaryForRow(ctx, row, content, null, true)));
+  return collectionSummariesForRows(ctx, rows, content, null, true);
 }
 
 export async function collectionRow(ctx: AppContext, slug: string) {
@@ -158,15 +171,80 @@ export async function collectionRow(ctx: AppContext, slug: string) {
 }
 
 export async function collectionPetIds(ctx: AppContext, slug: string) {
-  const rows = await all<{ pet_id: string }>(ctx.env.DB.prepare("select pet_id from collection_pets where collection_slug = ? order by created_at asc").bind(slug));
-  return rows.map((row) => row.pet_id);
+  return (await collectionPetIdsBySlug(ctx, [slug])).get(slug) || [];
 }
 
 export async function collectionPets(ctx: AppContext, slug: string, content: string) {
-  const ids = await collectionPetIds(ctx, slug);
-  const rows = (await Promise.all(ids.map((id) => getPet(ctx, id)))).filter(Boolean) as PetRow[];
-  return rows.filter((row) => content === "all" || !(JSON.parse(row.tags_json) as string[]).includes("nsfw"))
+  const rows = await collectionPetRows(ctx, [slug]);
+  return rows.filter((row) => content === "all" || !tags(row).includes("nsfw"))
     .sort((a, b) => a.display_name.localeCompare(b.display_name));
+}
+
+async function collectionSummariesForRows(ctx: AppContext, rows: CollectionRow[], content: string, viewer?: AuthUser | null, includePetIds = false) {
+  const slugs = rows.map((row) => row.slug);
+  const petsBySlug = await collectionPetsBySlug(ctx, slugs, content);
+  const petIdsBySlug = includePetIds ? await collectionPetIdsBySlug(ctx, slugs) : new Map<string, string[]>();
+  return rows.map((row) => collectionSummary(ctx, row, petsBySlug.get(row.slug) || [], includePetIds ? petIdsBySlug.get(row.slug) || [] : undefined, viewer));
+}
+
+async function collectionPetsBySlug(ctx: AppContext, slugs: string[], content: string) {
+  const rows = await collectionPetRows(ctx, slugs);
+  const bySlug = new Map<string, PetRow[]>();
+  for (const row of rows) {
+    if (content !== "all" && tags(row).includes("nsfw")) continue;
+    const pets = bySlug.get(row.collection_slug) || [];
+    pets.push(row);
+    bySlug.set(row.collection_slug, pets);
+  }
+  return bySlug;
+}
+
+async function collectionPetRows(ctx: AppContext, slugs: string[]) {
+  const uniqueSlugs = [...new Set(slugs)];
+  const rows: CollectionPetJoinRow[] = [];
+  for (let index = 0; index < uniqueSlugs.length; index += sqlVariableChunkSize) {
+    const chunk = uniqueSlugs.slice(index, index + sqlVariableChunkSize);
+    if (!chunk.length) continue;
+    const placeholders = chunk.map(() => "?").join(",");
+    rows.push(...await all<CollectionPetJoinRow>(ctx.env.DB.prepare(`
+      select
+        cp.collection_slug,
+        cp.pet_id as collection_pet_id,
+        cp.created_at as collection_pet_created_at,
+        p.*,
+        u.handle as owner_handle,
+        u.display_name as owner_display_name,
+        u.shadowbanned_at as owner_shadowbanned_at
+      from collection_pets cp
+      join pets p on p.id = cp.pet_id
+      left join users u on u.id = p.owner_id
+      where cp.collection_slug in (${placeholders})
+      order by cp.collection_slug asc, cp.created_at asc
+    `).bind(...chunk)));
+  }
+  return rows;
+}
+
+async function collectionPetIdsBySlug(ctx: AppContext, slugs: string[]) {
+  const uniqueSlugs = [...new Set(slugs)];
+  const bySlug = new Map<string, string[]>();
+  for (let index = 0; index < uniqueSlugs.length; index += sqlVariableChunkSize) {
+    const chunk = uniqueSlugs.slice(index, index + sqlVariableChunkSize);
+    if (!chunk.length) continue;
+    const placeholders = chunk.map(() => "?").join(",");
+    const rows = await all<CollectionPetIdRow>(ctx.env.DB.prepare(`
+      select collection_slug, pet_id
+      from collection_pets
+      where collection_slug in (${placeholders})
+      order by collection_slug asc, created_at asc
+    `).bind(...chunk));
+    for (const row of rows) {
+      const petIds = bySlug.get(row.collection_slug) || [];
+      petIds.push(row.pet_id);
+      bySlug.set(row.collection_slug, petIds);
+    }
+  }
+  return bySlug;
 }
 
 async function collectionSummaryForRow(ctx: AppContext, row: CollectionRow, content: string, viewer?: AuthUser | null, includePetIds = false) {
@@ -199,7 +277,7 @@ async function userCollections(ctx: AppContext, user: AuthUser, content: string)
   const rows = await all<CollectionRow>(
     ctx.env.DB.prepare("select * from collections where owner_id = ? order by updated_at desc, display_name asc, slug asc").bind(user.id)
   );
-  return Promise.all(rows.map((row) => collectionSummaryForRow(ctx, row, content, user, true)));
+  return collectionSummariesForRows(ctx, rows, content, user, true);
 }
 
 async function createUserCollection(ctx: AppContext, user: AuthUser) {

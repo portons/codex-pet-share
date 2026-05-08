@@ -85,9 +85,11 @@ export function useAppRouteEffects({
     window.addEventListener("hashchange", onHashChange);
     window.addEventListener("popstate", onHashChange);
     refresh();
-    loadCollections().catch((error) =>
-      setAuthStatus(error instanceof Error ? error.message : "failed to load collections")
-    );
+    if (route.name !== "collections") {
+      loadCollections().catch((error) =>
+        setAuthStatus(error instanceof Error ? error.message : "failed to load collections")
+      );
+    }
     return () => {
       window.removeEventListener("hashchange", onHashChange);
       window.removeEventListener("popstate", onHashChange);
