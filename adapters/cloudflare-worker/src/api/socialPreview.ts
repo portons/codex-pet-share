@@ -25,7 +25,7 @@ export async function handleCollectionSocialImage(ctx: AppContext, slug?: string
   if (!collection) return html("<svg xmlns=\"http://www.w3.org/2000/svg\"/>", 404, { "Content-Type": "image/svg+xml; charset=utf-8" });
   const owner = collection.owner_id ? await collectionOwner(ctx, collection.owner_id) : null;
   const pets = await collectionPets(ctx, collection.slug, "safe");
-  const version = collectionSocialPreviewVersion(collection, owner, pets);
+  const version = collectionSocialPreviewVersion(ctx, collection, owner, pets);
   const key = collectionSocialPreviewKey(ctx, collection.slug);
   const cached = await ctx.env.PET_ASSETS.get(key);
   if (cached?.customMetadata?.version === version) {
@@ -44,7 +44,7 @@ export async function handleCollectionSocialImage(ctx: AppContext, slug?: string
 
 export async function collectionSocialPreviewImageUrl(ctx: AppContext, collection: CollectionRow, pets: PetRow[]) {
   const owner = collection.owner_id ? await collectionOwner(ctx, collection.owner_id) : null;
-  const version = collectionSocialPreviewVersion(collection, owner, pets);
+  const version = collectionSocialPreviewVersion(ctx, collection, owner, pets);
   return `${ctx.url.origin}/api/collections/${encodeURIComponent(collection.slug)}/social-image?v=${encodeURIComponent(version)}`;
 }
 
@@ -59,7 +59,11 @@ function socialImageResponse(body: ReadableStream | string, etag: string | undef
 }
 
 function collectionSocialPreviewKey(ctx: AppContext, slug: string) {
-  return petAssetKey(ctx, `social/collections/${slug}.svg`);
+  const originKey = ctx.env.PUBLIC_APP_ORIGIN
+    .replace(/^https?:\/\//, "")
+    .replace(/\/$/, "")
+    .replace(/[^a-z0-9.-]+/gi, "_");
+  return petAssetKey(ctx, `social/collections/${originKey}/${slug}.svg`);
 }
 
 async function collectionOwner(ctx: AppContext, ownerId: string) {
@@ -70,9 +74,10 @@ async function collectionOwner(ctx: AppContext, ownerId: string) {
   return owner;
 }
 
-function collectionSocialPreviewVersion(collection: CollectionRow, owner: CollectionOwner | null, pets: PetRow[]) {
+function collectionSocialPreviewVersion(ctx: AppContext, collection: CollectionRow, owner: CollectionOwner | null, pets: PetRow[]) {
   return hashVersion([
     rendererVersion,
+    ctx.env.PUBLIC_APP_ORIGIN,
     collection.slug,
     collection.display_name,
     collection.updated_at,
