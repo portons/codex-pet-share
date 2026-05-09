@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
-import { petAssetUrl } from "../../domain/http";
+import { petTextureAssetUrl } from "../../domain/http";
 import type { Pet } from "../../domain/types";
 import type { RoomMode } from "../room/types";
 
@@ -70,7 +70,7 @@ export function usePetSwap({
     }
     const tex = spriteTextureRef.current;
     if (!tex) return;
-    const spritesheetUrl = petAssetUrl(target.spritesheetUrl);
+    const spritesheetUrl = petTextureAssetUrl(target.spritesheetUrl);
     try {
       const img = await new Promise<HTMLImageElement>((resolve, reject) => {
         const i = new Image();

@@ -1,4 +1,4 @@
-import { petAssetUrl } from "../../domain/http";
+import { petTextureAssetUrl } from "../../domain/http";
 
 export function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -7,6 +7,6 @@ export function loadImage(url: string): Promise<HTMLImageElement> {
     img.decoding = "async";
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error(`Could not load image: ${url}`));
-    img.src = petAssetUrl(url);
+    img.src = petTextureAssetUrl(url);
   });
 }

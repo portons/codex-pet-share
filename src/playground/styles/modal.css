@@ -3,7 +3,7 @@
 }
 
 .playgroundModal {
-  width: min(880px, 100%);
+  width: min(1245px, calc(100vw - 48px));
 }
 
 /* Native fullscreen — fill the viewport edge-to-edge, drop max-width

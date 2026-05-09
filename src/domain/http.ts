@@ -8,13 +8,24 @@ export function petAssetUrl(path: string) {
   if (path.startsWith("/api/")) {
     return apiUrl(path);
   }
-  if (typeof window !== "undefined" && path.includes("/assets/pets/")) {
-    const url = new URL(path, window.location.origin);
+  if (path.includes("/assets/pets/")) {
+    const url = new URL(path, apiBaseUrl);
     if (url.pathname.startsWith("/assets/pets/")) {
-      return `${window.location.origin}${url.pathname}${url.search}${url.hash}`;
+      return `${apiBaseUrl}${url.pathname}${url.search}${url.hash}`;
     }
   }
   return path;
+}
+
+export function petTextureAssetUrl(path: string) {
+  const resolved = petAssetUrl(path);
+  if (typeof window === "undefined") return resolved;
+  const url = new URL(resolved, window.location.href);
+  if (url.origin !== window.location.origin) {
+    url.searchParams.set("texture", "1");
+    return url.toString();
+  }
+  return resolved;
 }
 
 export async function readJson<T>(response: Response): Promise<T> {

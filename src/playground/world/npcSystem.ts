@@ -3,7 +3,7 @@
 // Physics is hand-rolled (sphere-only, no external lib).
 
 import * as THREE from "three";
-import { petAssetUrl } from "../../domain/http";
+import { petTextureAssetUrl } from "../../domain/http";
 
 // NPC slot system — up to MAX_NPCS wandering AI pets at once. Each NPC is a
 // distinct sprite atlas (different pet) so the user can populate the park.
@@ -115,7 +115,7 @@ export function makeNpcSystem(
   function add(pet: { id: string; displayName: string; spritesheetUrl: string }): string | null {
     if (npcs.length >= MAX_NPCS) return null;
     if (npcs.some((n) => n.petId === pet.id)) return null; // no duplicates
-    const spritesheetUrl = petAssetUrl(pet.spritesheetUrl);
+    const spritesheetUrl = petTextureAssetUrl(pet.spritesheetUrl);
 
     const img = new Image();
     img.crossOrigin = "anonymous";

@@ -215,8 +215,8 @@ export function PetPlaygroundModal({
           <canvas
             ref={minimapRef}
             className="playgroundMinimap"
-            width={132}
-            height={132}
+            width={160}
+            height={160}
             aria-hidden="true"
             data-touch={showTouchControls || undefined}
           />

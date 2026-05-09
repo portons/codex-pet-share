@@ -94,7 +94,8 @@ export function usePlaygroundSceneLoop({
     const isCoarsePointer = typeof window !== "undefined"
       && window.matchMedia
       && window.matchMedia("(pointer: coarse)").matches;
-    const zoomState = { value: isCoarsePointer ? 1.4 : 1 };
+    const initialZoom = isCoarsePointer ? 1.65 : 1.45;
+    const zoomState = { value: initialZoom };
     const yawState = { value: 0 };
     const inputCleanups: Array<() => void> = [];
     const disposables: Array<{ dispose: () => void }> = [];
@@ -141,7 +142,7 @@ export function usePlaygroundSceneLoop({
         resizeObserver = new ResizeObserver(applySize);
         resizeObserver.observe(wrapper);
 
-        zoomState.value = isCoarsePointer ? 1.4 : 1;
+        zoomState.value = initialZoom;
         inputCleanups.push(
           attachKeyboardControls({ pressed, clearPressedKeysRef }),
           attachZoomControls({ canvas, wrapper, zoomState }),

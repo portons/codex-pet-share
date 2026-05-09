@@ -1,6 +1,6 @@
 import { useEffect, type Dispatch, type RefObject, type SetStateAction } from "react";
 import * as THREE from "three";
-import { petAssetUrl } from "../../domain/http";
+import { petTextureAssetUrl } from "../../domain/http";
 import type { RoomPresence } from "../../realtime/roomChannel";
 import {
   CHAT_BUBBLE_TTL_MS,
@@ -312,7 +312,7 @@ export function usePlaygroundRoomHandlers({
         if (event.userId === roomMode.ownUserId) return;
         const remote = remotePetsRef.current.get(event.userId);
         if (!remote) return;
-        const spritesheetUrl = petAssetUrl(event.spritesheetUrl);
+        const spritesheetUrl = petTextureAssetUrl(event.spritesheetUrl);
         if (remote.spritesheetUrl === spritesheetUrl) return;
         const img = new Image();
         img.crossOrigin = "anonymous";

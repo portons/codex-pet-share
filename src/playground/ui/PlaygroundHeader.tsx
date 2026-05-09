@@ -86,7 +86,7 @@ export function PlaygroundHeader({
   return (
     <div className="modalHeader">
       <div className="modalTitle compact">
-        <p className="metaText">3D playground · POC</p>
+        <p className="metaText">Prontera playground</p>
         <h2>{liveLocalPet.displayName}</h2>
       </div>
       <div className="playgroundHeaderActions">

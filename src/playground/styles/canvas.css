@@ -57,26 +57,23 @@
   cursor: grab;
 }
 
-/* Top-down mini-map: small semi-transparent radar in the canvas's
-   bottom-right. Shows the local user (rust dot), remote pets (cream
-   gray) and NPCs (cool blue) so players can see where everyone is
-   without panning the camera. Pointer-events:none so it never eats a
-   drag-to-rotate gesture from the canvas underneath. */
+/* Top-down mini-map styled after Ragnarok Online's compact map overlay:
+   a translucent map plate with simple player, peer, NPC, and portal marks.
+   Pointer-events:none so it never eats drag-to-rotate gestures. */
 .playgroundMinimap {
   position: absolute;
-  bottom: 12px;
+  top: 52px;
   right: 12px;
-  width: 132px;
-  height: 132px;
-  border-radius: 10px;
-  background: rgba(20, 14, 6, 0.42);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  width: 144px;
+  height: 144px;
+  border-radius: 12px;
+  background: #92866d;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 240, 210, 0.18),
-    0 8px 18px -10px rgba(0, 0, 0, 0.45);
+    0 0 0 2px rgba(45, 38, 25, 0.78),
+    inset 0 0 0 1px rgba(255, 242, 198, 0.48),
+    0 8px 18px -10px rgba(0, 0, 0, 0.55);
   pointer-events: none;
-  opacity: 0.85;
+  opacity: 0.82;
   transition: opacity 200ms var(--ease-out);
   z-index: 4;
 }
@@ -85,26 +82,18 @@
   opacity: 1;
 }
 
-/* When on-screen touch controls render, the canvas's bottom row is
-   the D-pad (left) + action cluster (right). Flip the minimap to
-   top-right below the NPC bar so neither tap target gets overlapped.
-   Top-right at 48px clears the ~32px NPC bar with breathing room. */
 .playgroundMinimap[data-touch] {
-  bottom: auto;
-  top: 48px;
   right: 12px;
 }
 
 @media (max-width: 640px) {
   .playgroundMinimap {
-    width: 96px;
-    height: 96px;
-    bottom: 8px;
+    width: 108px;
+    height: 108px;
+    top: 52px;
     right: 8px;
   }
   .playgroundMinimap[data-touch] {
-    bottom: auto;
-    top: 44px;
     right: 8px;
   }
 }

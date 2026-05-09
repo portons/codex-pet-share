@@ -5,11 +5,11 @@ import {
   CAMERA_DISTANCE,
   CAMERA_HEIGHT,
   CAMERA_LOOK_Y,
-  FLOOR_HALF,
   FOV,
   SPRITE_HEIGHT,
   SPRITE_WIDTH
 } from "./config";
+import { addRoPronteraBiome } from "./roBiome";
 
 export function createPlaygroundScene(canvas: HTMLCanvasElement, img: HTMLImageElement) {
   const disposables: Array<{ dispose: () => void }> = [];
@@ -24,8 +24,8 @@ export function createPlaygroundScene(canvas: HTMLCanvasElement, img: HTMLImageE
   texture.needsUpdate = true;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#f5f0dc");
-  scene.fog = new THREE.Fog("#f5f0dc", 200, 600);
+  scene.background = new THREE.Color("#eadfc7");
+  scene.fog = new THREE.Fog("#eadfc7", 140, 420);
 
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 200);
   camera.position.set(0, CAMERA_HEIGHT, CAMERA_DISTANCE);
@@ -35,30 +35,12 @@ export function createPlaygroundScene(canvas: HTMLCanvasElement, img: HTMLImageE
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.65));
-  const sun = new THREE.DirectionalLight(0xffffff, 0.55);
+  scene.add(new THREE.AmbientLight(0xfff7e6, 0.74));
+  const sun = new THREE.DirectionalLight(0xffe2ad, 0.5);
   sun.position.set(6, 12, 8);
   scene.add(sun);
 
-  const floorGeom = new THREE.PlaneGeometry(FLOOR_HALF * 2, FLOOR_HALF * 2);
-  const floorMat = new THREE.MeshStandardMaterial({ color: "#e5dec6", roughness: 0.95 });
-  const floor = new THREE.Mesh(floorGeom, floorMat);
-  floor.rotation.x = -Math.PI / 2;
-  scene.add(floor);
-  disposables.push(floorGeom, floorMat);
-
-  const grid = new THREE.GridHelper(FLOOR_HALF * 2, 22, "#a59f86", "#cbc4a6");
-  const gridMat = grid.material as THREE.Material | THREE.Material[];
-  const setOpacity = (m: THREE.Material) => { m.transparent = true; (m as { opacity: number }).opacity = 0.6; };
-  if (Array.isArray(gridMat)) {
-    gridMat.forEach((m) => { setOpacity(m); disposables.push(m); });
-  } else {
-    setOpacity(gridMat);
-    disposables.push(gridMat);
-  }
-  disposables.push(grid.geometry);
-  grid.position.y = 0.01;
-  scene.add(grid);
+  addRoPronteraBiome(scene, disposables);
 
   const spriteMat = new THREE.SpriteMaterial({
     map: texture,
@@ -69,7 +51,7 @@ export function createPlaygroundScene(canvas: HTMLCanvasElement, img: HTMLImageE
   const sprite = new THREE.Sprite(spriteMat);
   sprite.scale.set(SPRITE_WIDTH, SPRITE_HEIGHT, 1);
   sprite.center.set(0.5, 0);
-  sprite.position.set(0, 0, 0);
+  sprite.position.set(0, 0, 18);
   scene.add(sprite);
   disposables.push(spriteMat);
 

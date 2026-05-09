@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { petAssetUrl } from "../../domain/http";
+import { petTextureAssetUrl } from "../../domain/http";
 import type { RoomPresence } from "../../realtime/roomChannel";
 import {
   ATLAS_COLS,
@@ -26,7 +26,7 @@ export function ensureRemotePet({
   if (presence.userId === ownUserId) return null;
   let r = remotePets.get(presence.userId);
   if (r) return r;
-  const spritesheetUrl = petAssetUrl(presence.spritesheetUrl);
+  const spritesheetUrl = petTextureAssetUrl(presence.spritesheetUrl);
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.decoding = "async";
@@ -152,7 +152,7 @@ export function createRemoteNpc({
   scene: THREE.Scene;
   loadingOrbTexture: THREE.Texture | null;
 }): RemoteNpc {
-  const resolvedSpritesheetUrl = petAssetUrl(spritesheetUrl);
+  const resolvedSpritesheetUrl = petTextureAssetUrl(spritesheetUrl);
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.decoding = "async";

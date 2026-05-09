@@ -1,3 +1,5 @@
+import { RO_PRONTERA_BLOCKED_ZONES, RO_PRONTERA_FLOOR_HALF } from "./roPronteraBiome.generated";
+
 export const CHAT_BUBBLE_TTL_MS = 5000;
 export const POS_BROADCAST_INTERVAL_MS = 1000 / 12;
 export const REMOTE_PET_LERP = 0.3;
@@ -43,9 +45,14 @@ export const ROW_TO_STATE: Record<number, StateId> = (() => {
   return out;
 })();
 
-export const FLOOR_HALF = 22;
+export const FLOOR_HALF = RO_PRONTERA_FLOOR_HALF;
 export const SPRITE_HEIGHT = 4;
 export const SPRITE_WIDTH = SPRITE_HEIGHT * (SPRITE_CELL_W / SPRITE_CELL_H);
+export const PET_COLLISION_RADIUS = 0.45;
+export type PlaygroundBlockedZone =
+  | { kind: "circle"; x: number; z: number; radius: number }
+  | { kind: "rect"; x: number; z: number; width: number; depth: number };
+export const PLAYGROUND_BLOCKED_ZONES: readonly PlaygroundBlockedZone[] = RO_PRONTERA_BLOCKED_ZONES;
 export const MOVE_SPEED = 9;
 export const SPRINT_MULTIPLIER = 1.85;
 export const JUMP_VELOCITY = 9;
@@ -53,9 +60,9 @@ export const GRAVITY = 22;
 export const IDLE_TO_WAITING_MS = 4500;
 
 export const FOV = 22;
-export const CAMERA_HEIGHT = 18;
-export const CAMERA_DISTANCE = 21;
-export const CAMERA_LOOK_Y = 1.5;
+export const CAMERA_HEIGHT = 22;
+export const CAMERA_DISTANCE = 26;
+export const CAMERA_LOOK_Y = 3.2;
 export const CAMERA_FOLLOW_LERP = 0.08;
 export const CAMERA_ZOOM_MIN = 0.55;
 export const CAMERA_ZOOM_MAX = 1.85;

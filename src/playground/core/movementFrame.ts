@@ -11,6 +11,8 @@ import {
   FLOOR_HALF,
   MOVE_KEYS,
   MOVE_SPEED,
+  PET_COLLISION_RADIUS,
+  PLAYGROUND_BLOCKED_ZONES,
   SPRITE_WIDTH,
   SPRINT_MULTIPLIER
 } from "./config";
@@ -58,13 +60,36 @@ export function applyMovementInput({
     const sinY = Math.sin(yaw);
     worldDx = dx * cosY + dz * sinY;
     worldDz = -dx * sinY + dz * cosY;
-    sprite.position.x += worldDx * runSpeed * dt;
-    sprite.position.z += worldDz * runSpeed * dt;
     const limit = FLOOR_HALF - SPRITE_WIDTH / 2;
-    sprite.position.x = Math.max(-limit, Math.min(limit, sprite.position.x));
-    sprite.position.z = Math.max(-limit, Math.min(limit, sprite.position.z));
+    const targetX = clampToFloor(sprite.position.x + worldDx * runSpeed * dt, limit);
+    const targetZ = clampToFloor(sprite.position.z + worldDz * runSpeed * dt, limit);
+    const currentX = sprite.position.x;
+    const currentZ = sprite.position.z;
+    if (canOccupy(targetX, targetZ)) {
+      sprite.position.x = targetX;
+      sprite.position.z = targetZ;
+    } else {
+      if (canOccupy(targetX, currentZ)) sprite.position.x = targetX;
+      if (canOccupy(sprite.position.x, targetZ)) sprite.position.z = targetZ;
+    }
   }
   return { dx, dz, moving, sprinting, runSpeed, worldDx, worldDz };
+}
+
+function clampToFloor(value: number, limit: number) {
+  return Math.max(-limit, Math.min(limit, value));
+}
+
+function canOccupy(x: number, z: number) {
+  const radius = PET_COLLISION_RADIUS;
+  return PLAYGROUND_BLOCKED_ZONES.every((zone) => {
+    if (zone.kind === "circle") {
+      return Math.hypot(x - zone.x, z - zone.z) > zone.radius + radius;
+    }
+    const dx = Math.max(Math.abs(x - zone.x) - zone.width / 2, 0);
+    const dz = Math.max(Math.abs(z - zone.z) - zone.depth / 2, 0);
+    return Math.hypot(dx, dz) > radius;
+  });
 }
 
 export function updateCameraZoom({
