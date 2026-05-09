@@ -389,6 +389,7 @@ function freshGalleryParams(search: string, tags: string[], content: ContentMode
   const params = new URLSearchParams();
   params.set("page", "1");
   params.set("pageSize", "1");
+  params.set("freshPollAt", String(Date.now()));
   if (search) {
     params.set("q", search);
   }

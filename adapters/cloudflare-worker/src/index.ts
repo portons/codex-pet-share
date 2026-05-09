@@ -69,6 +69,7 @@ function isPublicApiCacheable(ctx: AppContext, parts: string[]) {
   if (parts[0] !== "api") return false;
   if (ctx.url.searchParams.get("content") === "all") return false;
   if (ctx.url.searchParams.get("sort") === "random") return false;
+  if (ctx.url.searchParams.has("freshPollAt") || ctx.url.searchParams.has("nativePollAt")) return false;
   if ((ctx.url.searchParams.get("q") || "").trim()) return false;
   if (parts[1] === "pets" && parts.length === 2) return true;
   if (parts[1] === "collections" && parts.length <= 3) return true;

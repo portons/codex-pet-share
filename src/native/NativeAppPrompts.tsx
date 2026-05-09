@@ -60,7 +60,6 @@ export function NativeAppPrompts() {
   }, []);
 
   useEffect(() => {
-    if (!nativeStatus?.native) return;
     let cancelled = false;
 
     async function checkNewestPet() {
@@ -83,7 +82,7 @@ export function NativeAppPrompts() {
       cancelled = true;
       window.clearInterval(interval);
     };
-  }, [nativeStatus?.native]);
+  }, []);
 
   if (!nativeStatus && !statusError && !freshPet) {
     return null;
