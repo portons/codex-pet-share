@@ -1,0 +1,19 @@
+{
+  "name": "codex-pets-zero-native",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "zig build",
+    "package": "zig build -Doptimize=ReleaseSafe package",
+    "postinstall": "patch-package",
+    "run": "zig build run",
+    "test": "zig build test",
+    "validate": "zero-native validate",
+    "verify:prod-readonly": "node scripts/verify-prod-readonly.mjs"
+  },
+  "devDependencies": {
+    "patch-package": "^8.0.1",
+    "zero-native": "0.1.9"
+  }
+}

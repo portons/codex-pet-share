@@ -4,7 +4,7 @@ import { AuthModal, AccountSettingsModal } from "../auth/AuthModals";
 import { CollectionPetAdderModal, PetCollectorModal, UserCollectionEditorModal } from "../collections/UserCollectionModals";
 import type { CollectionPetAdderState } from "../collections/useUserCollections";
 import { DownloadModal } from "../downloads/DownloadModal";
-import { PetCollectionsModal, TagEditorModal } from "../pets/PetManagementModals";
+import { PetCollectionsModal, PetDeleteConfirmModal, TagEditorModal } from "../pets/PetManagementModals";
 import { EntityShareModal, ShareModal } from "../share/ShareModals";
 import type { CollectionSummary, EditablePetKind, EntityShareTarget, Pet } from "../domain/types";
 import type { TagName } from "../domain/config";
@@ -53,6 +53,11 @@ export function AppDialogs({
   toggleCollectionEditorSlug,
   submitCollectionEditor,
   closeCollectionEditor,
+  deleteConfirmPet,
+  deleteStatus,
+  deletingPetId,
+  confirmDeleteUpload,
+  closeDeleteConfirm,
   userCollectionEditor,
   userCollectionEditorStatus,
   userCollectionEditorBusy,
@@ -121,6 +126,11 @@ export function AppDialogs({
   toggleCollectionEditorSlug: (slug: string) => void;
   submitCollectionEditor: (event: FormEvent) => void | Promise<void>;
   closeCollectionEditor: () => void;
+  deleteConfirmPet: Pet | null;
+  deleteStatus: string;
+  deletingPetId: string;
+  confirmDeleteUpload: () => void | Promise<void>;
+  closeDeleteConfirm: () => void;
   userCollectionEditor: { mode: "create" | "edit"; collection: CollectionSummary | null; displayName: string } | null;
   userCollectionEditorStatus: string;
   userCollectionEditorBusy: boolean;
@@ -204,6 +214,16 @@ export function AppDialogs({
           onToggle={toggleCollectionEditorSlug}
           onSubmit={submitCollectionEditor}
           onClose={closeCollectionEditor}
+        />
+      )}
+
+      {deleteConfirmPet && (
+        <PetDeleteConfirmModal
+          pet={deleteConfirmPet}
+          status={deleteStatus}
+          busy={deletingPetId === deleteConfirmPet.id}
+          onConfirm={confirmDeleteUpload}
+          onClose={closeDeleteConfirm}
         />
       )}
 

@@ -61,7 +61,7 @@ export function secureResponse(ctx: AppContext, response: Response) {
     ].join("; ")
     : [
       "default-src 'self'",
-      "script-src 'self' https://static.cloudflareinsights.com",
+      "script-src 'self' 'wasm-unsafe-eval' https://static.cloudflareinsights.com",
       "style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com",
       "font-src 'self' https://cdn.fontshare.com https://fonts.gstatic.com data:",
       `img-src 'self' data: blob: https: ${ctx.env.PUBLIC_APP_ORIGIN}`,

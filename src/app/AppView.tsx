@@ -1,4 +1,5 @@
 import type { ComponentProps } from "react";
+import { NativeAppPrompts } from "../native/NativeAppPrompts";
 import { PlaygroundRouteLayers } from "../playground/PlaygroundRouteLayers";
 import { AppFooter, AppNav } from "./AppChrome";
 import { AppDialogs } from "./AppDialogs";
@@ -15,6 +16,7 @@ export function AppView({ nav, routes, dialogs, playground }: AppViewProps) {
   return (
     <main className="appShell">
       <AppNav {...nav} />
+      <NativeAppPrompts />
       <AppRoutes {...routes} />
       <AppFooter />
       <AppDialogs {...dialogs} />

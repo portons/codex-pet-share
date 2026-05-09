@@ -11,9 +11,14 @@
 }
 
 .revealItem {
+  position: relative;
   opacity: 0;
   animation: item-rise 540ms var(--ease-out) forwards;
   animation-delay: var(--delay);
+}
+
+.revealItem:has(.adminPetMenuList) {
+  z-index: 40;
 }
 
 /* Pet card */
@@ -29,6 +34,10 @@
   border-radius: var(--radius-lg);
   transition: border-color 220ms var(--ease-out), box-shadow 220ms var(--ease-out),
     transform 220ms var(--ease-out);
+}
+
+.petCard:has(.adminPetMenuList) {
+  z-index: 40;
 }
 
 .petCard.compact {

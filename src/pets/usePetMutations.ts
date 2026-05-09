@@ -94,10 +94,17 @@ export function usePetMutations({
   const [deleteStatus, setDeleteStatus] = useState("");
   const [deletingPetId, setDeletingPetId] = useState("");
   const [likeBusyId, setLikeBusyId] = useState("");
+  const [deleteConfirmPet, setDeleteConfirmPet] = useState<Pet | null>(null);
 
   async function deleteUpload(pet: Pet) {
     if (!user || deletingPetId) return;
-    if (!window.confirm(`Delete ${pet.displayName}?`)) return;
+    setDeleteStatus("");
+    setDeleteConfirmPet(pet);
+  }
+
+  async function confirmDeleteUpload() {
+    const pet = deleteConfirmPet;
+    if (!user || deletingPetId || !pet) return;
 
     setDeleteStatus("");
     setDeletingPetId(pet.id);
@@ -115,6 +122,7 @@ export function usePetMutations({
       setCollectionPets((current) => current.filter((item) => item.id !== pet.id));
       await loadCollections(session, contentMode);
       await refreshRoutePetLists(session, user);
+      setDeleteConfirmPet(null);
       if (route.name === "detail") {
         navigate(user.id === pet.ownerId ? "/mine" : "/");
       }
@@ -122,6 +130,13 @@ export function usePetMutations({
       setDeleteStatus(error instanceof Error ? error.message : "Delete failed.");
     } finally {
       setDeletingPetId("");
+    }
+  }
+
+  function closeDeleteConfirm() {
+    if (!deletingPetId) {
+      setDeleteConfirmPet(null);
+      setDeleteStatus("");
     }
   }
 
@@ -260,8 +275,11 @@ export function usePetMutations({
   return {
     deleteStatus,
     deletingPetId,
+    deleteConfirmPet,
     likeBusyId,
     deleteUpload,
+    confirmDeleteUpload,
+    closeDeleteConfirm,
     replacePet,
     reconcilePetCollections,
     reconcileTaggedPet,

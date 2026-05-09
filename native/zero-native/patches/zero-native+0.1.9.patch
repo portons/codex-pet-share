@@ -1,0 +1,46 @@
+diff --git a/node_modules/zero-native/src/platform/macos/appkit_host.m b/node_modules/zero-native/src/platform/macos/appkit_host.m
+index 5aa0ce3..75b75f7 100644
+--- a/node_modules/zero-native/src/platform/macos/appkit_host.m
++++ b/node_modules/zero-native/src/platform/macos/appkit_host.m
+@@ -35,7 +35,7 @@ static BOOL ZeroNativePolicyListMatches(NSArray<NSString *> *values, NSURL *url)
+ - (void)configureWithRootPath:(NSString *)rootPath entryPath:(NSString *)entryPath spaFallback:(BOOL)spaFallback;
+ @end
+ 
+-@interface ZeroNativeAppKitHost : NSObject <WKNavigationDelegate>
++@interface ZeroNativeAppKitHost : NSObject <WKNavigationDelegate, WKUIDelegate>
+ @property(nonatomic, strong) NSWindow *window;
+ @property(nonatomic, strong) WKWebView *webView;
+ @property(nonatomic, strong) ZeroNativeWindowDelegate *delegate;
+@@ -272,6 +272,7 @@ static BOOL ZeroNativePolicyListMatches(NSArray<NSString *> *values, NSURL *url)
+         [webView setValue:@YES forKey:@"inspectable"];
+     }
+     webView.navigationDelegate = self;
++    webView.UIDelegate = self;
+     webView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+     window.contentView = webView;
+ 
+@@ -689,6 +690,24 @@ static NSURL *ZeroNativeAssetEntryURL(NSString *origin, NSString *entryPath) {
+     decisionHandler(WKNavigationActionPolicyAllow);
+ }
+ 
++- (void)webView:(WKWebView *)webView runOpenPanelWithParameters:(WKOpenPanelParameters *)parameters initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSArray<NSURL *> * _Nullable URLs))completionHandler {
++    (void)frame;
++    NSOpenPanel *panel = [NSOpenPanel openPanel];
++    panel.canChooseFiles = YES;
++    panel.canChooseDirectories = parameters.allowsDirectories;
++    panel.allowsMultipleSelection = parameters.allowsMultipleSelection;
++
++    NSWindow *window = webView.window ?: self.window;
++    if (window) {
++        [panel beginSheetModalForWindow:window completionHandler:^(NSModalResponse result) {
++            completionHandler(result == NSModalResponseOK ? panel.URLs : nil);
++        }];
++        return;
++    }
++
++    completionHandler([panel runModal] == NSModalResponseOK ? panel.URLs : nil);
++}
++
+ - (NSString *)bridgeOriginForMessage:(WKScriptMessage *)message {
+     WKSecurityOrigin *securityOrigin = message.frameInfo.securityOrigin;
+     if (securityOrigin.protocol.length == 0 || [securityOrigin.protocol isEqualToString:@"about"]) {

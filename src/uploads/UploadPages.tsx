@@ -1,8 +1,8 @@
-import { type FormEvent } from "react";
+import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import { type TagName } from "../domain/config";
-import { formatDate } from "../domain/format";
+import { formatBytes, formatDate } from "../domain/format";
 import { navigate } from "../domain/routing";
-import type { ContentMode, EditablePetKind, Pet, UploadState, User } from "../domain/types";
+import type { ContentMode, EditablePetKind, Pet, UploadManifest, UploadState, User } from "../domain/types";
 import { EditableKindControls, TagFilters } from "../gallery/GalleryControls";
 import { CyclingPetPreview } from "../pets/PetPreview";
 import { OwnerLabel, PetStats, PetTags } from "../pets/PetMeta";
@@ -12,6 +12,7 @@ import { SignInGate } from "../ui/SignInGate";
 import { UploadsSkeleton } from "../ui/Skeletons";
 import { Spinner } from "../ui/Spinner";
 import { FileField } from "./FileField";
+import { normalizePetSlug, readUploadManifest } from "./uploadAssets";
 import { UploadValidationPreview } from "./UploadValidationPreview";
 
 export function YourUploads({
@@ -177,51 +178,167 @@ export function UploadPage({
           <h1>Upload</h1>
         </div>
       </header>
-      <form className="uploadForm card" onSubmit={onSubmit}>
-        <FileField
-          accept="application/json,.json"
-          file={uploadState.manifest}
-          help="pet.json"
-          icon="package"
-          label="pet.json"
-          onFile={(file) => setUploadState((current) => ({ ...current, manifest: file }))}
-          onInvalidFile={setUploadStatus}
-        />
-        <FileField
-          accept="image/webp,.webp"
-          file={uploadState.spritesheet}
-          help="spritesheet.webp"
-          icon="sheet"
-          label="spritesheet.webp"
-          onFile={(file) => setUploadState((current) => ({ ...current, spritesheet: file }))}
-          onInvalidFile={setUploadStatus}
-        />
-        <UploadTagPicker
-          tags={uploadState.tags}
-          kind={uploadState.kind}
-          onKind={(kind) => setUploadState((current) => ({ ...current, kind }))}
-          onToggle={(tag) =>
-            setUploadState((current) => ({
-              ...current,
-              tags: current.tags.includes(tag)
-                ? current.tags.filter((value) => value !== tag)
-                : [...current.tags, tag]
-            }))
-          }
-        />
-        <UploadValidationPreview uploadState={uploadState} />
-        <button className="btn btnPrimary btnLg" type="submit" disabled={uploadBusy}>
-          {uploadBusy ? <Spinner size={14} /> : <Icon name="upload" size={14} />}
-          {uploadBusy ? "Uploading" : "Upload pet"}
-        </button>
+      <form className="uploadForm" onSubmit={onSubmit}>
+        <div className="uploadControls card">
+          <FileField
+            accept="application/json,.json"
+            file={uploadState.manifest}
+            help="pet.json"
+            icon="package"
+            label="pet.json"
+            onFile={(file) => setUploadState((current) => ({ ...current, manifest: file }))}
+            onInvalidFile={setUploadStatus}
+          />
+          <FileField
+            accept="image/webp,.webp"
+            file={uploadState.spritesheet}
+            help="spritesheet.webp"
+            icon="sheet"
+            label="spritesheet.webp"
+            onFile={(file) => setUploadState((current) => ({ ...current, spritesheet: file }))}
+            onInvalidFile={setUploadStatus}
+          />
+          <UploadTagPicker
+            tags={uploadState.tags}
+            kind={uploadState.kind}
+            onKind={(kind) => setUploadState((current) => ({ ...current, kind }))}
+            onToggle={(tag) =>
+              setUploadState((current) => ({
+                ...current,
+                tags: current.tags.includes(tag)
+                  ? current.tags.filter((value) => value !== tag)
+                  : [...current.tags, tag]
+              }))
+            }
+          />
+          <UploadValidationPreview uploadState={uploadState} />
+          <button className="btn btnPrimary btnLg" type="submit" disabled={uploadBusy}>
+            {uploadBusy ? <Spinner size={14} /> : <Icon name="upload" size={14} />}
+            {uploadBusy ? "Uploading" : "Upload pet"}
+          </button>
+          {uploadStatus && (
+            <p className="status" role="alert">
+              {uploadStatus}
+            </p>
+          )}
+        </div>
+        <UploadLivePreview uploadState={uploadState} />
       </form>
-      {uploadStatus && (
-        <p className="status" role="alert">
-          {uploadStatus}
-        </p>
-      )}
     </section>
   );
+}
+
+function UploadLivePreview({ uploadState }: { uploadState: UploadState }) {
+  const { manifest, manifestError } = useUploadManifestPreview(uploadState.manifest);
+  const spritesheetUrl = useObjectUrl(uploadState.spritesheet);
+  const normalizedId = manifest ? normalizePetSlug(manifest.id) : "";
+  const spriteStyle = spritesheetUrl ? { backgroundImage: `url("${spritesheetUrl}")` } : undefined;
+  const displayName = manifest?.displayName || "Package preview";
+  const description = manifest?.description || "No manifest loaded.";
+
+  return (
+    <aside className="uploadPreviewPanel card" aria-label="Upload preview">
+      <div className="uploadPreviewHeader">
+        <div>
+          <span className="fieldLabel">Live package</span>
+          <strong>{displayName}</strong>
+        </div>
+        <span className="uploadPreviewState">{spritesheetUrl && manifest ? "Ready" : "Draft"}</span>
+      </div>
+
+      <div className="uploadSpriteStage">
+        {spritesheetUrl ? (
+          <div className="uploadSpriteFrame" style={spriteStyle} />
+        ) : (
+          <div className="uploadSpriteEmpty">
+            <Icon name="sheet" size={22} />
+          </div>
+        )}
+      </div>
+
+      <div className="uploadPreviewCopy">
+        <h2>{displayName}</h2>
+        <p>{description}</p>
+      </div>
+
+      <div className="uploadPreviewMeta">
+        <PreviewMetaItem label="pet.json" value={uploadState.manifest ? formatBytes(uploadState.manifest.size) : "missing"} />
+        <PreviewMetaItem label="spritesheet" value={uploadState.spritesheet ? formatBytes(uploadState.spritesheet.size) : "missing"} />
+        <PreviewMetaItem label="id" value={normalizedId || manifestError || "pending"} />
+        <PreviewMetaItem label="kind" value={uploadState.kind} />
+      </div>
+
+      <div className="uploadPreviewPills">
+        {uploadState.tags.length ? uploadState.tags.map((tag) => <span key={tag}>{tag}</span>) : <span>No tags</span>}
+      </div>
+
+      <div className="uploadPreviewStrip" aria-hidden="true">
+        {Array.from({ length: 8 }, (_, frame) => (
+          <span
+            className={spritesheetUrl ? "uploadPreviewStripFrame" : "uploadPreviewStripFrame empty"}
+            key={frame}
+            style={spritesheetUrl ? { ...spriteStyle, "--upload-frame": frame } as CSSProperties : undefined}
+          />
+        ))}
+      </div>
+    </aside>
+  );
+}
+
+function PreviewMetaItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function useUploadManifestPreview(file: File | null) {
+  const [manifest, setManifest] = useState<UploadManifest | null>(null);
+  const [manifestError, setManifestError] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+    if (!file) {
+      setManifest(null);
+      setManifestError("");
+      return;
+    }
+    readUploadManifest(file)
+      .then((nextManifest) => {
+        if (!alive) return;
+        setManifest(nextManifest);
+        setManifestError("");
+      })
+      .catch((error) => {
+        if (!alive) return;
+        setManifest(null);
+        setManifestError(error instanceof Error ? error.message : "pet.json is invalid");
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [file]);
+
+  return { manifest, manifestError };
+}
+
+function useObjectUrl(file: File | null) {
+  const [url, setUrl] = useState("");
+
+  useEffect(() => {
+    if (!file) {
+      setUrl("");
+      return;
+    }
+    const nextUrl = URL.createObjectURL(file);
+    setUrl(nextUrl);
+    return () => URL.revokeObjectURL(nextUrl);
+  }, [file]);
+
+  return url;
 }
 
 function UploadTagPicker({

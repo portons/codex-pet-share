@@ -149,3 +149,59 @@ export function PetCollectionsModal({
     </div>
   );
 }
+
+export function PetDeleteConfirmModal({
+  pet,
+  status,
+  busy,
+  onConfirm,
+  onClose
+}: {
+  pet: Pet;
+  status: string;
+  busy: boolean;
+  onConfirm: () => void | Promise<void>;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="modalBackdrop"
+      role="presentation"
+      onClick={(event) => {
+        if (event.target === event.currentTarget && !busy) {
+          onClose();
+        }
+      }}
+    >
+      <section className="authModal" role="dialog" aria-modal="true" aria-label={`Delete ${pet.displayName}`}>
+        <div className="modalHeader">
+          <div className="modalTitle compact">
+            <p className="metaText">Delete pet</p>
+            <h2>{pet.displayName}</h2>
+          </div>
+          <button className="btn btnSm btnGhost modalCloseButton" type="button" onClick={onClose} disabled={busy}>
+            <Icon name="close" size={12} />
+            Close
+          </button>
+        </div>
+        <div className="stackForm">
+          <p className="modalBodyCopy">This removes the pet, its package assets, and its gallery entry.</p>
+          <div className="modalActionRow">
+            <button className="btn btnDanger btnLg" type="button" disabled={busy} onClick={onConfirm}>
+              {busy ? <Spinner size={14} /> : <Icon name="trash" size={14} />}
+              {busy ? "Deleting" : "Delete pet"}
+            </button>
+            <button className="btn btnLg" type="button" disabled={busy} onClick={onClose}>
+              Cancel
+            </button>
+          </div>
+        </div>
+        {status && (
+          <p className="status" role="alert">
+            {status}
+          </p>
+        )}
+      </section>
+    </div>
+  );
+}

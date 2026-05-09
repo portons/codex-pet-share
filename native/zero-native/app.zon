@@ -1,0 +1,34 @@
+.{
+    .id = "dev.porton.codex-pets",
+    .name = "codex-pets",
+    .display_name = "Codex Pets",
+    .version = "0.1.0",
+    .icons = .{ "assets/icon.icns" },
+    .platforms = .{ "macos" },
+    .permissions = .{ "network", "notifications" },
+    .capabilities = .{ "webview", "network", "native_module", "js_bridge" },
+    .bridge = .{
+        .commands = .{
+            .{ .name = "codex-pets.notifications.status", .permissions = .{ "notifications" }, .origins = .{ "https://codex-pets.net" } },
+            .{ .name = "codex-pets.notifications.enable", .permissions = .{ "notifications" }, .origins = .{ "https://codex-pets.net" } },
+        },
+    },
+    .frontend = .{
+        .dist = "dist",
+        .entry = "index.html",
+        .spa_fallback = true,
+    },
+    .security = .{
+        .navigation = .{
+            .allowed_origins = .{ "zero://app", "zero://inline", "http://127.0.0.1:5173", "https://codex-pets.net" },
+            .external_links = .{
+                .action = "open_system_browser",
+                .allowed_urls = .{ "https://github.com/*", "https://x.com/*" },
+            },
+        },
+    },
+    .web_engine = "system",
+    .windows = .{
+        .{ .label = "main", .title = "Codex Pets", .width = 1280, .height = 860, .restore_state = true },
+    },
+}

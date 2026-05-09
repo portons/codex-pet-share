@@ -149,11 +149,7 @@ export async function generatePreviewImage(spritesheet: File) {
       }
     }
 
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.78));
-    if (!blob) {
-      throw new Error("Could not create preview image.");
-    }
-    return new File([blob], "preview.webp", { type: "image/webp" });
+    return encodeCanvasAsWebp(context, canvas, "preview.webp", 78);
   } finally {
     URL.revokeObjectURL(imageUrl);
   }
@@ -178,14 +174,25 @@ export async function generatePosterImage(spritesheet: File) {
     context.imageSmoothingEnabled = false;
     context.drawImage(image, 0, 0, 192, 208, 0, 0, 192, 208);
 
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 1));
-    if (!blob) {
-      throw new Error("Could not create poster image.");
-    }
-    return new File([blob], "poster.webp", { type: "image/webp" });
+    return encodeCanvasAsWebp(context, canvas, "poster.webp", 100);
   } finally {
     URL.revokeObjectURL(imageUrl);
   }
+}
+
+async function encodeCanvasAsWebp(
+  context: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement,
+  fileName: string,
+  quality: number
+) {
+  const { encode } = await import("@jsquash/webp");
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+  const bytes = await encode(imageData, {
+    quality,
+    alpha_quality: 100
+  });
+  return new File([bytes], fileName, { type: "image/webp" });
 }
 
 function wrapCanvasText(

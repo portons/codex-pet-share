@@ -286,6 +286,11 @@
 
 .tagDropdown {
   position: relative;
+  z-index: 6;
+}
+
+.tagDropdown:has(.tagDropdownMenu) {
+  z-index: 80;
 }
 
 .tagDropdownTrigger {
@@ -323,8 +328,11 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  z-index: 20;
+  z-index: 80;
   width: 236px;
+  max-width: calc(100vw - 24px);
+  max-height: min(360px, calc(100vh - 48px));
+  overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--surface);

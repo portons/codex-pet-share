@@ -61,7 +61,7 @@ export function parseJson(value: string, name: string) {
 }
 
 export function validateSpritesheet(bytes: Uint8Array) {
-  const size = webpSize(bytes);
+  const size = webpSize(bytes, "spritesheet");
   if (size.width !== atlas.width || size.height !== atlas.height) {
     throw new HttpError(`spritesheet must be ${atlas.width}x${atlas.height}`, 400);
   }
@@ -73,17 +73,17 @@ export function validateShareImage(bytes: Uint8Array) {
 }
 
 export function validatePreviewImage(bytes: Uint8Array) {
-  const size = webpSize(bytes);
+  const size = webpSize(bytes, "preview.webp");
   if (size.width !== 5472 || size.height !== 104) throw new HttpError("preview.webp must be 5472x104", 400);
 }
 
 export function validatePosterImage(bytes: Uint8Array) {
-  const size = webpSize(bytes);
+  const size = webpSize(bytes, "poster.webp");
   if (size.width !== cell.width || size.height !== cell.height) throw new HttpError(`poster.webp must be ${cell.width}x${cell.height}`, 400);
 }
 
 export function validationFromBytes(manifest: Manifest, spritesheet: Uint8Array): ValidationReport {
-  const size = webpSize(spritesheet);
+  const size = webpSize(spritesheet, "spritesheet");
   return {
     manifestId: manifest.id,
     atlasSize: `${size.width}x${size.height}`,
@@ -94,8 +94,8 @@ export function validationFromBytes(manifest: Manifest, spritesheet: Uint8Array)
   };
 }
 
-function webpSize(bytes: Uint8Array) {
-  if (text(bytes, 0, 4) !== "RIFF" || text(bytes, 8, 12) !== "WEBP") throw new HttpError("spritesheet must be a WebP file", 400);
+function webpSize(bytes: Uint8Array, name: string) {
+  if (text(bytes, 0, 4) !== "RIFF" || text(bytes, 8, 12) !== "WEBP") throw new HttpError(`${name} must be a WebP file`, 400);
   let offset = 12;
   while (offset + 8 <= bytes.length) {
     const chunk = text(bytes, offset, offset + 4);
@@ -108,7 +108,7 @@ function webpSize(bytes: Uint8Array) {
     }
     offset = data + length + (length % 2);
   }
-  throw new HttpError("spritesheet dimensions could not be read", 400);
+  throw new HttpError(`${name} dimensions could not be read`, 400);
 }
 
 function pngSize(bytes: Uint8Array) {
