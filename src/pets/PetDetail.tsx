@@ -199,24 +199,24 @@ export function PetDetail({
       <article className="detailInstall" aria-label="Install">
         <header className="detailSectionHeader">
           <span className="detailSectionLabel">Install</span>
-          <span className="detailSectionHint">Run in your terminal — adds this pet to <code>$HOME/.codex/pets</code>.</span>
+          <span className="detailSectionHint">Open in Codex, or install manually into <code>$HOME/.codex/pets</code>.</span>
         </header>
+        <a className="btn btnPrimary btnLg" href={codexInstallUrl}>
+          <Icon name="terminal" size={15} />
+          Open in Codex
+        </a>
         <DownloadCommandRow
           command={downloadCommand}
           copied={copiedDownloadCommand}
           copyIcon={<Icon name={copiedDownloadCommand ? "check" : "copy"} size={13} />}
-          helperText=""
+          helperText="Terminal install command"
           mode={downloadCommandMode}
           onCopy={copyDownloadCommand}
           onModeChange={changeDownloadCommandMode}
         />
         <a className="detailInstallSecondary" href={pet.downloadUrl} download>
           <Icon name="package" size={13} />
-          Or download <code>.codex-pet.zip</code> directly
-        </a>
-        <a className="btn btnLg" href={codexInstallUrl}>
-          <Icon name="terminal" size={15} />
-          Open in Codex
+          Download <code>.codex-pet.zip</code>
         </a>
         <ValidationReportCard report={pet.validationReport} />
       </article>

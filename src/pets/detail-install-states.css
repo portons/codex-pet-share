@@ -40,10 +40,6 @@
   color: var(--ink);
 }
 
-.detailInstall .commandHelperText {
-  display: none;
-}
-
 .detailInstallSecondary {
   display: inline-flex;
   align-items: center;
