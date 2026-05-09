@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, type SetStateAction } from "react";
 import { useAdminActions } from "../admin/useAdminActions";
 import { useAppEntityData } from "./useAppEntityData";
 import { useAppNavigationActions } from "./useAppNavigationActions";
@@ -6,7 +6,8 @@ import { useAppRouteEffects } from "./useAppRouteEffects";
 import { AppView, type AppViewProps } from "./AppView";
 import { useSessionApi } from "./useSessionApi";
 import { useAuthForms } from "../auth/useAuthForms";
-import { routeFromHash } from "../domain/routing";
+import { navigate, routeFromHash } from "../domain/routing";
+import { readJson } from "../domain/http";
 import { useUploadWorkflow } from "../uploads/useUploadWorkflow";
 import { usePetEditors } from "../pets/usePetEditors";
 import { usePetMutations } from "../pets/usePetMutations";
@@ -139,16 +140,25 @@ function App() {
     authStatus,
     setAuthStatus,
     authBusy,
+    resendBusy,
+    authProviders,
+    startOAuth,
+    resendVerification,
     submitAuth,
     openAuth,
     closeAuth,
     settingsOpen,
     settingsDisplayName,
     setSettingsDisplayName,
+    settingsCurrentPassword,
+    setSettingsCurrentPassword,
+    settingsNewPassword,
+    setSettingsNewPassword,
     settingsStatus,
     settingsBusy,
     submitSettings,
     openSettings,
+    openPasswordReset,
     closeSettings,
     setAuthMode
   } = useAuthForms({
@@ -334,6 +344,62 @@ function App() {
     });
   }
 
+  useEffect(() => {
+    const hash = window.location.hash.replace(/^#\/?/, "");
+    if (hash.startsWith("auth/reset-password")) {
+      const params = new URLSearchParams(hash.split("?")[1] || "");
+      const token = params.get("token") || "";
+      navigate("/");
+      setRoute(routeFromHash());
+      if (token) {
+        openPasswordReset(token);
+      } else {
+        openAuth();
+        setAuthStatus("Password reset link is invalid.");
+      }
+      return;
+    }
+    if (!hash.startsWith("auth/callback")) return;
+    const params = new URLSearchParams(hash.split("?")[1] || "");
+    const code = params.get("code") || "";
+    navigate("/");
+    setRoute(routeFromHash());
+    if (!code) {
+      openAuth();
+      setAuthStatus("Authentication link is invalid.");
+      return;
+    }
+    let cancelled = false;
+    async function completeAuthCallback() {
+      try {
+        const body = await readJson<{ user: User; session: AuthSession | null }>(
+          await apiFetch(
+            "/api/auth/session-code",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code })
+            },
+            null
+          )
+        );
+        if (cancelled) return;
+        if (!body.session) throw new Error("Authentication session was not created.");
+        applySession(body.session);
+        setUser(body.user);
+        await refreshAfterAuth(body.user, body.session);
+      } catch (error) {
+        if (cancelled) return;
+        openAuth();
+        setAuthStatus(error instanceof Error ? error.message : "Authentication failed.");
+      }
+    }
+    void completeAuthCallback();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   useAppRouteEffects({
     route,
     setRoute,
@@ -396,6 +462,10 @@ function App() {
     loadCollectionDetail
   });
 
+  function setEntryAuthMode(next: SetStateAction<"login" | "register">) {
+    setAuthMode(typeof next === "function" ? next(authMode === "register" ? "register" : "login") : next);
+  }
+
   const viewProps = {
     nav: { route, user, theme, onLogout: logout, onSignIn: openAuth, onAccount: openSettings, onThemeToggle: toggleTheme },
     routes: {
@@ -415,7 +485,7 @@ function App() {
       startUserCollectionRoom: userCollectionActions.startCollectionRoom,
       deleteUpload, openAuth, favoritePets, favoritesLoading, minePets, mineLoading, deleteStatus,
       uploadState, uploadStatus, uploadBusy, setUploadState, setUploadStatus, submitUpload, creators,
-      creatorsTotal, creatorsLoading, collectionsLoading, setAuthMode, setSharingEntity, collectionDetail,
+      creatorsTotal, creatorsLoading, collectionsLoading, setAuthMode: setEntryAuthMode, setSharingEntity, collectionDetail,
       collectionPets, collectionMeta, collectionDetailLoading, adminCollections, adminCollectionsLoading,
       adminCollectionBusySlug, adminModerationBusy, adminStatus, setAdminUserShadowban, removeAdminUser,
       createCollection, updateCollection, deleteCollection, creator, creatorPets, creatorMeta,
@@ -423,8 +493,10 @@ function App() {
     },
     dialogs: {
       authOpen, authMode, selectAuthMode, displayName, setDisplayName, email, setEmail, password,
-      setPassword, authStatus, authBusy, submitAuth, closeAuth, settingsOpen, settingsDisplayName,
-      setSettingsDisplayName, settingsStatus, settingsBusy, submitSettings, closeSettings, sharingPet,
+      setPassword, authStatus, authBusy, resendBusy, authProviders, startOAuth, resendVerification, submitAuth,
+      closeAuth, settingsOpen, settingsDisplayName,
+      setSettingsDisplayName, settingsCurrentPassword, setSettingsCurrentPassword, settingsNewPassword,
+      setSettingsNewPassword, settingsStatus, settingsBusy, submitSettings, closeSettings, sharingPet,
       setSharingPet, sharingEntity, setSharingEntity, downloadPet, setDownloadPet, tagEditorPet,
       tagEditorTags, tagEditorKind, tagEditorStatus, tagEditorBusy, setTagEditorKind, toggleTagEditorTag,
       submitTagEditor, closeTagEditor, collectionEditorPet, adminCollections, collectionEditorSlugs,
@@ -456,7 +528,7 @@ function App() {
       userCollections
     },
     playground: {
-      route, user, session, playgroundPet, favoritePets, collections, setPlaygroundPet, setAuthMode, apiFetch
+      route, user, session, playgroundPet, favoritePets, collections, setPlaygroundPet, setAuthMode: setEntryAuthMode, apiFetch
     }
   } satisfies AppViewProps;
 

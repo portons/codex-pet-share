@@ -85,8 +85,11 @@ async function route(ctx: AppContext, parts: string[]) {
   if (parts[0] === "collections" && parts[1]) return handleEntityShare(ctx, "collections", parts[1]);
   if (parts[0] === "users" && parts[1]) return handleEntityShare(ctx, "users", parts[1]);
   if (parts[0] === "gallery") return handleEntityShare(ctx, "gallery", parts[1]);
+  if ((parts[0] === "privacy" || parts[0] === "terms") && parts.length === 1) {
+    return ctx.env.ASSETS.fetch(new Request(new URL("/", ctx.url.origin), ctx.request));
+  }
   if (parts[0] !== "api") return ctx.env.ASSETS.fetch(ctx.request);
-  if (parts[1] === "auth") return handleAuth(ctx, parts[2]);
+  if (parts[1] === "auth") return handleAuth(ctx, parts.slice(2));
   if (parts[1] === "admin") return handleAdmin(ctx, parts.slice(2));
   if (parts[1] === "pets") return handlePets(ctx, parts.slice(2));
   if (parts[1] === "users") return handleUsers(ctx, parts.slice(2));

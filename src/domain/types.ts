@@ -4,6 +4,7 @@ export type User = {
   displayName: string;
   isAdmin: boolean;
   isShadowbanned: boolean;
+  emailVerified?: boolean;
 };
 
 export type Pet = {
@@ -44,6 +45,7 @@ export type Route =
   | { name: "creators" }
   | { name: "collections" }
   | { name: "collection"; slug: string }
+  | { name: "legal"; page: "privacy" | "terms" }
   | { name: "admin" }
   | { name: "detail"; id: string }
   | { name: "user"; id: string }

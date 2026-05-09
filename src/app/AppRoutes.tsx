@@ -3,6 +3,7 @@ import { APP_NAME } from "../branding/brand";
 import { DetailSkeleton } from "../ui/Skeletons";
 import { Spinner } from "../ui/Spinner";
 import { PetDetail } from "../pets/PetDetail";
+import { LegalPage } from "../legal/LegalPage";
 import {
   CollectionDetailPageWithPresence,
   CollectionsPageWithPresence,
@@ -327,6 +328,8 @@ export function AppRoutes({
           />
         </Suspense>
       )}
+
+      {route.name === "legal" && <LegalPage page={route.page} />}
 
       {route.name === "user" && (
         <CreatorPage

@@ -31,6 +31,7 @@
     "@jsquash/webp": "^1.5.0",
     "@types/three": "^0.184.0",
     "@vitejs/plugin-react": "^5.1.2",
+    "arctic": "^3.7.0",
     "bcryptjs": "^3.0.3",
     "emoji-picker-react": "^4.19.1",
     "fflate": "^0.8.2",

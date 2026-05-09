@@ -13,6 +13,12 @@ Secrets are set with Wrangler and are not committed:
 ```sh
 npx wrangler secret put AUTH_SECRET -c adapters/cloudflare-worker/wrangler.toml
 npx wrangler secret put PET_STATS_SALT -c adapters/cloudflare-worker/wrangler.toml
+npx wrangler secret put RESEND_API_KEY -c adapters/cloudflare-worker/wrangler.toml
+npx wrangler secret put AUTH_EMAIL_FROM -c adapters/cloudflare-worker/wrangler.toml
+npx wrangler secret put AUTH_GOOGLE_CLIENT_ID -c adapters/cloudflare-worker/wrangler.toml
+npx wrangler secret put AUTH_GOOGLE_CLIENT_SECRET -c adapters/cloudflare-worker/wrangler.toml
+npx wrangler secret put AUTH_X_CLIENT_ID -c adapters/cloudflare-worker/wrangler.toml
+npx wrangler secret put AUTH_X_CLIENT_SECRET -c adapters/cloudflare-worker/wrangler.toml
 ```
 
 Resource setup:

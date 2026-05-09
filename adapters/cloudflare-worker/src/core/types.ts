@@ -12,6 +12,12 @@ export type Env = {
   ASSET_PUBLIC_BASE_URL: string;
   PET_BUCKET_PREFIX?: string;
   AUTH_SECRET: string;
+  AUTH_EMAIL_FROM?: string;
+  RESEND_API_KEY?: string;
+  AUTH_GOOGLE_CLIENT_ID?: string;
+  AUTH_GOOGLE_CLIENT_SECRET?: string;
+  AUTH_X_CLIENT_ID?: string;
+  AUTH_X_CLIENT_SECRET?: string;
   PET_STATS_SALT: string;
   PETSHARE_MAINTENANCE?: string;
 };
@@ -36,6 +42,7 @@ export type AuthUser = {
   handle: string;
   isAdmin: boolean;
   isShadowbanned: boolean;
+  emailVerified: boolean;
 };
 
 export type PublicUser = {

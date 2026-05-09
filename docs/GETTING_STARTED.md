@@ -44,6 +44,13 @@ APP_NAME=Your Pet Share
 APP_HANDLE=your-pet-share
 APP_TAGLINE=A shareable home for your pixel pets.
 PET_STATS_SALT=openssl-rand-hex-32-output
+AUTH_SECRET=openssl-rand-hex-32-output
+AUTH_EMAIL_FROM=accounts@your-app.example.com
+RESEND_API_KEY=resend-api-key
+AUTH_GOOGLE_CLIENT_ID=google-oauth-client-id
+AUTH_GOOGLE_CLIENT_SECRET=google-oauth-client-secret
+AUTH_X_CLIENT_ID=x-oauth-client-id
+AUTH_X_CLIENT_SECRET=x-oauth-client-secret
 ```
 
 Use `docs/PROVIDER_ADAPTERS.md` for the API/realtime/storage contract. The

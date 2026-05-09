@@ -98,6 +98,10 @@ The backend adapter validator rejects mismatched dimensions, manifest schema err
 Never commit, screenshot, or expose to a `VITE_*` env var:
 
 - `PET_STATS_SALT` (any 32+ random chars; used to hash visitor IPs for view-count dedup)
+- `AUTH_SECRET`
+- `RESEND_API_KEY`
+- `AUTH_GOOGLE_CLIENT_SECRET`
+- `AUTH_X_CLIENT_SECRET`
 - backend database credentials
 - Cloudflare API tokens
 

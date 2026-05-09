@@ -143,6 +143,12 @@ export function AppFooter() {
           <Icon name="github" size={14} />
           <span>GitHub</span>
         </a>
+        <a href="/privacy">
+          <span>Privacy</span>
+        </a>
+        <a href="/terms">
+          <span>Terms</span>
+        </a>
       </div>
       <span>
         Pets are shared by the community. Some may be inspired by existing characters or brands. We don&apos;t claim rights to those characters or brands.

@@ -1,6 +1,7 @@
 import type { Dispatch, FormEvent, SetStateAction } from "react";
 import { type AdminCollection } from "../admin/AdminPage";
 import { AuthModal, AccountSettingsModal } from "../auth/AuthModals";
+import type { AuthMode, AuthProvider } from "../auth/useAuthForms";
 import { CollectionPetAdderModal, PetCollectorModal, UserCollectionEditorModal } from "../collections/UserCollectionModals";
 import type { CollectionPetAdderState } from "../collections/useUserCollections";
 import { DownloadModal } from "../downloads/DownloadModal";
@@ -21,11 +22,19 @@ export function AppDialogs({
   setPassword,
   authStatus,
   authBusy,
+  resendBusy,
+  authProviders,
+  startOAuth,
+  resendVerification,
   submitAuth,
   closeAuth,
   settingsOpen,
   settingsDisplayName,
   setSettingsDisplayName,
+  settingsCurrentPassword,
+  setSettingsCurrentPassword,
+  settingsNewPassword,
+  setSettingsNewPassword,
   settingsStatus,
   settingsBusy,
   submitSettings,
@@ -84,8 +93,8 @@ export function AppDialogs({
   userCollections
 }: {
   authOpen: boolean;
-  authMode: "login" | "register";
-  selectAuthMode: (next: "login" | "register") => void;
+  authMode: AuthMode;
+  selectAuthMode: (next: AuthMode) => void;
   displayName: string;
   setDisplayName: Dispatch<SetStateAction<string>>;
   email: string;
@@ -94,11 +103,19 @@ export function AppDialogs({
   setPassword: Dispatch<SetStateAction<string>>;
   authStatus: string;
   authBusy: boolean;
+  resendBusy: boolean;
+  authProviders: AuthProvider[];
+  startOAuth: (provider: AuthProvider["id"]) => void | Promise<void>;
+  resendVerification: () => void | Promise<void>;
   submitAuth: (event: FormEvent) => void | Promise<void>;
   closeAuth: () => void;
   settingsOpen: boolean;
   settingsDisplayName: string;
   setSettingsDisplayName: Dispatch<SetStateAction<string>>;
+  settingsCurrentPassword: string;
+  setSettingsCurrentPassword: Dispatch<SetStateAction<string>>;
+  settingsNewPassword: string;
+  setSettingsNewPassword: Dispatch<SetStateAction<string>>;
   settingsStatus: string;
   settingsBusy: boolean;
   submitSettings: (event: FormEvent) => void | Promise<void>;
@@ -170,6 +187,10 @@ export function AppDialogs({
           setPassword={setPassword}
           status={authStatus}
           busy={authBusy}
+          resendBusy={resendBusy}
+          providers={authProviders}
+          onOAuth={startOAuth}
+          onResendVerification={resendVerification}
           onSubmit={submitAuth}
           onClose={closeAuth}
         />
@@ -179,6 +200,10 @@ export function AppDialogs({
         <AccountSettingsModal
           displayName={settingsDisplayName}
           setDisplayName={setSettingsDisplayName}
+          currentPassword={settingsCurrentPassword}
+          setCurrentPassword={setSettingsCurrentPassword}
+          newPassword={settingsNewPassword}
+          setNewPassword={setSettingsNewPassword}
           status={settingsStatus}
           busy={settingsBusy}
           onSubmit={submitSettings}

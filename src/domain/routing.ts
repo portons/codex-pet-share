@@ -10,7 +10,8 @@ import type { GalleryUrlState, Route } from "./types";
 
 function hashParts() {
   const hash = window.location.hash.replace(/^#\/?/, "");
-  const [path, search = ""] = hash.split("?");
+  const source = hash || `${window.location.pathname.replace(/^\/?/, "")}${window.location.search}`;
+  const [path, search = ""] = source.split("?");
   return { path, params: new URLSearchParams(search) };
 }
 
@@ -31,6 +32,9 @@ export function routeFromHash(): Route {
   }
   if (cleanPath === "collections") {
     return { name: "collections" };
+  }
+  if (cleanPath === "privacy" || cleanPath === "terms") {
+    return { name: "legal", page: cleanPath };
   }
   if (cleanPath.startsWith("collections/")) {
     const rest = cleanPath.slice("collections/".length);

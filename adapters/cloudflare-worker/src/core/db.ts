@@ -45,6 +45,7 @@ export function serializeUser(row: {
   handle: string;
   is_admin: number;
   shadowbanned_at: string | null;
+  email_verified_at?: string | null;
 }): AuthUser {
   return {
     id: row.id,
@@ -52,7 +53,8 @@ export function serializeUser(row: {
     displayName: row.display_name,
     handle: row.handle,
     isAdmin: Boolean(row.is_admin),
-    isShadowbanned: Boolean(row.shadowbanned_at)
+    isShadowbanned: Boolean(row.shadowbanned_at),
+    emailVerified: Boolean(row.email_verified_at)
   };
 }
 

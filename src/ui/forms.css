@@ -236,6 +236,76 @@
   gap: 14px;
 }
 
+.authProviderList {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.authProviderButton {
+  width: 100%;
+  justify-content: flex-start;
+  background: var(--surface);
+}
+
+.authProviderMark {
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.authProviderMark.x {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.authDivider {
+  display: grid;
+  padding: 2px 0;
+}
+
+.authDivider span {
+  height: 1px;
+  background: var(--border);
+}
+
+.authInlineAction {
+  display: block;
+  margin: 14px auto 0;
+}
+
+.textButton {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.textButton:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.textButton:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.settingsDivider {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--border);
+}
+
 .modalBodyCopy {
   margin: 0;
   color: var(--muted);
