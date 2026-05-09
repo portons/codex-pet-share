@@ -398,13 +398,33 @@
   .detailHero {
     padding: 22px;
     gap: 22px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detailSurface,
+  .detailInstall {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detailHeader,
+  .detailLede,
+  .detailShowcase,
+  .detailHeroFooter {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detailLede {
+    overflow-wrap: anywhere;
   }
 
   .detailShowcase .spriteFrame.large {
-    width: 100%;
-    max-width: 320px;
+    width: min(100%, 210px);
+    max-width: 210px;
     height: auto;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 192 / 208;
   }
 
   .detailHeroFooter {
@@ -415,13 +435,28 @@
   .detailSocialActions {
     width: 100%;
     justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .detailSocialActions .btn,
+  .detailSocialActions .adminPetMenu {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  .detailSocialActions .btn {
+    white-space: normal;
+  }
+
+  .detailSocialActions .adminPetMenuTrigger {
+    width: 100%;
   }
 
   .detailPreviewSkeleton {
-    width: 100%;
-    max-width: 320px;
+    width: min(100%, 210px);
+    max-width: 210px;
     height: auto;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 192 / 208;
   }
 
   .detailTitle {
@@ -434,6 +469,8 @@
 
   .detailStates {
     padding: 20px;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .detailStatesGrid {
@@ -492,15 +529,13 @@
 
 @media (max-width: 380px) {
   .detailShowcase .spriteFrame.large {
-    max-width: 260px;
-  }
-
-  .detailShowcase .large .sprite {
-    transform: scale(1.25);
+    width: min(100%, 192px);
+    max-width: 192px;
   }
 
   .detailPreviewSkeleton {
-    max-width: 260px;
+    width: min(100%, 192px);
+    max-width: 192px;
   }
 }
 
