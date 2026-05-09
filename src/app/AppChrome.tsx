@@ -4,7 +4,7 @@ import { navigate } from "../domain/routing";
 import type { Route, User } from "../domain/types";
 import { Icon } from "../ui/Icon";
 
-const macosAppDownloadUrl = `${APP_REPO_URL.replace(/\/$/, "")}/releases/latest/download/Codex%20Pets-macOS.zip`;
+const macosAppDownloadUrl = `${APP_REPO_URL.replace(/\/$/, "")}/releases/latest/download/Codex.Pets-macOS.zip`;
 
 export function AppNav({
   route,
