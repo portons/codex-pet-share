@@ -1,7 +1,7 @@
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import { DownloadCommandRow, type DownloadCommandMode } from "../downloads/DownloadCommandRow";
 import { petStates, type TagName } from "../domain/config";
-import { isNsfwPet, petImportCommand } from "../domain/pets";
+import { isNsfwPet, petCodexInstallUrl, petImportCommand } from "../domain/pets";
 import type { ContentMode, Pet, User } from "../domain/types";
 import { copyText } from "../ui/clipboard";
 import { Icon } from "../ui/Icon";
@@ -84,6 +84,7 @@ export function PetDetail({
   const canDelete = Boolean(!user?.isAdmin && user?.id && user.id === pet.ownerId);
   const canEditTags = Boolean(!user?.isAdmin && user?.id && user.id === pet.ownerId);
   const downloadCommand = petImportCommand(pet, downloadCommandMode);
+  const codexInstallUrl = petCodexInstallUrl(pet);
 
   async function copyDownloadCommand() {
     const copied = await copyText(downloadCommand);
@@ -212,6 +213,10 @@ export function PetDetail({
         <a className="detailInstallSecondary" href={pet.downloadUrl} download>
           <Icon name="package" size={13} />
           Or download <code>.codex-pet.zip</code> directly
+        </a>
+        <a className="btn btnLg" href={codexInstallUrl}>
+          <Icon name="terminal" size={15} />
+          Open in Codex
         </a>
         <ValidationReportCard report={pet.validationReport} />
       </article>

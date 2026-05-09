@@ -1,5 +1,5 @@
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
-import { petImportCommand } from "../domain/pets";
+import { petCodexInstallUrl, petImportCommand } from "../domain/pets";
 import type { Pet } from "../domain/types";
 import { Icon } from "../ui/Icon";
 import { copyText } from "../ui/clipboard";
@@ -11,6 +11,7 @@ export function DownloadModal({ pet, onClose }: { pet: Pet; onClose: () => void 
   const dialogRef = useRef<HTMLElement | null>(null);
   const primaryActionRef = useRef<HTMLAnchorElement | null>(null);
   const command = petImportCommand(pet, commandMode);
+  const codexInstallUrl = petCodexInstallUrl(pet);
 
   useEffect(() => {
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -106,6 +107,10 @@ export function DownloadModal({ pet, onClose }: { pet: Pet; onClose: () => void 
           <a className="btn btnPrimary btnLg" ref={primaryActionRef} href={pet.downloadUrl} download>
             <Icon name="package" size={15} />
             Download package
+          </a>
+          <a className="btn btnLg" href={codexInstallUrl}>
+            <Icon name="terminal" size={15} />
+            Open in Codex
           </a>
           <div className="downloadOptionDivider">
             <span>OR</span>

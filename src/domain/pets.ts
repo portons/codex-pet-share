@@ -12,6 +12,11 @@ export function petImportCommand(pet: Pet, mode: DownloadCommandMode) {
   return `curl -L "${pet.downloadUrl}" -o "/tmp/${pet.id}.codex-pet.zip" && mkdir -p "$HOME/.codex/pets/${pet.id}" && unzip -o "/tmp/${pet.id}.codex-pet.zip" -d "$HOME/.codex/pets/${pet.id}"`;
 }
 
+export function petCodexInstallUrl(pet: Pet) {
+  const prompt = `Install this pet: ${petImportCommand(pet, "cli")}`;
+  return `codex://new?prompt=${encodeURIComponent(prompt)}`;
+}
+
 export function normalizePet(pet: Pet): Pet {
   return {
     ...pet,

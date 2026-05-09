@@ -60,6 +60,8 @@ export function NativeAppPrompts() {
   }, []);
 
   useEffect(() => {
+    if (!nativeBridge()) return;
+
     let cancelled = false;
 
     async function checkNewestPet() {

@@ -288,7 +288,6 @@ export function useGalleryBrowser({
     const key = freshGalleryKey(query, activeTags, contentMode, activeKind);
     const baseline = freshBaselineRef.current;
     if (!baseline || baseline.key !== key) return;
-    const baselineTotal = baseline.total;
     let cancelled = false;
 
     async function checkFreshPets() {
@@ -297,7 +296,9 @@ export function useGalleryBrowser({
         await apiFetch(`/api/pets?${params}`, {}, session)
       );
       if (cancelled) return;
-      setFreshPetCount(Math.max(0, body.total - baselineTotal));
+      const currentBaseline = freshBaselineRef.current;
+      if (!currentBaseline || currentBaseline.key !== key) return;
+      setFreshPetCount(Math.max(0, body.total - currentBaseline.total));
     }
 
     const intervalId = window.setInterval(() => {

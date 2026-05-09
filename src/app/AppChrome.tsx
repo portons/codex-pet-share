@@ -4,8 +4,6 @@ import { navigate } from "../domain/routing";
 import type { Route, User } from "../domain/types";
 import { Icon } from "../ui/Icon";
 
-const macosAppDownloadUrl = `${APP_REPO_URL.replace(/\/$/, "")}/releases/latest/download/Codex.Pets-macOS.zip`;
-
 export function AppNav({
   route,
   user,
@@ -144,10 +142,6 @@ export function AppFooter() {
         <a href="https://github.com/portons/codex-pet-share" target="_blank" rel="noopener noreferrer">
           <Icon name="github" size={14} />
           <span>GitHub</span>
-        </a>
-        <a href={macosAppDownloadUrl} target="_blank" rel="noopener noreferrer">
-          <Icon name="download" size={13} />
-          <span>macOS app</span>
         </a>
       </div>
       <span>
