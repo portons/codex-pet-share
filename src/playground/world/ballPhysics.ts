@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { canOccupyPlaygroundPosition, clampToPlaygroundFloor } from "../core/collision";
 import {
   BALL_FRICTION,
   BALL_GRAVITY,
@@ -28,7 +29,7 @@ export function updateBallPhysics({
 
   for (const ball of balls) {
     if (!ball.simulated) {
-      updateRemotePredictedBall(ball, dt);
+      updateRemotePredictedBall(ball, dt, limit);
       continue;
     }
     integrateSimulatedBall({ ball, actors, limit, dt, rollDelta, rollAxis });
@@ -38,7 +39,9 @@ export function updateBallPhysics({
   syncBallTransforms(balls);
 }
 
-function updateRemotePredictedBall(ball: Ball, dt: number) {
+function updateRemotePredictedBall(ball: Ball, dt: number, limit: number) {
+  const previousX = ball.pos.x;
+  const previousZ = ball.pos.z;
   ball.vel.y -= BALL_GRAVITY * dt;
   ball.pos.x += ball.vel.x * dt;
   ball.pos.y += ball.vel.y * dt;
@@ -47,6 +50,7 @@ function updateRemotePredictedBall(ball: Ball, dt: number) {
     ball.pos.y = ball.radius;
     if (ball.vel.y < 0) ball.vel.y = 0;
   }
+  resolveEnvironmentCollision(ball, previousX, previousZ, limit);
 }
 
 function integrateSimulatedBall({
@@ -64,6 +68,8 @@ function integrateSimulatedBall({
   rollDelta: THREE.Quaternion;
   rollAxis: THREE.Vector3;
 }) {
+  const previousX = ball.pos.x;
+  const previousZ = ball.pos.z;
   ball.vel.y -= BALL_GRAVITY * dt;
   ball.pos.x += ball.vel.x * dt;
   ball.pos.y += ball.vel.y * dt;
@@ -83,8 +89,45 @@ function integrateSimulatedBall({
   if (ball.pos.z > limit) { ball.pos.z = limit; ball.vel.z = -Math.abs(ball.vel.z) * BALL_WALL_RESTITUTION; }
   if (ball.pos.z < -limit) { ball.pos.z = -limit; ball.vel.z = Math.abs(ball.vel.z) * BALL_WALL_RESTITUTION; }
 
+  resolveEnvironmentCollision(ball, previousX, previousZ, limit);
+  const beforeActorX = ball.pos.x;
+  const beforeActorZ = ball.pos.z;
   resolveActorCollisions(ball, actors);
+  resolveEnvironmentCollision(ball, beforeActorX, beforeActorZ, limit);
   applyRollingVisual({ ball, onGround, dt, rollDelta, rollAxis });
+}
+
+function resolveEnvironmentCollision(ball: Ball, previousX: number, previousZ: number, limit: number) {
+  ball.pos.x = clampToPlaygroundFloor(ball.pos.x, limit);
+  ball.pos.z = clampToPlaygroundFloor(ball.pos.z, limit);
+
+  if (canOccupyPlaygroundPosition(ball.pos.x, ball.pos.z, ball.radius)) {
+    return;
+  }
+
+  const targetX = ball.pos.x;
+  const targetZ = ball.pos.z;
+  const fallbackX = clampToPlaygroundFloor(previousX, limit);
+  const fallbackZ = clampToPlaygroundFloor(previousZ, limit);
+  const canKeepX = canOccupyPlaygroundPosition(targetX, fallbackZ, ball.radius);
+  const canKeepZ = canOccupyPlaygroundPosition(fallbackX, targetZ, ball.radius);
+
+  if (canKeepX) {
+    ball.pos.z = fallbackZ;
+    ball.vel.z = -ball.vel.z * BALL_WALL_RESTITUTION;
+    return;
+  }
+
+  if (canKeepZ) {
+    ball.pos.x = fallbackX;
+    ball.vel.x = -ball.vel.x * BALL_WALL_RESTITUTION;
+    return;
+  }
+
+  ball.pos.x = fallbackX;
+  ball.pos.z = fallbackZ;
+  ball.vel.x = -ball.vel.x * BALL_WALL_RESTITUTION;
+  ball.vel.z = -ball.vel.z * BALL_WALL_RESTITUTION;
 }
 
 function resolveActorCollisions(ball: Ball, actors: BallActor[]) {

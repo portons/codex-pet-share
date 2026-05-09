@@ -91,7 +91,7 @@ export function usePlaygroundMinimap({
       drawMap();
       const own = spriteRef.current;
       if (own) {
-        drawDot(own.position.x, own.position.z, "#f08b24", 4.2, "rgba(255, 210, 112, 0.36)", "diamond");
+        drawDot(own.position.x, own.position.z, "#f08b24", 4.2, undefined, "diamond");
       }
       for (const r of remotePetsRef.current.values()) {
         drawDot(r.targetX, r.targetZ, "#f8efd2", 3);

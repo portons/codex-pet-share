@@ -4,6 +4,7 @@
 
 import * as THREE from "three";
 import { petTextureAssetUrl } from "../../domain/http";
+import { canOccupyPlaygroundPosition, clampToPlaygroundFloor } from "../core/collision";
 
 // NPC slot system — up to MAX_NPCS wandering AI pets at once. Each NPC is a
 // distinct sprite atlas (different pet) so the user can populate the park.
@@ -16,6 +17,8 @@ const NPC_WAYPOINT_RADIUS = 0.6;
 const NPC_GREET_TRIGGER_DIST = 4;
 const NPC_GREET_DURATION_MS = 2400;
 const NPC_GREET_COOLDOWN_MS = 6000;
+const NPC_SPAWN_RADIUS_SCALE = 0.65;
+const NPC_POSITION_ATTEMPTS = 80;
 
 export const NPC_ATLAS_COLS = 8;
 export const NPC_ATLAS_ROWS = 9;
@@ -95,10 +98,39 @@ export function makeNpcSystem(
 ): NpcSystem {
   const npcs: Npc[] = [];
   let nextId = 1;
+  const moveLimit = floorHalf - spriteWidth / 2;
+
+  function randomWalkablePoint(radiusScale = 1): { x: number; z: number } | null {
+    const span = (floorHalf - 3) * radiusScale;
+    for (let attempt = 0; attempt < NPC_POSITION_ATTEMPTS; attempt += 1) {
+      const x = clampToPlaygroundFloor((Math.random() - 0.5) * span * 2, moveLimit);
+      const z = clampToPlaygroundFloor((Math.random() - 0.5) * span * 2, moveLimit);
+      if (canOccupyPlaygroundPosition(x, z)) {
+        return { x, z };
+      }
+    }
+    return null;
+  }
+
+  function randomWalkableSpawnPoint(): { x: number; z: number } | null {
+    const radius = floorHalf * NPC_SPAWN_RADIUS_SCALE;
+    for (let attempt = 0; attempt < NPC_POSITION_ATTEMPTS; attempt += 1) {
+      const angle = Math.random() * Math.PI * 2;
+      const x = clampToPlaygroundFloor(Math.cos(angle) * radius, moveLimit);
+      const z = clampToPlaygroundFloor(Math.sin(angle) * radius, moveLimit);
+      if (canOccupyPlaygroundPosition(x, z)) {
+        return { x, z };
+      }
+    }
+    return null;
+  }
 
   function pickWaypoint(n: Npc) {
-    n.wpX = (Math.random() - 0.5) * (floorHalf - 3) * 2;
-    n.wpZ = (Math.random() - 0.5) * (floorHalf - 3) * 2;
+    const next = randomWalkablePoint();
+    if (!next) return false;
+    n.wpX = next.x;
+    n.wpZ = next.z;
+    return true;
   }
 
   function setState(n: Npc, next: NpcState, now: number) {
@@ -140,10 +172,10 @@ export function makeNpcSystem(
     sprite.scale.set(spriteWidth, spriteHeight, 1);
     sprite.center.set(0.5, 0);
     sprite.visible = false;
-    // Spawn somewhere on the perimeter, well away from the player.
-    const a = Math.random() * Math.PI * 2;
-    const r = floorHalf * 0.65;
-    sprite.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    // Spawn away from the center without starting inside blocked geometry.
+    const spawnPoint = randomWalkableSpawnPoint();
+    if (!spawnPoint) return null;
+    sprite.position.set(spawnPoint.x, 0, spawnPoint.z);
     scene.add(sprite);
 
     const npc: Npc = {
@@ -173,7 +205,12 @@ export function makeNpcSystem(
       onGround: true,
       bounceCooldownUntil: 0
     };
-    pickWaypoint(npc);
+    if (!pickWaypoint(npc)) {
+      scene.remove(sprite);
+      mat.dispose();
+      tex.dispose();
+      return null;
+    }
     img.onload = () => {
       npc.imgReady = true;
       tex.needsUpdate = true;
@@ -243,21 +280,21 @@ export function makeNpcSystem(
             n.pauseAt = now + 800 + Math.random() * 1600;
           }
           if (now >= n.pauseAt && n.onGround) {
-            pickWaypoint(n);
-            setState(n, "walking", now);
+            if (pickWaypoint(n)) {
+              setState(n, "walking", now);
+            }
           }
         } else {
           if (n.state !== "walking") setState(n, "walking", now);
           const inv = 1 / d;
           const nx = dxw * inv;
           const nz = dzw * inv;
-          n.vx = nx * NPC_SPEED;
-          n.vz = nz * NPC_SPEED;
-          n.obj.position.x += n.vx * dt;
-          n.obj.position.z += n.vz * dt;
-          if (nx > 0.3) { n.row = NPC_DEFS.runRight.row; n.frames = NPC_DEFS.runRight.frames; n.fps = NPC_DEFS.runRight.fps; }
-          else if (nx < -0.3) { n.row = NPC_DEFS.runLeft.row; n.frames = NPC_DEFS.runLeft.frames; n.fps = NPC_DEFS.runLeft.fps; }
-          else { n.row = NPC_DEFS.runFwd.row; n.frames = NPC_DEFS.runFwd.frames; n.fps = NPC_DEFS.runFwd.fps; }
+          moveNpc(n, nx, nz, dt, now);
+          if (n.state === "walking") {
+            if (nx > 0.3) { n.row = NPC_DEFS.runRight.row; n.frames = NPC_DEFS.runRight.frames; n.fps = NPC_DEFS.runRight.fps; }
+            else if (nx < -0.3) { n.row = NPC_DEFS.runLeft.row; n.frames = NPC_DEFS.runLeft.frames; n.fps = NPC_DEFS.runLeft.fps; }
+            else { n.row = NPC_DEFS.runFwd.row; n.frames = NPC_DEFS.runFwd.frames; n.fps = NPC_DEFS.runFwd.fps; }
+          }
         }
       }
 
@@ -285,6 +322,34 @@ export function makeNpcSystem(
         n.tex.offset.x = frameIdx / NPC_ATLAS_COLS;
       }
       n.tex.offset.y = (NPC_ATLAS_ROWS - 1 - n.row) / NPC_ATLAS_ROWS;
+    }
+  }
+
+  function moveNpc(n: Npc, nx: number, nz: number, dt: number, now: number) {
+    const currentX = n.obj.position.x;
+    const currentZ = n.obj.position.z;
+    const targetX = clampToPlaygroundFloor(currentX + nx * NPC_SPEED * dt, moveLimit);
+    const targetZ = clampToPlaygroundFloor(currentZ + nz * NPC_SPEED * dt, moveLimit);
+    let nextX = currentX;
+    let nextZ = currentZ;
+
+    if (canOccupyPlaygroundPosition(targetX, targetZ)) {
+      nextX = targetX;
+      nextZ = targetZ;
+    } else {
+      if (canOccupyPlaygroundPosition(targetX, currentZ)) nextX = targetX;
+      if (canOccupyPlaygroundPosition(nextX, targetZ)) nextZ = targetZ;
+    }
+
+    n.obj.position.x = nextX;
+    n.obj.position.z = nextZ;
+    n.vx = dt > 0 ? (nextX - currentX) / dt : 0;
+    n.vz = dt > 0 ? (nextZ - currentZ) / dt : 0;
+
+    if (nextX === currentX && nextZ === currentZ) {
+      setState(n, "idle", now);
+      n.pauseAt = now + 300 + Math.random() * 500;
+      pickWaypoint(n);
     }
   }
 

@@ -705,9 +705,6 @@ async function writeMinimapImage(biome, textureRecords) {
     [size - margin - 8, center]
   ].map(([cx, cy]) => `<circle cx="${cx}" cy="${cy}" r="5.2" fill="#c52f20" stroke="#fff5d9" stroke-width="1.6"/>`).join("");
 
-  const fountain = `<circle cx="${center}" cy="${center + 39.4}" r="30" fill="none" stroke="#416f92" stroke-width="4" opacity="0.72"/>
-  <circle cx="${center}" cy="${center + 39.4}" r="5" fill="#4c88b0" stroke="#f9efd4" stroke-width="1.4"/>`;
-
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
   <rect width="${size}" height="${size}" rx="18" fill="#998e74"/>
   <rect x="${margin}" y="${margin}" width="${size - margin * 2}" height="${size - margin * 2}" rx="10" fill="#c8baa0"/>
@@ -718,7 +715,6 @@ async function writeMinimapImage(biome, textureRecords) {
     }).join("")}
   </g>
   <g>${polygons.join("")}</g>
-  ${fountain}
   ${portalDots}
   <rect x="8" y="8" width="${size - 16}" height="${size - 16}" rx="16" fill="none" stroke="#2f2b21" stroke-width="6" opacity="0.72"/>
   <rect x="13" y="13" width="${size - 26}" height="${size - 26}" rx="12" fill="none" stroke="#ead8a4" stroke-width="2" opacity="0.68"/>
