@@ -149,7 +149,7 @@ export async function generatePreviewImage(spritesheet: File) {
       }
     }
 
-    return encodeCanvasAsWebp(context, canvas, "preview.webp", 78);
+    return encodeCanvasAsWebp(canvas, "preview.webp", 78);
   } finally {
     URL.revokeObjectURL(imageUrl);
   }
@@ -174,25 +174,24 @@ export async function generatePosterImage(spritesheet: File) {
     context.imageSmoothingEnabled = false;
     context.drawImage(image, 0, 0, 192, 208, 0, 0, 192, 208);
 
-    return encodeCanvasAsWebp(context, canvas, "poster.webp", 100);
+    return encodeCanvasAsWebp(canvas, "poster.webp", 100);
   } finally {
     URL.revokeObjectURL(imageUrl);
   }
 }
 
 async function encodeCanvasAsWebp(
-  context: CanvasRenderingContext2D,
   canvas: HTMLCanvasElement,
   fileName: string,
   quality: number
 ) {
-  const { encode } = await import("@jsquash/webp");
-  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-  const bytes = await encode(imageData, {
-    quality,
-    alpha_quality: 100
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, "image/webp", quality / 100);
   });
-  return new File([bytes], fileName, { type: "image/webp" });
+  if (!blob) {
+    throw new Error(`Could not create ${fileName}.`);
+  }
+  return new File([blob], fileName, { type: "image/webp" });
 }
 
 function wrapCanvasText(
