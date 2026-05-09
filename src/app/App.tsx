@@ -60,7 +60,7 @@ function App() {
     showFreshPets,
     selectVisibleTag,
     removePetFromGallery
-  } = useGalleryBrowser({ apiFetch, session, route, setRoute });
+  } = useGalleryBrowser({ apiFetch, session, user, route, setRoute });
   const {
     minePets,
     setMinePets,

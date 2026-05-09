@@ -19,17 +19,20 @@ import type {
   GalleryView,
   Pet,
   PetKind,
-  Route
+  Route,
+  User
 } from "../domain/types";
 
 export function useGalleryBrowser({
   apiFetch,
   session,
+  user,
   route,
   setRoute
 }: {
   apiFetch: (path: string, init?: RequestInit, authSession?: AuthSession | null) => Promise<Response>;
   session: AuthSession | null;
+  user: User | null;
   route: Route;
   setRoute: Dispatch<SetStateAction<Route>>;
 }) {
@@ -50,6 +53,7 @@ export function useGalleryBrowser({
   const [loading, setLoading] = useState(true);
   const [freshPetCount, setFreshPetCount] = useState(0);
   const freshBaselineRef = useRef<{ key: string; total: number } | null>(null);
+  const freshViewer = freshViewerKey(user, session);
 
   function applyGalleryState(nextState: GalleryUrlState) {
     setQuery(nextState.query);
@@ -112,7 +116,7 @@ export function useGalleryBrowser({
     const body = await readJson<GalleryResponse>(await apiFetch(`/api/pets${suffix}`, {}, authSession));
     const pageSize = galleryPageSize(view, sort);
     const nextPets = body.pets.map(normalizePet);
-    freshBaselineRef.current = { key: freshGalleryKey(search, tags, content, kind), total: body.total };
+    freshBaselineRef.current = { key: freshGalleryKey(search, tags, content, kind, freshViewerKey(user, authSession)), total: body.total };
     setFreshPetCount(0);
     setPets(nextPets);
     setGalleryMeta({
@@ -153,7 +157,7 @@ export function useGalleryBrowser({
     );
     const randomPets = firstBody.pets.map(normalizePet);
 
-    freshBaselineRef.current = { key: freshGalleryKey(search, tags, content, kind), total: firstBody.total };
+    freshBaselineRef.current = { key: freshGalleryKey(search, tags, content, kind, freshViewerKey(user, authSession)), total: firstBody.total };
     setFreshPetCount(0);
     setPets(randomPets);
     setGalleryMeta({
@@ -285,20 +289,38 @@ export function useGalleryBrowser({
 
   useEffect(() => {
     if (route.name !== "gallery") return;
-    const key = freshGalleryKey(query, activeTags, contentMode, activeKind);
+    const key = freshGalleryKey(query, activeTags, contentMode, activeKind, freshViewer);
     const baseline = freshBaselineRef.current;
-    if (!baseline || baseline.key !== key) return;
     let cancelled = false;
 
-    async function checkFreshPets() {
+    async function fetchFreshTotal() {
       const params = freshGalleryParams(query, activeTags, contentMode, activeKind);
       const body = await readJson<GalleryResponse>(
         await apiFetch(`/api/pets?${params}`, {}, session)
       );
+      return body.total;
+    }
+
+    async function resetFreshBaseline() {
+      const total = await fetchFreshTotal();
+      if (cancelled) return;
+      freshBaselineRef.current = { key, total };
+      setFreshPetCount(0);
+    }
+
+    if (!baseline || baseline.key !== key) {
+      void resetFreshBaseline().catch(() => {});
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    async function checkFreshPets() {
+      const total = await fetchFreshTotal();
       if (cancelled) return;
       const currentBaseline = freshBaselineRef.current;
       if (!currentBaseline || currentBaseline.key !== key) return;
-      setFreshPetCount(Math.max(0, body.total - currentBaseline.total));
+      setFreshPetCount(Math.max(0, total - currentBaseline.total));
     }
 
     const intervalId = window.setInterval(() => {
@@ -309,7 +331,7 @@ export function useGalleryBrowser({
       cancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [route, query, activeTags, contentMode, activeKind, apiFetch, session, galleryMeta.total]);
+  }, [route, query, activeTags, contentMode, activeKind, freshViewer, apiFetch, session, galleryMeta.total]);
 
   async function selectVisibleTag(tag: TagName, sourceTags: string[]) {
     const nextContent = tag === "nsfw" || sourceTags.includes("nsfw") ? "all" : contentMode;
@@ -377,12 +399,22 @@ export function useGalleryBrowser({
   };
 }
 
-function freshGalleryKey(search: string, tags: string[], content: ContentMode, kind: PetKind) {
+function freshViewerKey(user: User | null, session: AuthSession | null) {
+  if (!user) return session ? "authenticated" : "anonymous";
+  return JSON.stringify({
+    id: user.id,
+    admin: user.isAdmin,
+    shadowbanned: user.isShadowbanned
+  });
+}
+
+function freshGalleryKey(search: string, tags: string[], content: ContentMode, kind: PetKind, viewer: string) {
   return JSON.stringify({
     search,
     tags: galleryRequestTags(tags),
     content,
-    kind
+    kind,
+    viewer
   });
 }
 
