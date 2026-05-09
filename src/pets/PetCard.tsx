@@ -1,4 +1,5 @@
-import { type KeyboardEvent, type MouseEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { autoUpdate, flip, offset, shift, useFloating } from "@floating-ui/react";
+import { type KeyboardEvent, type MouseEvent, useEffect, useRef, useState } from "react";
 import { type TagName } from "../domain/config";
 import { formatMetric } from "../domain/format";
 import { isNsfwPet } from "../domain/pets";
@@ -32,10 +33,15 @@ export function AdminPetMenu({
   onDelete: (pet: Pet) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [menuPosition, setMenuPosition] = useState<{ left: number; top: number; maxHeight: number } | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const menuListRef = useRef<HTMLDivElement | null>(null);
+  const { refs, floatingStyles } = useFloating({
+    open,
+    onOpenChange: setOpen,
+    placement: "bottom-start",
+    strategy: "fixed",
+    whileElementsMounted: autoUpdate,
+    middleware: [offset(6), flip({ padding: 12 }), shift({ padding: 12 })]
+  });
   const ownerModerationBusy = Boolean(pet.ownerId && shadowbanBusyOwnerId === pet.ownerId);
   const nsfwBusy = nsfwBusyId === pet.id;
 
@@ -50,47 +56,6 @@ export function AdminPetMenu({
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [open]);
-
-  useLayoutEffect(() => {
-    if (!open) {
-      setMenuPosition(null);
-      return;
-    }
-
-    const updateMenuPosition = () => {
-      const trigger = triggerRef.current;
-      const menu = menuListRef.current;
-      if (!trigger || !menu) {
-        return;
-      }
-
-      const margin = 12;
-      const gap = 8;
-      const triggerRect = trigger.getBoundingClientRect();
-      const menuWidth = menu.offsetWidth;
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const availableAbove = triggerRect.top - margin - gap;
-      const availableBelow = viewportHeight - triggerRect.bottom - margin - gap;
-      const opensAbove = availableAbove >= Math.min(menu.scrollHeight, 320) || availableAbove >= availableBelow;
-      const maxHeight = Math.max(80, Math.min(320, viewportHeight - margin * 2, opensAbove ? availableAbove : availableBelow));
-      const menuHeight = Math.min(menu.scrollHeight, maxHeight);
-      const left = Math.min(Math.max(margin, triggerRect.left), viewportWidth - menuWidth - margin);
-      const top = opensAbove
-        ? Math.max(margin, triggerRect.top - gap - menuHeight)
-        : Math.min(triggerRect.bottom + gap, viewportHeight - margin - menuHeight);
-
-      setMenuPosition({ left, top, maxHeight });
-    };
-
-    updateMenuPosition();
-    window.addEventListener("resize", updateMenuPosition);
-    window.addEventListener("scroll", updateMenuPosition, true);
-    return () => {
-      window.removeEventListener("resize", updateMenuPosition);
-      window.removeEventListener("scroll", updateMenuPosition, true);
-    };
   }, [open]);
 
   function run(action: () => void) {
@@ -109,28 +74,36 @@ export function AdminPetMenu({
       }}
     >
       <button
-        ref={triggerRef}
         className="btn btnSm adminPetMenuTrigger"
         type="button"
         aria-label={`Admin actions for ${pet.displayName}`}
         aria-haspopup="true"
         aria-expanded={open}
         title="Admin actions"
-        onClick={() => setOpen((current) => !current)}
+        onClick={(event) => {
+          if (open) {
+            setOpen(false);
+            return;
+          }
+          const triggerRect = event.currentTarget.getBoundingClientRect();
+          const hasPointerPosition = event.clientX !== 0 || event.clientY !== 0;
+          const x = hasPointerPosition ? event.clientX : triggerRect.left;
+          const y = hasPointerPosition ? event.clientY : triggerRect.bottom;
+          refs.setPositionReference({
+            getBoundingClientRect: () => DOMRect.fromRect({ x, y, width: 0, height: 0 })
+          });
+          setOpen(true);
+        }}
       >
         <Icon name="more" size={compact ? 13 : 14} />
         {!compact && "Admin"}
       </button>
       {open && (
         <div
-          ref={menuListRef}
+          ref={refs.setFloating}
           className="adminPetMenuList"
           role="menu"
-          style={
-            menuPosition
-              ? { left: menuPosition.left, top: menuPosition.top, maxHeight: menuPosition.maxHeight }
-              : { left: 0, top: 0, visibility: "hidden" }
-          }
+          style={floatingStyles}
         >
           <button type="button" role="menuitem" onClick={() => run(() => onEditTags(pet))}>
             Edit tags

@@ -27,6 +27,7 @@
     "build:nav-mark": "node scripts/build-nav-mark.mjs"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.19",
     "@jsquash/webp": "^1.5.0",
     "@types/three": "^0.184.0",
     "@vitejs/plugin-react": "^5.1.2",
