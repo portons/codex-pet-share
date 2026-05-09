@@ -88,7 +88,9 @@ export function AppRoutes({
   setUploadStatus,
   submitUpload,
   creators,
-  creatorsTotal,
+  creatorsMeta,
+  creatorsSort,
+  creatorsQuery,
   creatorsLoading,
   collectionsLoading,
   setAuthMode,
@@ -112,6 +114,9 @@ export function AppRoutes({
   creatorMeta,
   creatorLoading,
   selectCreatorPage,
+  selectCreatorsPage,
+  selectCreatorsSort,
+  selectCreatorsQuery,
   selectCollectionPage,
   detailLoading,
   detailPet,
@@ -221,7 +226,16 @@ export function AppRoutes({
       )}
 
       {route.name === "creators" && (
-        <CreatorsLeaderboardPage creators={creators} total={creatorsTotal} loading={creatorsLoading} />
+        <CreatorsLeaderboardPage
+          creators={creators}
+          meta={creatorsMeta}
+          mode={creatorsSort}
+          query={creatorsQuery}
+          loading={creatorsLoading}
+          onMode={selectCreatorsSort}
+          onQuery={selectCreatorsQuery}
+          onPage={selectCreatorsPage}
+        />
       )}
 
       {route.name === "collections" && (

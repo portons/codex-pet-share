@@ -57,6 +57,7 @@ export type GalleryView = "standard" | "compact";
 export type PetKind = "all" | "object" | "animal" | "person" | "creature";
 export type EditablePetKind = Exclude<PetKind, "all">;
 export type ContentMode = "safe" | "all";
+export type CreatorLeaderboardSort = "likes" | "views" | "uploads";
 
 export type UploadManifest = {
   id: string;
@@ -114,9 +115,8 @@ export type CreatorLeaderboardItem = {
   topPets: Array<Pet>;
 };
 
-export type CreatorsLeaderboardResponse = {
+export type CreatorsLeaderboardResponse = GalleryMeta & {
   creators: Array<CreatorLeaderboardItem>;
-  total: number;
 };
 
 export type CollectionSummary = {

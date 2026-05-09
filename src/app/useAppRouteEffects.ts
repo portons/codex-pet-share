@@ -1,8 +1,18 @@
 import { useEffect, type Dispatch, type SetStateAction } from "react";
-import { collectionPageFromHash, creatorPageFromHash, galleryUrlStateFromHash, routeFromHash } from "../domain/routing";
+import { trackRouteView } from "../domain/analytics";
+import {
+  collectionPageFromHash,
+  creatorPageFromHash,
+  creatorsPageFromHash,
+  creatorsQueryFromHash,
+  creatorsSortFromHash,
+  galleryUrlStateFromHash,
+  routeFromHash
+} from "../domain/routing";
 import type {
   AuthSession,
   Creator,
+  CreatorLeaderboardSort,
   GalleryMeta,
   GallerySort,
   GalleryView,
@@ -44,6 +54,9 @@ export function useAppRouteEffects({
   setCreatorPets,
   setCreatorMeta,
   loadCreator,
+  setCreatorsMeta,
+  setCreatorsSort,
+  setCreatorsQuery,
   loadCreators,
   setCollectionDetail,
   setCollectionPets,
@@ -72,7 +85,10 @@ export function useAppRouteEffects({
   setCreatorPets: Dispatch<SetStateAction<Pet[]>>;
   setCreatorMeta: Dispatch<SetStateAction<GalleryMeta>>;
   loadCreator: (id: string, page?: number, authSession?: AuthSession | null, content?: "safe" | "all") => Promise<void>;
-  loadCreators: (authSession?: AuthSession | null, content?: "safe" | "all") => Promise<void>;
+  setCreatorsMeta: Dispatch<SetStateAction<GalleryMeta>>;
+  setCreatorsSort: Dispatch<SetStateAction<CreatorLeaderboardSort>>;
+  setCreatorsQuery: Dispatch<SetStateAction<string>>;
+  loadCreators: (authSession?: AuthSession | null, content?: "safe" | "all", page?: number, sort?: CreatorLeaderboardSort, query?: string) => Promise<void>;
   setCollectionDetail: Dispatch<SetStateAction<Omit<import("../domain/types").CollectionSummary, "topPets"> | null>>;
   setCollectionPets: Dispatch<SetStateAction<Pet[]>>;
   setCollectionMeta: Dispatch<SetStateAction<GalleryMeta>>;
@@ -80,6 +96,10 @@ export function useAppRouteEffects({
   loadAdminCollections: (authSession?: AuthSession | null, currentUser?: User | null) => Promise<void>;
   setAdminStatus: Dispatch<SetStateAction<string>>;
 }) {
+  useEffect(() => {
+    trackRouteView(route.name, user);
+  }, [route, user?.id]);
+
   useEffect(() => {
     const onHashChange = () => setRoute(routeFromHash());
     window.addEventListener("hashchange", onHashChange);
@@ -120,7 +140,13 @@ export function useAppRouteEffects({
       );
     }
     if (route.name === "creators") {
-      loadCreators().catch((error) =>
+      const page = creatorsPageFromHash();
+      const sort = creatorsSortFromHash();
+      const query = creatorsQueryFromHash();
+      setCreatorsMeta((current) => ({ ...current, page }));
+      setCreatorsSort(sort);
+      setCreatorsQuery(query);
+      loadCreators(session, undefined, page, sort, query).catch((error) =>
         setAuthStatus(error instanceof Error ? error.message : "failed to load creators")
       );
     }

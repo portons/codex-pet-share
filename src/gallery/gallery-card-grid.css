@@ -354,31 +354,101 @@
 
 .collectionsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  gap: 12px;
+  min-width: 0;
+  padding-bottom: min(42vh, 340px);
+}
+
+.collectionsIndexShell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  align-items: start;
+  gap: 12px;
+}
+
+.collectionAlphabetRail {
+  position: sticky;
+  top: 86px;
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  width: 34px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  box-shadow: inset 0 1px 0 var(--inset-highlight), var(--shadow-sm);
+  backdrop-filter: saturate(115%) blur(6px);
+  -webkit-backdrop-filter: saturate(115%) blur(6px);
+  animation: collection-index-in 320ms var(--ease-out) both;
+}
+
+.collectionAlphabetItem {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--subtle);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  text-decoration: none;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.collectionAlphabetItem.active {
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.collectionAlphabetItem.current {
+  background: var(--ink);
+  color: var(--surface);
+  box-shadow: 0 4px 10px -8px var(--ink);
+}
+
+.collectionAlphabetItem.active:hover,
+.collectionAlphabetItem.active:focus-visible {
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  outline: none;
+  transform: translateX(-2px);
 }
 
 .collectionCard {
-  display: flex;
-  flex-direction: column;
-  min-height: 172px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 172px;
+  min-height: 0;
+  scroll-margin-top: 108px;
   color: inherit;
   text-align: left;
-  transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
   overflow: hidden;
+  content-visibility: auto;
+  contain-intrinsic-size: 190px;
+  transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out),
+    border-color 200ms var(--ease-out);
 }
 
 .collectionCard:hover {
-  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
 .collectionCardBody {
   display: grid;
-  gap: 10px;
-  align-content: start;
-  flex: 1 1 auto;
-  padding: 16px 18px 12px;
+  grid-template-columns: 268px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+  min-height: 180px;
+  padding: 16px 20px;
   color: inherit;
   text-decoration: none;
   background: transparent;
@@ -386,39 +456,109 @@
   cursor: pointer;
 }
 
+.collectionPosterMosaic {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  min-height: 126px;
+}
+
+.collectionPosterTile,
+.collectionPosterEmpty {
+  display: grid;
+  place-items: center;
+  flex: 0 0 74px;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background:
+    radial-gradient(circle at 50% 78%, var(--preview-ground), transparent 64%),
+    color-mix(in srgb, var(--surface) 82%, transparent);
+}
+
+.collectionPosterTile:first-child {
+  flex-basis: 108px;
+}
+
+.collectionPosterTile img {
+  display: block;
+  width: min(100%, 76px);
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.collectionPosterTile:first-child img {
+  width: min(100%, 106px);
+}
+
+.collectionPosterEmpty {
+  min-height: 152px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.collectionCardCopy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
 .collectionCardTitle {
   margin: 0;
   color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 24px;
+  font-size: clamp(25px, 3vw, 38px);
   font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.96;
+}
+
+.collectionCardTopPets {
+  min-height: 18px;
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.35;
   letter-spacing: 0;
-  line-height: 1.08;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .collectionCardFooter {
-  /* Meta on the left, actions on the right — single row, never wraps.
-     The live-presence chip used to live here and pushed cards to
-     uneven heights when present; it's now an absolute overlay on the
-     card body so footer geometry stays identical for every card. */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 14px 12px 18px;
-  border-top: 1px solid var(--border-soft);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  align-content: space-between;
+  padding: 16px;
+  border-left: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface-warm) 36%, transparent);
 }
 
 .collectionCardMeta {
   margin: 0;
-  min-width: 0;
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.02em;
-  /* Truncate to one line under pressure — guarantees the right-aligned
-     action group stays on the same row at narrow card widths. */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+@keyframes collection-index-in {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

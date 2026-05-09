@@ -8,6 +8,7 @@ import type {
   CollectionSummary,
   ContentMode,
   Creator,
+  CreatorLeaderboardSort,
   GalleryMeta,
   GallerySort,
   GalleryUrlState,
@@ -87,7 +88,7 @@ export function usePetMutations({
   loadCollections: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   refreshRoutePetLists: (authSession?: AuthSession | null, currentUser?: User | null) => Promise<void>;
   loadCreator: (id: string, page?: number, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
-  loadCreators: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
+  loadCreators: (authSession?: AuthSession | null, content?: ContentMode, page?: number, sort?: CreatorLeaderboardSort, query?: string) => Promise<void>;
   removePetFromGallery: (petId: string) => void;
   openAuth: () => void;
 }) {

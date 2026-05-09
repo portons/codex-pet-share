@@ -288,6 +288,11 @@ function Gallery({
           </div>
         )}
       </div>
+      {activeSort !== "random" ? (
+        <div className="galleryTopPagination">
+          <PaginationControls meta={meta} loading={loading} onPage={onPage} />
+        </div>
+      ) : null}
       {loading ? (
         <GallerySkeleton view={activeView} />
       ) : pets.length ? (

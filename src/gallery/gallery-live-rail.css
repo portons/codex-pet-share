@@ -238,39 +238,40 @@
 }
 
 .collectionCardActions {
-  display: inline-flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-self: end;
   gap: 6px;
-  flex: 0 0 auto;
 }
 
 .collectionCardActions .btn {
-  /* Compress to a tighter footprint specifically inside the card footer.
-     Two pills + meta have to fit comfortably at ~260px without wrapping. */
   height: 30px;
-  padding: 0 10px;
-  font-size: 12px;
+  min-width: 0;
+  padding: 0 9px;
+  font-size: 11.5px;
   gap: 5px;
 }
 
+.collectionCardCodex {
+  grid-column: 1 / -1;
+  order: -1;
+}
+
 .collectionCardPlay {
-  /* Softened primary — cream pill with a rust border + rust label, fills
-     to solid rust on hover. The default btnPrimary uses near-black ink
-     which over-asserts in the gallery surface. */
   padding-right: 12px;
-  border-color: var(--accent-deep, #b15a16);
-  background: var(--accent-soft, #f7e2c8);
-  color: var(--accent-deep, #b15a16);
-  box-shadow: inset 0 1px 0 var(--inset-highlight);
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
 }
 
 .collectionCardPlay:hover:not(:disabled),
 .collectionCardPlay:focus-visible:not(:disabled) {
-  border-color: var(--accent-deep, #b15a16);
-  background: var(--accent-deep, #b15a16);
-  color: var(--surface, #fbf6e6);
+  border-color: transparent;
+  background: var(--surface-soft);
+  color: var(--ink);
   outline: none;
-  box-shadow: 0 6px 14px -8px rgba(177, 90, 22, 0.5);
+  box-shadow: none;
 }
 
 .collectionCardPlay .icon {
@@ -311,28 +312,6 @@
   border: 1px dashed var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-warm);
-}
-
-.collectionCardCopy {
-  display: grid;
-  gap: 5px;
-}
-
-.collectionCardCopy h2 {
-  margin: 0;
-  color: var(--ink);
-  font-family: var(--font-sans);
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: 0;
-  line-height: 1.08;
-}
-
-.collectionCardCopy p {
-  margin: 0;
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 12px;
 }
 
 .collectionCommand {

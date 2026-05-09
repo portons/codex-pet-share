@@ -17,10 +17,20 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
+  .collectionCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .collectionCardFooter {
+    grid-template-rows: auto;
+    border-left: 0;
+    border-top: 1px solid var(--border-soft);
+  }
+
   .appNav {
     grid-template-columns: 1fr auto;
     gap: 16px;
-    padding: 14px 0 16px;
+    padding: 14px 12px 16px;
   }
 
   .navLinks {
@@ -92,32 +102,6 @@
   .uploadsRow .petStats,
   .rowActions {
     grid-column: 2 / -1;
-  }
-
-  .creatorRow .ownerLink {
-    grid-column: 1 / -1;
-  }
-
-  .creatorsTable .uploadsRow {
-    grid-template-columns: 1fr;
-  }
-
-  .creatorsTable .uploadsRow .monoText {
-    grid-column: 1;
-  }
-
-  .creatorRow .leaderboardMetric {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .leaderMetricLabel {
-    display: inline;
-    min-width: 56px;
-    color: var(--muted);
-    font-family: var(--font-sans);
-    font-size: 12px;
   }
 
   .rowActions {
@@ -226,6 +210,25 @@
 
   .galleryGrid {
     grid-template-columns: 1fr;
+  }
+
+  .userCollectionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .collectionCardBody {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .collectionCardFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .collectionCardActions {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .galleryGrid.compact {

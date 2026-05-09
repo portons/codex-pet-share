@@ -1,10 +1,17 @@
-import { type CSSProperties } from "react";
+import { type CSSProperties, useEffect, useState, type FormEvent } from "react";
 import { type TagName } from "../domain/config";
 import { formatMetric } from "../domain/format";
 import { navigate } from "../domain/routing";
-import type { ContentMode, Creator, CreatorLeaderboardItem, GalleryMeta, Pet, User } from "../domain/types";
+import type {
+  ContentMode,
+  Creator,
+  CreatorLeaderboardItem,
+  CreatorLeaderboardSort,
+  GalleryMeta,
+  Pet,
+  User
+} from "../domain/types";
 import { PetCard } from "../pets/PetCard";
-import { CyclingPetPreview } from "../pets/PetPreview";
 import { EmptyState } from "../ui/EmptyState";
 import { Icon } from "../ui/Icon";
 import { ResultBar } from "../ui/ResultBar";
@@ -235,86 +242,263 @@ export function FavoritesPage({
 
 export function CreatorsLeaderboardPage({
   creators,
-  total,
-  loading
+  meta,
+  mode,
+  query,
+  loading,
+  onMode,
+  onQuery,
+  onPage
 }: {
   creators: CreatorLeaderboardItem[];
-  total: number;
+  meta: GalleryMeta;
+  mode: CreatorLeaderboardSort;
+  query: string;
   loading: boolean;
+  onMode: (mode: CreatorLeaderboardSort) => void;
+  onQuery: (query: string) => void;
+  onPage: (page: number) => void;
 }) {
+  const [draftQuery, setDraftQuery] = useState(query);
+  const activeMode = leaderboardModesById[mode];
+  const rankedPageCreators = creators.map((creator, index) => ({
+    creator,
+    rank: creatorAbsoluteRank(meta, index)
+  }));
+  const featuredCreators = rankedPageCreators.filter((item) => item.rank <= 3);
+  const rankedCreators = rankedPageCreators.filter((item) => item.rank > 3);
+
+  useEffect(() => {
+    setDraftQuery(query);
+  }, [query]);
+
+  function submitQuery(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    onQuery(draftQuery);
+  }
+
+  function clearQuery() {
+    setDraftQuery("");
+    onQuery("");
+  }
+
   return (
-    <section className="surface">
-      <header className="sectionHeader">
+    <section className="surface creatorLeaderboardSurface">
+      <header className="sectionHeader creatorLeaderboardHeader">
         <div>
           <p className="metaText">Creators</p>
           <h1>Leaderboard</h1>
-          <p className="sectionSubhead">{formatMetric(total)} {total === 1 ? "creator" : "creators"}</p>
+          <p className="sectionSubhead">
+            {formatMetric(meta.total)} {meta.total === 1 ? "creator" : "creators"} · sorted by {activeMode.label.toLowerCase()}
+            {meta.totalPages > 1 ? ` · page ${meta.page} of ${meta.totalPages}` : ""}
+          </p>
+        </div>
+        <div className="creatorLeaderboardActions">
+          <form className="creatorSearchForm" onSubmit={submitQuery}>
+            <label className="searchShell creatorSearchShell">
+              <Icon name="search" size={15} />
+              <input
+                className="input inputLg searchInput"
+                value={draftQuery}
+                onChange={(event) => setDraftQuery(event.target.value)}
+                placeholder="Search creators"
+                aria-label="Search creators"
+              />
+            </label>
+            {query ? (
+              <button className="btn" type="button" disabled={loading} onClick={clearQuery}>
+                Clear
+              </button>
+            ) : null}
+            <button className="btn btnPrimary" type="submit" disabled={loading}>
+              Find
+            </button>
+          </form>
+          <div className="creatorLeaderboardToolbar" aria-label="Leaderboard sort">
+            {leaderboardModes.map((item) => (
+              <button
+                className={item.id === mode ? "active" : ""}
+                key={item.id}
+                type="button"
+                aria-pressed={item.id === mode}
+                onClick={() => onMode(item.id)}
+              >
+                <Icon name={item.icon} size={13} />
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
       {loading ? (
         <UploadsSkeleton />
       ) : creators.length ? (
-        <table className="uploadsTable creatorsTable card">
-          <thead className="uploadsHead">
-            <tr>
-              <th scope="col">Creator</th>
-              <th scope="col">Uploads</th>
-              <th scope="col">Likes</th>
-              <th scope="col">Views</th>
-            </tr>
-          </thead>
-          <tbody>
-            {creators.map((creator, index) => (
-              <tr className="uploadsRow creatorRow" key={creator.id}>
-                <td>
-                  <div className="creatorLeaderboardCell">
-                    <span className={`leaderRank rank${index + 1}`}>{index + 1}</span>
-                    <div className="creatorLeaderboardStack">
-                      <div className="leaderPets">
-                        {creator.topPets.map((pet) => (
-                          <button
-                            className="leaderPetPreview"
-                            key={pet.id}
-                            type="button"
-                            title={pet.displayName}
-                            onClick={() => navigate(`/pets/${pet.id}`)}
-                          >
-                            <CyclingPetPreview pet={pet} size="thumb" transparent />
-                          </button>
-                        ))}
-                      </div>
-                      <button className="ownerLink" type="button" onClick={() => navigate(`/users/${creator.handle || creator.id}`)}>
-                        {creator.displayName}
-                      </button>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <p className="monoText leaderboardMetric">
-                    <span className="leaderMetricLabel">Uploads</span>
-                    {formatMetric(creator.petCount)}
-                  </p>
-                </td>
-                <td>
-                  <p className="monoText leaderboardMetric">
-                    <span className="leaderMetricLabel">Likes</span>
-                    {formatMetric(creator.likeCount)}
-                  </p>
-                </td>
-                <td>
-                  <p className="monoText leaderboardMetric">
-                    <span className="leaderMetricLabel">Views</span>
-                    {formatMetric(creator.viewCount)}
-                  </p>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="creatorLeaderboardBoard">
+          <div className="creatorTopPagination">
+            <PaginationControls meta={meta} loading={loading} onPage={onPage} />
+          </div>
+          {featuredCreators.length ? (
+            <div className="creatorTopThree" aria-label="Featured creators">
+              {featuredCreators.map(({ creator, rank }) => (
+              <CreatorFeatureCard
+                creator={creator}
+                key={creator.id}
+                mode={mode}
+                rank={rank}
+              />
+              ))}
+            </div>
+          ) : null}
+
+          {rankedCreators.length ? (
+            <div className="creatorRankList" aria-label="Creator rankings">
+              {rankedCreators.map(({ creator, rank }) => (
+                <CreatorRankRow creator={creator} key={creator.id} mode={mode} rank={rank} />
+              ))}
+            </div>
+          ) : null}
+          <PaginationControls meta={meta} loading={loading} onPage={onPage} />
+        </div>
       ) : (
-        <EmptyState text="No creators yet." />
+        <EmptyState text={query ? "No creators match that search." : "No creators yet."} />
       )}
     </section>
+  );
+}
+
+type LeaderboardMode = CreatorLeaderboardSort;
+type LeaderboardModeConfig = { id: LeaderboardMode; label: string; icon: "heart" | "eye" | "upload" };
+
+const leaderboardModesById = {
+  likes: { id: "likes", label: "Likes", icon: "heart" },
+  views: { id: "views", label: "Views", icon: "eye" },
+  uploads: { id: "uploads", label: "Uploads", icon: "upload" }
+} satisfies Record<LeaderboardMode, LeaderboardModeConfig>;
+
+const leaderboardModes = Object.values(leaderboardModesById);
+
+function creatorAbsoluteRank(meta: GalleryMeta, index: number) {
+  return (meta.page - 1) * meta.pageSize + index + 1;
+}
+
+function CreatorFeatureCard({
+  creator,
+  mode,
+  rank
+}: {
+  creator: CreatorLeaderboardItem;
+  mode: LeaderboardMode;
+  rank: number;
+}) {
+  return (
+    <article className="creatorFeatureCard">
+      <div className="creatorFeatureCopy">
+        <p className="creatorSpotlightKicker">Rank {rank}</p>
+        <button
+          className="ownerLink creatorFeatureName"
+          type="button"
+          onClick={() => navigate(`/users/${creator.handle || creator.id}`)}
+        >
+          {creator.displayName}
+        </button>
+      </div>
+      <CreatorPetMosaic creator={creator} variant="feature" />
+      <div className="creatorFeatureMetrics" aria-label={`${creator.displayName} stats`}>
+        <CreatorMetric active={mode === "likes"} icon="heart" label="Likes" value={creator.likeCount} />
+        <CreatorMetric active={mode === "views"} icon="eye" label="Views" value={creator.viewCount} />
+        <CreatorMetric active={mode === "uploads"} icon="upload" label="Uploads" value={creator.petCount} />
+      </div>
+    </article>
+  );
+}
+
+function CreatorRankRow({
+  creator,
+  mode,
+  rank
+}: {
+  creator: CreatorLeaderboardItem;
+  mode: LeaderboardMode;
+  rank: number;
+}) {
+  return (
+    <article
+      className="creatorRankRow"
+      style={{ "--delay": `${Math.min(rank - 2, 8) * 48}ms` } as CSSProperties}
+    >
+      <span className={`leaderRank ${rank <= 3 ? `rank${rank}` : ""}`}>{rank}</span>
+      <div className="creatorRankIdentity">
+        <button className="ownerLink creatorRankName" type="button" onClick={() => navigate(`/users/${creator.handle || creator.id}`)}>
+          {creator.displayName}
+        </button>
+        <CreatorPetMosaic creator={creator} variant="row" />
+      </div>
+      <div className="creatorRankMetrics" aria-label={`${creator.displayName} stats`}>
+        <CreatorMetric active={mode === "likes"} icon="heart" label="Likes" value={creator.likeCount} />
+        <CreatorMetric active={mode === "views"} icon="eye" label="Views" value={creator.viewCount} />
+        <CreatorMetric active={mode === "uploads"} icon="upload" label="Uploads" value={creator.petCount} />
+      </div>
+    </article>
+  );
+}
+
+function CreatorPetMosaic({
+  creator,
+  variant
+}: {
+  creator: CreatorLeaderboardItem;
+  variant: "feature" | "row";
+}) {
+  const pets = creator.topPets.slice(0, 3);
+  if (!pets.length) return null;
+
+  return (
+    <div
+      className={`${variant === "feature" ? "creatorFeaturePets" : "creatorRankPets"} petCount${pets.length}`}
+      aria-label={`${creator.displayName} top pets`}
+    >
+      {pets.map((pet, index) => (
+        <button
+          className={variant === "feature" ? "creatorFeaturePet" : "creatorRankPet"}
+          key={pet.id}
+          type="button"
+          title={pet.displayName}
+          onClick={() => navigate(`/pets/${pet.id}`)}
+        >
+          <img
+            alt=""
+            aria-hidden="true"
+            decoding="async"
+            draggable={false}
+            height={208}
+            loading={variant === "feature" && index === 0 ? "eager" : "lazy"}
+            src={pet.posterUrl}
+            width={192}
+          />
+          <span>{pet.displayName}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function CreatorMetric({
+  active,
+  icon,
+  label,
+  value
+}: {
+  active?: boolean;
+  icon: "heart" | "eye" | "upload";
+  label: string;
+  value: number;
+}) {
+  return (
+    <span className={`creatorMetric ${active ? "active" : ""}`}>
+      <Icon name={icon} size={13} />
+      <span>{label}</span>
+      <strong>{formatMetric(value)}</strong>
+    </span>
   );
 }
 

@@ -9,7 +9,13 @@ export function petImportCommand(pet: Pet, mode: DownloadCommandMode) {
     return `npx ${APP_HANDLE} add ${pet.id}`;
   }
 
-  return `curl -L "${pet.downloadUrl}" -o "/tmp/${pet.id}.codex-pet.zip" && mkdir -p "$HOME/.codex/pets/${pet.id}" && unzip -o "/tmp/${pet.id}.codex-pet.zip" -d "$HOME/.codex/pets/${pet.id}"`;
+  return [
+    `curl -L "${pet.downloadUrl}" \\`,
+    `  -o "/tmp/${pet.id}.codex-pet.zip" &&`,
+    `mkdir -p "$HOME/.codex/pets/${pet.id}" &&`,
+    `unzip -o "/tmp/${pet.id}.codex-pet.zip" \\`,
+    `  -d "$HOME/.codex/pets/${pet.id}"`
+  ].join("\n");
 }
 
 export function petCodexInstallUrl(pet: Pet) {
@@ -53,7 +59,15 @@ function petMatchesQuery(pet: Pet, query: string) {
   if (!needle) {
     return true;
   }
-  return [pet.id, pet.displayName, pet.description].some((value) => value.toLowerCase().includes(needle));
+  return [
+    pet.id,
+    pet.displayName,
+    pet.description,
+    pet.ownerName,
+    pet.ownerHandle || "",
+    pet.kind,
+    ...pet.tags
+  ].some((value) => value.toLowerCase().includes(needle));
 }
 
 function petMatchesTagFilter(pet: Pet, tags: Array<string>) {

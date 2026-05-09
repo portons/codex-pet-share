@@ -77,6 +77,9 @@ export async function handleCreators(ctx: AppContext, parts: string[]) {
   if (ctx.request.method === "GET" && parts.length === 1 && parts[0] === "leaderboard") {
     const viewer = await currentUser(ctx);
     const pets = (await listPets(ctx, "", undefined, [], viewer, "new", undefined, parseContentMode(ctx.url.searchParams.get("content")))).pets;
+    const pagination = parsePagination(ctx.url);
+    const sort = parseCreatorSort(ctx.url.searchParams.get("sort"));
+    const query = (ctx.url.searchParams.get("q") || "").trim().toLowerCase();
     const shadowbannedCreators = await shadowbannedUserIds(ctx);
     const byCreator = new Map<string, { id: string; handle: string | null; displayName: string; petCount: number; viewCount: number; likeCount: number; topPets: typeof pets }>();
     for (const pet of pets) {
@@ -85,10 +88,42 @@ export async function handleCreators(ctx: AppContext, parts: string[]) {
       item.petCount += 1; item.viewCount += pet.viewCount; item.likeCount += pet.likeCount; item.topPets.push(pet);
       byCreator.set(pet.ownerId, item);
     }
-    const creators = Array.from(byCreator.values()).sort((a, b) => (b.likeCount - a.likeCount) || (b.viewCount - a.viewCount) || (b.petCount - a.petCount));
-    return json({ creators: creators.map((creator) => ({ ...creator, topPets: creator.topPets.slice(0, 3) })), total: creators.length });
+    const creators = Array.from(byCreator.values()).filter((creator) => !query
+      || creator.displayName.toLowerCase().includes(query)
+      || (creator.handle || "").toLowerCase().includes(query)
+    ).sort((a, b) => creatorSortValue(b, sort) - creatorSortValue(a, sort)
+      || b.likeCount - a.likeCount
+      || b.viewCount - a.viewCount
+      || b.petCount - a.petCount
+      || a.displayName.localeCompare(b.displayName));
+    const start = (pagination.page - 1) * pagination.pageSize;
+    const pageCreators = creators.slice(start, start + pagination.pageSize);
+    return json({
+      creators: pageCreators.map((creator) => ({ ...creator, topPets: creator.topPets.slice(0, 3) })),
+      page: pagination.page,
+      pageSize: pagination.pageSize,
+      total: creators.length,
+      totalPages: Math.ceil(creators.length / pagination.pageSize)
+    });
   }
   return json({ error: "not found" }, 404);
+}
+
+type CreatorSort = "likes" | "views" | "uploads";
+
+function parseCreatorSort(value: string | null): CreatorSort {
+  if (!value || value === "likes") return "likes";
+  if (value === "views" || value === "uploads") return value;
+  throw new HttpError("invalid creator sort", 400);
+}
+
+function creatorSortValue(
+  creator: { likeCount: number; viewCount: number; petCount: number },
+  sort: CreatorSort
+) {
+  if (sort === "views") return creator.viewCount;
+  if (sort === "uploads") return creator.petCount;
+  return creator.likeCount;
 }
 
 export async function handleAdmin(ctx: AppContext, parts: string[]) {

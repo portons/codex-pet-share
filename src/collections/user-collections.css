@@ -1,21 +1,24 @@
 .userCollectionsBand {
-  margin-bottom: 28px;
-  padding-bottom: 26px;
-  border-bottom: 1px dashed var(--border);
+  margin: 0 0 32px;
+  padding: 6px 0 24px;
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .userCollectionsHeader {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 18px;
-  align-items: flex-end;
+  align-items: center;
   margin-bottom: 16px;
 }
 
 .userCollectionsHeader h2 {
   margin: 0;
-  font-size: clamp(1.35rem, 3vw, 2rem);
-  line-height: 1;
+  color: var(--ink);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 0.96;
 }
 
 .userCollectionsActions {
@@ -27,16 +30,23 @@
 
 .userCollectionsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 .userCollectionCard {
-  display: flex;
-  flex-direction: column;
-  min-height: 220px;
-  padding: 14px;
-  gap: 12px;
+  display: grid;
+  gap: 14px;
+  min-height: 0;
+  padding: 16px;
+  transition: border-color 180ms var(--ease-out), transform 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out);
+}
+
+.userCollectionCard:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .userCollectionCardHeader {
@@ -48,8 +58,11 @@
 
 .userCollectionCardTitle {
   margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.1;
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
 }
 
 .userCollectionCardMeta {
@@ -62,22 +75,27 @@
 }
 
 .userCollectionPreview {
-  display: flex;
-  align-items: flex-end;
-  min-height: 92px;
-  padding: 10px;
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  background: var(--surface-soft);
+  display: block;
+  color: inherit;
   overflow: hidden;
 }
 
-.userCollectionPreview .collectionPreviewStack {
-  width: 100%;
+.userCollectionPreview .collectionPosterMosaic {
+  min-height: 126px;
+}
+
+.userCollectionPreview .collectionPosterTile img {
+  width: min(100%, 88px);
 }
 
 .userCollectionEmptyPreview {
+  display: grid;
+  place-items: center;
   width: 100%;
+  min-height: 126px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-warm);
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 0.78rem;
@@ -86,10 +104,23 @@
 }
 
 .userCollectionCardActions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 8px;
   margin-top: auto;
+}
+
+.userCollectionPrimaryAction {
+  width: 100%;
+}
+
+.userCollectionSecondaryActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.userCollectionSecondaryActions .btn {
+  min-width: 0;
 }
 
 .userCollectionModal .collectionCheckboxList {

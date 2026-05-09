@@ -1,8 +1,9 @@
 import type { Dispatch, SetStateAction } from "react";
-import { collectionHash, creatorHash, navigate, pushHash } from "../domain/routing";
+import { collectionHash, creatorHash, creatorsHash, navigate, pushHash } from "../domain/routing";
 import type {
   AuthSession,
   ContentMode,
+  CreatorLeaderboardSort,
   GalleryMeta,
   GallerySort,
   GalleryView,
@@ -37,6 +38,9 @@ export function useAppNavigationActions({
   activeKind,
   galleryMeta,
   creatorMeta,
+  creatorsMeta,
+  creatorsSort,
+  creatorsQuery,
   collectionMeta,
   apiFetch,
   applySession,
@@ -44,6 +48,9 @@ export function useAppNavigationActions({
   setMinePets,
   setFavoritePets,
   setCreatorMeta,
+  setCreatorsMeta,
+  setCreatorsSort,
+  setCreatorsQuery,
   setCollectionMeta,
   setLoading,
   pushGalleryState,
@@ -67,6 +74,9 @@ export function useAppNavigationActions({
   activeKind: PetKind;
   galleryMeta: GalleryMeta;
   creatorMeta: GalleryMeta;
+  creatorsMeta: GalleryMeta;
+  creatorsSort: CreatorLeaderboardSort;
+  creatorsQuery: string;
   collectionMeta: GalleryMeta;
   apiFetch: ApiFetch;
   applySession: (next: AuthSession | null) => void;
@@ -74,6 +84,9 @@ export function useAppNavigationActions({
   setMinePets: Dispatch<SetStateAction<Pet[]>>;
   setFavoritePets: Dispatch<SetStateAction<Pet[]>>;
   setCreatorMeta: Dispatch<SetStateAction<GalleryMeta>>;
+  setCreatorsMeta: Dispatch<SetStateAction<GalleryMeta>>;
+  setCreatorsSort: Dispatch<SetStateAction<CreatorLeaderboardSort>>;
+  setCreatorsQuery: Dispatch<SetStateAction<string>>;
   setCollectionMeta: Dispatch<SetStateAction<GalleryMeta>>;
   setLoading: Dispatch<SetStateAction<boolean>>;
   pushGalleryState: (state: {
@@ -88,7 +101,7 @@ export function useAppNavigationActions({
   scrollPageTop: () => void;
   loadGallery: LoadGallery;
   loadCreator: (id: string, page?: number, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
-  loadCreators: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
+  loadCreators: (authSession?: AuthSession | null, content?: ContentMode, page?: number, sort?: CreatorLeaderboardSort, query?: string) => Promise<void>;
   loadCollections: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadUserCollections: (currentUser?: User | null, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: ContentMode, page?: number) => Promise<void>;
@@ -113,7 +126,9 @@ export function useAppNavigationActions({
       scrollPageTop();
     }
     if (route.name === "creators") {
-      await loadCreators(session, mode);
+      pushHash(creatorsHash(creatorsSort, 1, creatorsQuery));
+      setCreatorsMeta((current) => ({ ...current, page: 1 }));
+      await loadCreators(session, mode, 1, creatorsSort, creatorsQuery);
     }
     if (route.name === "collections") {
       await Promise.all([
@@ -133,6 +148,33 @@ export function useAppNavigationActions({
     pushHash(creatorHash(route.id, page));
     setCreatorMeta((current) => ({ ...current, page }));
     await loadCreator(route.id, page, session, contentMode);
+    scrollPageTop();
+  }
+
+  async function selectCreatorsPage(page: number) {
+    if (route.name !== "creators" || page === creatorsMeta.page) return;
+    pushHash(creatorsHash(creatorsSort, page, creatorsQuery));
+    setCreatorsMeta((current) => ({ ...current, page }));
+    await loadCreators(session, contentMode, page, creatorsSort, creatorsQuery);
+    scrollPageTop();
+  }
+
+  async function selectCreatorsSort(sort: CreatorLeaderboardSort) {
+    if (route.name !== "creators" || sort === creatorsSort) return;
+    pushHash(creatorsHash(sort, 1, creatorsQuery));
+    setCreatorsSort(sort);
+    setCreatorsMeta((current) => ({ ...current, page: 1 }));
+    await loadCreators(session, contentMode, 1, sort, creatorsQuery);
+    scrollPageTop();
+  }
+
+  async function selectCreatorsQuery(nextQuery: string) {
+    if (route.name !== "creators") return;
+    const cleanQuery = nextQuery.trim();
+    pushHash(creatorsHash(creatorsSort, 1, cleanQuery));
+    setCreatorsQuery(cleanQuery);
+    setCreatorsMeta((current) => ({ ...current, page: 1 }));
+    await loadCreators(session, contentMode, 1, creatorsSort, cleanQuery);
     scrollPageTop();
   }
 
@@ -161,6 +203,9 @@ export function useAppNavigationActions({
   return {
     selectContentMode,
     selectCreatorPage,
+    selectCreatorsPage,
+    selectCreatorsSort,
+    selectCreatorsQuery,
     selectCollectionPage,
     logout
   };

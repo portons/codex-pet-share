@@ -1,5 +1,6 @@
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import { DownloadCommandRow, type DownloadCommandMode } from "../downloads/DownloadCommandRow";
+import { trackEvent } from "../domain/analytics";
 import { petStates, type TagName } from "../domain/config";
 import { isNsfwPet, petCodexInstallUrl, petImportCommand } from "../domain/pets";
 import type { ContentMode, Pet, User } from "../domain/types";
@@ -87,14 +88,48 @@ export function PetDetail({
   const codexInstallUrl = petCodexInstallUrl(pet);
 
   async function copyDownloadCommand() {
+    trackEvent("download_command_copy", { route: "detail", petId: pet.id, value: downloadCommandMode, user });
     const copied = await copyText(downloadCommand);
     setCopiedDownloadCommand(copied);
     window.setTimeout(() => setCopiedDownloadCommand(false), 1400);
   }
 
   function changeDownloadCommandMode(mode: DownloadCommandMode) {
+    trackEvent("download_command_mode", { route: "detail", petId: pet.id, value: mode, user });
     setDownloadCommandMode(mode);
     setCopiedDownloadCommand(false);
+  }
+
+  function handleLike() {
+    trackEvent("detail_like_click", { route: "detail", petId: pet.id, user });
+    if (user) {
+      onLike(pet);
+    } else {
+      onSignIn();
+    }
+  }
+
+  function handleShare() {
+    trackEvent("detail_share_click", { route: "detail", petId: pet.id, user });
+    onShare(pet);
+  }
+
+  function handlePlayground() {
+    trackEvent("detail_playground_click", { route: "detail", petId: pet.id, user });
+    onPlayground?.(pet);
+  }
+
+  function handleCollect() {
+    trackEvent("detail_collect_click", { route: "detail", petId: pet.id, user });
+    onCollect?.(pet);
+  }
+
+  function handleCodexInstall() {
+    trackEvent("detail_codex_install_click", { route: "detail", petId: pet.id, user });
+  }
+
+  function handleZipDownload() {
+    trackEvent("detail_zip_download_click", { route: "detail", petId: pet.id, user });
   }
 
   return (
@@ -141,12 +176,12 @@ export function PetDetail({
               className={`btn btnSm likeButton ${pet.likedByMe ? "active" : ""}`}
               type="button"
               disabled={likeBusyId === pet.id}
-              onClick={() => (user ? onLike(pet) : onSignIn())}
+              onClick={handleLike}
             >
               <Icon name="heart" size={13} />
               {pet.likedByMe ? "Liked" : "Like"}
             </button>
-            <button className="btn btnSm" type="button" onClick={() => onShare(pet)}>
+            <button className="btn btnSm" type="button" onClick={handleShare}>
               <Icon name="share" size={13} />
               Share
             </button>
@@ -154,7 +189,7 @@ export function PetDetail({
               <button
                 className="btn btnSm"
                 type="button"
-                onClick={() => onPlayground(pet)}
+                onClick={handlePlayground}
                 title="3D playground · WASD · shift sprint · space jump · E wave · Q sit · drag rotate · scroll zoom"
                 data-tooltip="WASD move · drag rotate · scroll zoom · E wave · Q sit"
               >
@@ -163,7 +198,7 @@ export function PetDetail({
               </button>
             )}
             {user && onCollect && (
-              <button className="btn btnSm" type="button" onClick={() => onCollect(pet)}>
+              <button className="btn btnSm" type="button" onClick={handleCollect}>
                 <Icon name="package" size={13} />
                 Add to collection
               </button>
@@ -198,12 +233,12 @@ export function PetDetail({
 
       <article className="detailInstall" aria-label="Install">
         <header className="detailSectionHeader">
-          <span className="detailSectionLabel">Install</span>
-          <span className="detailSectionHint">Open in Codex, or install manually into <code>$HOME/.codex/pets</code>.</span>
+          <span className="detailSectionLabel">Codex install</span>
+          <span className="detailSectionHint">Ask Codex to install this pet.</span>
         </header>
-        <a className="btn btnPrimary btnLg" href={codexInstallUrl}>
+        <a className="btn btnPrimary btnLg detailInstallPrimary" href={codexInstallUrl} onClick={handleCodexInstall}>
           <Icon name="terminal" size={15} />
-          Open in Codex
+          Install in Codex
         </a>
         <DownloadCommandRow
           command={downloadCommand}
@@ -214,16 +249,16 @@ export function PetDetail({
           onCopy={copyDownloadCommand}
           onModeChange={changeDownloadCommandMode}
         />
-        <a className="detailInstallSecondary" href={pet.downloadUrl} download>
+        <a className="detailInstallSecondary" href={pet.downloadUrl} download onClick={handleZipDownload}>
           <Icon name="package" size={13} />
-          Download <code>.codex-pet.zip</code>
+          Download sprite kit <code>.codex-pet.zip</code>
         </a>
         <ValidationReportCard report={pet.validationReport} />
       </article>
 
       <article className="detailStates" aria-label="Animation states">
         <header className="detailSectionHeader">
-          <span className="detailSectionLabel">Animation states · {petStates.length}</span>
+          <span className="detailSectionLabel">Animation states</span>
           <div className="detailStatesActions">
             <button
               className="btn btnSm"

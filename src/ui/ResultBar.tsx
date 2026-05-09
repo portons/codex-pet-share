@@ -4,11 +4,10 @@ const preciseCountFormatter = new Intl.NumberFormat(undefined);
 
 export function ResultBar({ meta, loading }: { meta: GalleryMeta; loading: boolean }) {
   return (
-    <div className="resultBar">
+    <div className="resultBar" aria-busy={loading} data-loading={loading ? "true" : "false"}>
       <span>{preciseCountFormatter.format(meta.total)} {meta.total === 1 ? "pet" : "pets"}</span>
-      <span>
+      <span className="resultPageStatus">
         {meta.totalPages > 1 ? `Page ${meta.page} / ${meta.totalPages}` : ""}
-        {loading ? (meta.totalPages > 1 ? " · loading" : "loading") : ""}
       </span>
     </div>
   );

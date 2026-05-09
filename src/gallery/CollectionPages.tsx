@@ -1,11 +1,11 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useState } from "react";
+import { trackEvent } from "../domain/analytics";
 import { type TagName } from "../domain/config";
 import { formatMetric } from "../domain/format";
 import { collectionCodexInstallUrl, collectionImportCommand } from "../domain/pets";
 import type { AuthSession, CollectionSummary, ContentMode, GalleryMeta, Pet, User } from "../domain/types";
 import { useCollectionPresenceCounts } from "../realtime/useCollectionPresenceCounts";
 import { PetCard } from "../pets/PetCard";
-import { CyclingPetPreview } from "../pets/PetPreview";
 import { copyText } from "../ui/clipboard";
 import { EmptyState } from "../ui/EmptyState";
 import { Icon } from "../ui/Icon";
@@ -121,6 +121,66 @@ function CollectionsPage({
   onShareRoom: (collection: CollectionSummary) => void;
   onSignIn: () => void;
 }) {
+  const alphabetEntries = useMemo(() => collectionAlphabetEntries(collections), [collections]);
+  const firstAlphabetLetter = alphabetEntries.find((entry) => entry.collection)?.letter || "";
+  const [activeAlphabetLetter, setActiveAlphabetLetter] = useState(firstAlphabetLetter);
+
+  useEffect(() => {
+    if (!firstAlphabetLetter) {
+      setActiveAlphabetLetter("");
+      return;
+    }
+    const currentStillExists = alphabetEntries.some(
+      (entry) => entry.collection && entry.letter === activeAlphabetLetter
+    );
+    if (!currentStillExists) {
+      setActiveAlphabetLetter(firstAlphabetLetter);
+    }
+  }, [activeAlphabetLetter, alphabetEntries, firstAlphabetLetter]);
+
+  useEffect(() => {
+    if (!collections.length) return;
+    const cards = collections
+      .map((collection) => document.getElementById(collectionAnchorId(collection)))
+      .filter((element): element is HTMLElement => Boolean(element));
+    if (!cards.length) return;
+
+    let frame = 0;
+    const letterById = new Map(collections.map((collection) => [collectionAnchorId(collection), collectionFirstLetter(collection)]));
+
+    function updateActiveLetter() {
+      const anchorY = 118;
+      let activeCard = cards[0];
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      for (const card of cards) {
+        const top = card.getBoundingClientRect().top;
+        const distance = Math.abs(top - anchorY);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          activeCard = card;
+        }
+      }
+
+      const nextLetter = letterById.get(activeCard.id) || "";
+      if (nextLetter) setActiveAlphabetLetter(nextLetter);
+    }
+
+    function scheduleUpdate() {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(updateActiveLetter);
+    }
+
+    updateActiveLetter();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+    };
+  }, [collections]);
+
   return (
     <section className="surface">
       <header className="sectionHeader">
@@ -144,87 +204,109 @@ function CollectionsPage({
       {loading ? (
         <GallerySkeleton />
       ) : collections.length ? (
-        <div className="collectionsGrid">
-          {collections.map((collection) => {
-            const liveCount = presenceCounts.get(collection.slug);
-            return (
-            <article className="collectionCard card" key={collection.slug}>
-              {liveCount != null && liveCount > 0 && (
-                signedIn ? (
-                  <a
-                    className="collectionCardLive collectionCardLiveOverlay"
-                    href={`#/collections/${collection.slug}/play`}
-                    title={`Join ${collection.displayName} playground (${liveCount} ${liveCount === 1 ? "person" : "people"} live)`}
-                    aria-label={`Join ${collection.displayName} playground · ${liveCount} live`}
-                  >
-                    <span className="collectionCardLiveDot" aria-hidden="true" />
-                    {liveCount} live
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    className="collectionCardLive collectionCardLiveOverlay"
-                    onClick={onSignIn}
-                    title={`Sign in to join (${liveCount} ${liveCount === 1 ? "person" : "people"} live)`}
-                    aria-label={`Sign in to join · ${liveCount} live`}
-                  >
-                    <span className="collectionCardLiveDot" aria-hidden="true" />
-                    {liveCount} live
-                  </button>
-                )
-              )}
-              <a
-                className="collectionCardBody"
-                href={`#/collections/${collection.slug}`}
-                aria-label={`Open ${collection.displayName}`}
-              >
-                <div className="collectionPreviewStack">
-                  {collection.topPets.map((pet) => (
-                    <CyclingPetPreview key={pet.id} pet={pet} size="thumb" transparent />
-                  ))}
-                </div>
-                <h2 className="collectionCardTitle">{collection.displayName}</h2>
-              </a>
-              <footer className="collectionCardFooter">
-                <p className="collectionCardMeta">
-                  {formatMetric(collection.petCount)} {collection.petCount === 1 ? "pet" : "pets"}
-                </p>
-                <div className="collectionCardActions">
-                  <button
-                    className="btn btnSm btnGhost collectionCardShare"
-                    type="button"
-                    onClick={() => onShareRoom(collection)}
-                    aria-label={`Share ${collection.displayName} playground`}
-                    title="Share playground"
-                  >
-                    <Icon name="share" size={13} />
-                    Share
-                  </button>
-                  {signedIn ? (
-                    <a
-                      className="btn btnSm btnPrimary collectionCardPlay"
-                      href={`#/collections/${collection.slug}/play`}
-                      aria-label={`Join ${collection.displayName} playground`}
-                    >
-                      <Icon name="play" size={11} />
-                      Join
-                    </a>
-                  ) : (
-                    <button
-                      className="btn btnSm btnPrimary collectionCardPlay"
-                      type="button"
-                      onClick={onSignIn}
-                      aria-label={`Sign in to join ${collection.displayName} playground`}
-                    >
-                      <Icon name="play" size={11} />
-                      Join
-                    </button>
+        <div className="collectionsIndexShell">
+          <div className="collectionsGrid">
+            {collections.map((collection) => {
+              const liveCount = presenceCounts.get(collection.slug);
+              return (
+                <article className="collectionCard card" id={collectionAnchorId(collection)} key={collection.slug}>
+                  {liveCount != null && liveCount > 0 && (
+                    signedIn ? (
+                      <a
+                        className="collectionCardLive collectionCardLiveOverlay"
+                        href={`#/collections/${collection.slug}/play`}
+                        title={`Join ${collection.displayName} playground (${liveCount} ${liveCount === 1 ? "person" : "people"} live)`}
+                        aria-label={`Join ${collection.displayName} playground · ${liveCount} live`}
+                      >
+                        <span className="collectionCardLiveDot" aria-hidden="true" />
+                        {liveCount} live
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        className="collectionCardLive collectionCardLiveOverlay"
+                        onClick={onSignIn}
+                        title={`Sign in to join (${liveCount} ${liveCount === 1 ? "person" : "people"} live)`}
+                        aria-label={`Sign in to join · ${liveCount} live`}
+                      >
+                        <span className="collectionCardLiveDot" aria-hidden="true" />
+                        {liveCount} live
+                      </button>
+                    )
                   )}
-                </div>
-              </footer>
-            </article>
-            );
-          })}
+                  <a
+                    className="collectionCardBody"
+                    href={`#/collections/${collection.slug}`}
+                    aria-label={`Open ${collection.displayName}`}
+                  >
+                    <CollectionPosterMosaic collection={collection} />
+                    <div className="collectionCardCopy">
+                      <h2 className="collectionCardTitle">{collection.displayName}</h2>
+                      <p className="collectionCardTopPets">{collectionTopPetsLabel(collection)}</p>
+                    </div>
+                  </a>
+                  <footer className="collectionCardFooter">
+                    <p className="collectionCardMeta">
+                      {formatMetric(collection.petCount)} {collection.petCount === 1 ? "pet" : "pets"}
+                    </p>
+                    <div className="collectionCardActions">
+                      <a
+                        className="btn btnSm btnPrimary collectionCardCodex"
+                        href={collectionCodexInstallUrl(collection)}
+                        onClick={() => trackEvent("collection_card_codex_click", { route: "collections", collectionSlug: collection.slug })}
+                        aria-label={`Install ${collection.displayName} in Codex`}
+                      >
+                        <Icon name="terminal" size={13} />
+                        Codex
+                      </a>
+                      <button
+                        className="btn btnSm btnGhost collectionCardShare"
+                        type="button"
+                        onClick={() => {
+                          trackEvent("collection_card_share_room_click", { route: "collections", collectionSlug: collection.slug });
+                          onShareRoom(collection);
+                        }}
+                        aria-label={`Share ${collection.displayName} playground`}
+                        title="Share playground"
+                      >
+                        <Icon name="share" size={13} />
+                        Share
+                      </button>
+                      {signedIn ? (
+                        <a
+                          className="btn btnSm btnGhost collectionCardPlay"
+                          href={`#/collections/${collection.slug}/play`}
+                          onClick={() => trackEvent("collection_card_room_click", { route: "collections", collectionSlug: collection.slug })}
+                          aria-label={`Join ${collection.displayName} playground`}
+                        >
+                          <Icon name="play" size={11} />
+                          Join
+                        </a>
+                      ) : (
+                        <button
+                          className="btn btnSm btnGhost collectionCardPlay"
+                          type="button"
+                          onClick={() => {
+                            trackEvent("collection_card_room_sign_in_click", { route: "collections", collectionSlug: collection.slug });
+                            onSignIn();
+                          }}
+                          aria-label={`Sign in to join ${collection.displayName} playground`}
+                        >
+                          <Icon name="play" size={11} />
+                          Join
+                        </button>
+                      )}
+                    </div>
+                  </footer>
+                </article>
+              );
+            })}
+          </div>
+          <CollectionAlphabetRail
+            activeLetter={activeAlphabetLetter}
+            entries={alphabetEntries}
+            onJump={setActiveAlphabetLetter}
+          />
         </div>
       ) : (
         <EmptyState text="No collections yet." />
@@ -295,37 +377,43 @@ function UserCollectionsSection({
               </div>
               <a className="userCollectionPreview" href={`#/collections/${collection.slug}`} aria-label={`Open ${collection.displayName}`}>
                 {collection.topPets.length ? (
-                  <div className="collectionPreviewStack">
-                    {collection.topPets.map((pet) => (
-                      <CyclingPetPreview key={pet.id} pet={pet} size="thumb" transparent />
-                    ))}
-                  </div>
+                  <CollectionPosterMosaic collection={collection} compact />
                 ) : (
                   <span className="userCollectionEmptyPreview">empty</span>
                 )}
               </a>
               <div className="userCollectionCardActions">
-                <a className="btn btnSm" href={`#/collections/${collection.slug}`}>
-                  <Icon name="eye" size={13} />
-                  Open
-                </a>
-                <button className="btn btnSm" type="button" onClick={() => onShare(collection)}>
-                  <Icon name="share" size={13} />
-                  Share
-                </button>
-                <button
-                  className="btn btnSm btnPrimary"
-                  type="button"
-                  disabled={collection.petCount === 0}
-                  onClick={() => onStartRoom(collection)}
+                <a
+                  className="btn btnSm btnPrimary userCollectionPrimaryAction"
+                  href={collectionCodexInstallUrl(collection)}
+                  onClick={() => trackEvent("user_collection_codex_click", { route: "collections", collectionSlug: collection.slug })}
                 >
-                  <Icon name="play" size={11} />
-                  Room
-                </button>
-                <button className="btn btnSm btnDanger" type="button" onClick={() => onDelete(collection)}>
-                  <Icon name="trash" size={13} />
-                  Delete
-                </button>
+                  <Icon name="terminal" size={13} />
+                  Codex
+                </a>
+                <div className="userCollectionSecondaryActions">
+                  <a className="btn btnSm" href={`#/collections/${collection.slug}`}>
+                    <Icon name="eye" size={13} />
+                    Open
+                  </a>
+                  <button
+                    className="btn btnSm"
+                    type="button"
+                    disabled={collection.petCount === 0}
+                    onClick={() => onStartRoom(collection)}
+                  >
+                    <Icon name="play" size={11} />
+                    Room
+                  </button>
+                  <button className="btn btnSm" type="button" onClick={() => onShare(collection)}>
+                    <Icon name="share" size={13} />
+                    Share
+                  </button>
+                  <button className="btn btnSm btnDanger" type="button" onClick={() => onDelete(collection)}>
+                    <Icon name="trash" size={13} />
+                    Delete
+                  </button>
+                </div>
               </div>
             </article>
           ))}
@@ -407,6 +495,7 @@ function CollectionDetailPage({
 
   async function copyCollectionCommand() {
     if (!collectionCommand) return;
+    trackEvent("collection_command_copy", { route: "collection", collectionSlug: collection?.slug });
     const copied = await copyText(collectionCommand);
     setCopiedCommand(copied);
     window.setTimeout(() => setCopiedCommand(false), 1400);
@@ -437,9 +526,13 @@ function CollectionDetailPage({
         {collection && (
           <div className="collectionHeaderActions">
             <section className="collectionCommand card" aria-label="Install collection">
-              <a className="btn btnPrimary collectionCommandCodex" href={codexInstallUrl}>
+              <a
+                className="btn btnPrimary collectionCommandCodex"
+                href={codexInstallUrl}
+                onClick={() => trackEvent("collection_codex_install_click", { route: "collection", collectionSlug: collection.slug })}
+              >
                 <Icon name="terminal" size={13} />
-                Open in Codex
+                Install in Codex
               </a>
               <p className="commandHelperText">Terminal install command</p>
               <div className="terminalCommandLine" aria-label="Command">
@@ -528,5 +621,101 @@ function CollectionDetailPage({
       )}
       <PaginationControls meta={meta} loading={loading} onPage={onPage} />
     </section>
+  );
+}
+
+function collectionTopPetsLabel(collection: CollectionSummary) {
+  if (!collection.topPets.length) return "No pets yet";
+  const names = collection.topPets.slice(0, 3).map((pet) => pet.displayName);
+  return `Featuring ${names.join(", ")}`;
+}
+
+const collectionAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+function collectionAlphabetEntries(collections: CollectionSummary[]) {
+  const lookup = new Map<string, CollectionSummary>();
+  for (const collection of collections) {
+    const letter = collectionFirstLetter(collection);
+    if (/^[A-Z]$/.test(letter) && !lookup.has(letter)) {
+      lookup.set(letter, collection);
+    }
+  }
+  return collectionAlphabet.map((letter) => ({ letter, collection: lookup.get(letter) }));
+}
+
+function collectionFirstLetter(collection: CollectionSummary) {
+  return collection.displayName.trim().charAt(0).toUpperCase();
+}
+
+function collectionAnchorId(collection: CollectionSummary) {
+  return `collection-${collection.slug}`;
+}
+
+function CollectionAlphabetRail({
+  activeLetter,
+  onJump,
+  entries
+}: {
+  activeLetter: string;
+  onJump: (letter: string) => void;
+  entries: Array<{ letter: string; collection?: CollectionSummary }>;
+}) {
+  function scrollToCollection(collection: CollectionSummary) {
+    const letter = collectionFirstLetter(collection);
+    onJump(letter);
+    document.getElementById(collectionAnchorId(collection))?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+
+  return (
+    <nav className="collectionAlphabetRail" aria-label="Jump to collection">
+      {entries.map(({ letter, collection }) => collection ? (
+        <button
+          className={`collectionAlphabetItem active ${letter === activeLetter ? "current" : ""}`}
+          key={letter}
+          type="button"
+          aria-current={letter === activeLetter ? "true" : undefined}
+          onClick={() => scrollToCollection(collection)}
+          title={`Jump to ${collection.displayName}`}
+        >
+          {letter}
+        </button>
+      ) : (
+        <span className="collectionAlphabetItem" key={letter} aria-disabled="true">
+          {letter}
+        </span>
+      ))}
+    </nav>
+  );
+}
+
+function CollectionPosterMosaic({
+  collection,
+  compact = false
+}: {
+  collection: CollectionSummary;
+  compact?: boolean;
+}) {
+  const pets = collection.topPets.slice(0, compact ? 3 : 4);
+  if (!pets.length) return <span className="collectionPosterEmpty">No pets yet</span>;
+
+  return (
+    <div className={`collectionPosterMosaic ${compact ? "compact" : ""} petCount${pets.length}`} aria-hidden="true">
+      {pets.map((pet, index) => (
+        <span className="collectionPosterTile" key={pet.id}>
+          <img
+            alt=""
+            decoding="async"
+            draggable={false}
+            height={208}
+            loading={index === 0 ? "eager" : "lazy"}
+            src={pet.posterUrl}
+            width={192}
+          />
+        </span>
+      ))}
+    </div>
   );
 }

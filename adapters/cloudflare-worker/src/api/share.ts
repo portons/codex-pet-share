@@ -21,6 +21,8 @@ export async function handleSharePet(ctx: AppContext, petId?: string) {
     canonical: `${ctx.env.PUBLIC_APP_ORIGIN}/#/pets/${pet.id}`,
     shareUrl: `${ctx.env.PUBLIC_APP_ORIGIN}/share/${pet.id}`,
     image: nsfw ? `${ctx.env.PUBLIC_APP_ORIGIN}/assets/petshare-logo.png` : petAssetUrl(ctx, `${pet.id}/share.png`, version),
+    imageAlt: `${pet.display_name} preview`,
+    imageType: "image/png",
     body: `<h1>${escapeHtml(pet.display_name)}</h1><p>${escapeHtml(pet.description)}</p><p>${nsfw ? "NSFW · " : ""}by ${escapeHtml(creator)}</p>`
   });
 }
@@ -35,6 +37,8 @@ export async function handleEntityShare(ctx: AppContext, kind: "collections" | "
       canonical: `${ctx.env.PUBLIC_APP_ORIGIN}/#/gallery`,
       shareUrl: `${ctx.env.PUBLIC_APP_ORIGIN}/gallery/popular`,
       image: `${ctx.env.PUBLIC_APP_ORIGIN}/assets/petshare-social-preview.png`,
+      imageAlt: `${ctx.env.APP_NAME} gallery preview`,
+      imageType: "image/png",
       body: `<h1>${escapeHtml(ctx.env.APP_NAME)}</h1><p>${escapeHtml(ctx.env.APP_TAGLINE)}</p><p>${pets.total} pets</p>`
     });
   }
@@ -49,6 +53,8 @@ export async function handleEntityShare(ctx: AppContext, kind: "collections" | "
       canonical: `${ctx.env.PUBLIC_APP_ORIGIN}/#/collections/${collection.slug}`,
       shareUrl: `${ctx.env.PUBLIC_APP_ORIGIN}/collections/${collection.slug}`,
       image,
+      imageAlt: `${collection.display_name} collection preview`,
+      imageType: "image/svg+xml",
       body: `<h1>${escapeHtml(collection.display_name)}</h1><p>${pets.length} pets</p>`
     });
   }
@@ -68,6 +74,8 @@ export async function handleEntityShare(ctx: AppContext, kind: "collections" | "
       canonical: `${ctx.env.PUBLIC_APP_ORIGIN}/#/users/${handleOrId}`,
       shareUrl: `${ctx.env.PUBLIC_APP_ORIGIN}/users/${handleOrId}`,
       image,
+      imageAlt: `${user.displayName} creator preview`,
+      imageType: "image/png",
       body: `<h1>${escapeHtml(user.displayName)}</h1><p>${escapeHtml(description)}</p>`
     });
   }
@@ -95,7 +103,16 @@ function creatorDescription(displayName: string, pets: Array<{ displayName: stri
   return `${displayName} made ${pets[0].displayName} and ${remaining} more pixel pet${remaining === 1 ? "" : "s"} for ${appName}.`;
 }
 
-function entityHtml(ctx: AppContext, input: { title: string; description: string; canonical: string; shareUrl: string; image: string; body: string }) {
+function entityHtml(ctx: AppContext, input: {
+  title: string;
+  description: string;
+  canonical: string;
+  shareUrl: string;
+  image: string;
+  imageAlt: string;
+  imageType: string;
+  body: string;
+}) {
   return html(`<!doctype html>
 <html lang="en">
 <head>
@@ -109,11 +126,17 @@ function entityHtml(ctx: AppContext, input: { title: string; description: string
   <meta property="og:title" content="${escapeHtml(input.title)}">
   <meta property="og:description" content="${escapeHtml(input.description)}">
   <meta property="og:image" content="${escapeHtml(input.image)}">
+  <meta property="og:image:secure_url" content="${escapeHtml(input.image)}">
+  <meta property="og:image:type" content="${escapeHtml(input.imageType)}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${escapeHtml(input.imageAlt)}">
   <meta property="og:url" content="${escapeHtml(input.shareUrl)}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escapeHtml(input.title)}">
   <meta name="twitter:description" content="${escapeHtml(input.description)}">
   <meta name="twitter:image" content="${escapeHtml(input.image)}">
+  <meta name="twitter:image:alt" content="${escapeHtml(input.imageAlt)}">
   <style>
     :root {
       color-scheme: light;
@@ -280,7 +303,7 @@ function entityHtml(ctx: AppContext, input: { title: string; description: string
       <span>Share page</span>
     </div>
     <section class="sharePanel" aria-label="${escapeHtml(input.title)}">
-      <img class="shareImage" src="${escapeHtml(input.image)}" alt="">
+      <img class="shareImage" src="${escapeHtml(input.image)}" alt="${escapeHtml(input.imageAlt)}">
       <div class="shareCopy">
         ${input.body}
         <a class="shareCta" href="${escapeHtml(input.canonical)}">Open in ${escapeHtml(ctx.env.APP_NAME)}</a>

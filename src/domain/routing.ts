@@ -7,6 +7,7 @@ import {
   isTagName
 } from "./config";
 import type { GalleryUrlState, Route } from "./types";
+import type { CreatorLeaderboardSort } from "./types";
 
 function hashParts() {
   const hash = window.location.hash.replace(/^#\/?/, "");
@@ -100,6 +101,20 @@ export function creatorPageFromHash() {
   return parsePositivePage(hashParts().params.get("page"));
 }
 
+export function creatorsPageFromHash() {
+  return parsePositivePage(hashParts().params.get("page"));
+}
+
+export function creatorsSortFromHash(): CreatorLeaderboardSort {
+  const value = hashParts().params.get("sort");
+  if (value === "views" || value === "uploads") return value;
+  return "likes";
+}
+
+export function creatorsQueryFromHash() {
+  return hashParts().params.get("q") || "";
+}
+
 export function collectionPageFromHash() {
   return parsePositivePage(hashParts().params.get("page"));
 }
@@ -132,6 +147,22 @@ export function galleryHash(state: Partial<GalleryUrlState> = {}) {
 
 export function creatorHash(id: string, page = 1) {
   return page > 1 ? `/users/${id}?page=${page}` : `/users/${id}`;
+}
+
+export function creatorsHash(sort: CreatorLeaderboardSort = "likes", page = 1, query = "") {
+  const params = new URLSearchParams();
+  const cleanQuery = query.trim();
+  if (cleanQuery) {
+    params.set("q", cleanQuery);
+  }
+  if (sort !== "likes") {
+    params.set("sort", sort);
+  }
+  if (page > 1) {
+    params.set("page", String(page));
+  }
+  const suffix = params.toString();
+  return suffix ? `/creators?${suffix}` : "/creators";
 }
 
 export function collectionHash(slug: string, page = 1) {

@@ -76,7 +76,12 @@ function App() {
     creatorMeta,
     setCreatorMeta,
     creators,
-    creatorsTotal,
+    creatorsMeta,
+    creatorsSort,
+    creatorsQuery,
+    setCreatorsMeta,
+    setCreatorsSort,
+    setCreatorsQuery,
     collections,
     setCollections,
     userCollections,
@@ -421,6 +426,9 @@ function App() {
     setCreatorPets,
     setCreatorMeta,
     loadCreator,
+    setCreatorsMeta,
+    setCreatorsSort,
+    setCreatorsQuery,
     loadCreators,
     setCollectionDetail,
     setCollectionPets,
@@ -430,7 +438,15 @@ function App() {
     setAdminStatus
   });
 
-  const { selectContentMode, selectCreatorPage, selectCollectionPage, logout } = useAppNavigationActions({
+  const {
+    selectContentMode,
+    selectCreatorPage,
+    selectCreatorsPage,
+    selectCreatorsSort,
+    selectCreatorsQuery,
+    selectCollectionPage,
+    logout
+  } = useAppNavigationActions({
     route,
     user,
     session,
@@ -443,6 +459,9 @@ function App() {
     activeKind,
     galleryMeta,
     creatorMeta,
+    creatorsMeta,
+    creatorsSort,
+    creatorsQuery,
     collectionMeta,
     apiFetch,
     applySession,
@@ -450,6 +469,9 @@ function App() {
     setMinePets,
     setFavoritePets,
     setCreatorMeta,
+    setCreatorsMeta,
+    setCreatorsSort,
+    setCreatorsQuery,
     setCollectionMeta,
     setLoading,
     pushGalleryState,
@@ -485,11 +507,12 @@ function App() {
       startUserCollectionRoom: userCollectionActions.startCollectionRoom,
       deleteUpload, openAuth, favoritePets, favoritesLoading, minePets, mineLoading, deleteStatus,
       uploadState, uploadStatus, uploadBusy, setUploadState, setUploadStatus, submitUpload, creators,
-      creatorsTotal, creatorsLoading, collectionsLoading, setAuthMode: setEntryAuthMode, setSharingEntity, collectionDetail,
+      creatorsMeta, creatorsSort, creatorsQuery, creatorsLoading, collectionsLoading, setAuthMode: setEntryAuthMode, setSharingEntity, collectionDetail,
       collectionPets, collectionMeta, collectionDetailLoading, adminCollections, adminCollectionsLoading,
       adminCollectionBusySlug, adminModerationBusy, adminStatus, setAdminUserShadowban, removeAdminUser,
       createCollection, updateCollection, deleteCollection, creator, creatorPets, creatorMeta,
-      creatorLoading, selectCreatorPage, selectCollectionPage, detailLoading, detailPet, morePets
+      creatorLoading, selectCreatorPage, selectCreatorsPage, selectCreatorsSort, selectCreatorsQuery,
+      selectCollectionPage, detailLoading, detailPet, morePets
     },
     dialogs: {
       authOpen, authMode, selectAuthMode, displayName, setDisplayName, email, setEmail, password,

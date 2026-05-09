@@ -1,6 +1,16 @@
 import { sessionNeedsRefresh } from "../domain/session";
-import { collectionPageFromHash } from "../domain/routing";
-import type { AuthSession, ContentMode, GalleryMeta, GallerySort, GalleryView, PetKind, Route, User } from "../domain/types";
+import { collectionPageFromHash, creatorsPageFromHash, creatorsQueryFromHash, creatorsSortFromHash } from "../domain/routing";
+import type {
+  AuthSession,
+  ContentMode,
+  CreatorLeaderboardSort,
+  GalleryMeta,
+  GallerySort,
+  GalleryView,
+  PetKind,
+  Route,
+  User
+} from "../domain/types";
 
 type LoadGallery = (
   query: string,
@@ -52,7 +62,7 @@ export async function refreshAfterAuthRoute({
   loadMine: (currentUser?: User | null, authSession?: AuthSession | null) => Promise<void>;
   loadFavorites: (currentUser?: User | null, authSession?: AuthSession | null) => Promise<void>;
   loadCreator: (id: string, page?: number, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
-  loadCreators: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
+  loadCreators: (authSession?: AuthSession | null, content?: ContentMode, page?: number, sort?: CreatorLeaderboardSort, query?: string) => Promise<void>;
   loadCollections: (authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadUserCollections: (currentUser?: User | null, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: ContentMode, page?: number) => Promise<void>;
@@ -65,7 +75,7 @@ export async function refreshAfterAuthRoute({
   if (route.name === "mine") await loadMine(nextUser, nextSession);
   if (route.name === "favorites") await loadFavorites(nextUser, nextSession);
   if (route.name === "user") await loadCreator(route.id, creatorMeta.page, nextSession, contentMode);
-  if (route.name === "creators") await loadCreators(nextSession, contentMode);
+  if (route.name === "creators") await loadCreators(nextSession, contentMode, creatorsPageFromHash(), creatorsSortFromHash(), creatorsQueryFromHash());
   if (route.name === "collections") {
     await Promise.all([
       loadCollections(nextSession, contentMode),

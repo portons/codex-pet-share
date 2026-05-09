@@ -52,8 +52,15 @@ export function useGalleryBrowser({
   const [contentMode, setContentMode] = useState<ContentMode>(initialGalleryState.content);
   const [loading, setLoading] = useState(true);
   const [freshPetCount, setFreshPetCount] = useState(0);
-  const freshBaselineRef = useRef<{ key: string; total: number } | null>(null);
+  const [freshBaselineVersion, setFreshBaselineVersion] = useState(0);
+  const freshBaselineRef = useRef<{ key: string; latestUploadedAt: string } | null>(null);
   const freshViewer = freshViewerKey(user, session);
+
+  function resetFreshNotice() {
+    freshBaselineRef.current = null;
+    setFreshPetCount(0);
+    setFreshBaselineVersion((current) => current + 1);
+  }
 
   function applyGalleryState(nextState: GalleryUrlState) {
     setQuery(nextState.query);
@@ -89,10 +96,11 @@ export function useGalleryBrowser({
     authSession = session,
     content = contentMode,
     view = activeView,
-    kind = activeKind
+    kind = activeKind,
+    forceFresh = false
   ) {
     if (sort === "random") {
-      await loadRandomGallery(search, tags, authSession, content, view, kind);
+      await loadRandomGallery(search, tags, authSession, content, view, kind, forceFresh);
       return;
     }
 
@@ -112,12 +120,14 @@ export function useGalleryBrowser({
     if (content === "all") {
       params.set("content", "all");
     }
+    if (forceFresh) {
+      params.set("freshPollAt", String(Date.now()));
+    }
     const suffix = params.toString() ? `?${params}` : "";
     const body = await readJson<GalleryResponse>(await apiFetch(`/api/pets${suffix}`, {}, authSession));
     const pageSize = galleryPageSize(view, sort);
     const nextPets = body.pets.map(normalizePet);
-    freshBaselineRef.current = { key: freshGalleryKey(search, tags, content, kind, freshViewerKey(user, authSession)), total: body.total };
-    setFreshPetCount(0);
+    resetFreshNotice();
     setPets(nextPets);
     setGalleryMeta({
       page: body.page,
@@ -133,7 +143,8 @@ export function useGalleryBrowser({
     authSession = session,
     content = contentMode,
     view = activeView,
-    kind = activeKind
+    kind = activeKind,
+    forceFresh = false
   ) {
     const pageSize = galleryPageSize(view, "random");
     const params = new URLSearchParams();
@@ -151,14 +162,16 @@ export function useGalleryBrowser({
     if (content === "all") {
       params.set("content", "all");
     }
+    if (forceFresh) {
+      params.set("freshPollAt", String(Date.now()));
+    }
 
     const firstBody = await readJson<GalleryResponse>(
       await apiFetch(`/api/pets?${params}`, {}, authSession)
     );
     const randomPets = firstBody.pets.map(normalizePet);
 
-    freshBaselineRef.current = { key: freshGalleryKey(search, tags, content, kind, freshViewerKey(user, authSession)), total: firstBody.total };
-    setFreshPetCount(0);
+    resetFreshNotice();
     setPets(randomPets);
     setGalleryMeta({
       page: 1,
@@ -280,7 +293,7 @@ export function useGalleryBrowser({
     pushGalleryState(nextState);
     setLoading(true);
     try {
-      await loadGallery(nextState.query, nextState.tags, nextState.sort, nextState.page, session, nextState.content, nextState.view, nextState.kind);
+      await loadGallery(nextState.query, nextState.tags, nextState.sort, nextState.page, session, nextState.content, nextState.view, nextState.kind, true);
       scrollPageTop();
     } finally {
       setLoading(false);
@@ -290,48 +303,67 @@ export function useGalleryBrowser({
   useEffect(() => {
     if (route.name !== "gallery") return;
     const key = freshGalleryKey(query, activeTags, contentMode, activeKind, freshViewer);
-    const baseline = freshBaselineRef.current;
     let cancelled = false;
 
-    async function fetchFreshTotal() {
+    async function fetchFreshSnapshot() {
       const params = freshGalleryParams(query, activeTags, contentMode, activeKind);
       const body = await readJson<GalleryResponse>(
         await apiFetch(`/api/pets?${params}`, {}, session)
       );
-      return body.total;
-    }
-
-    async function resetFreshBaseline() {
-      const total = await fetchFreshTotal();
-      if (cancelled) return;
-      freshBaselineRef.current = { key, total };
-      setFreshPetCount(0);
-    }
-
-    if (!baseline || baseline.key !== key) {
-      void resetFreshBaseline().catch(() => {});
-      return () => {
-        cancelled = true;
+      const freshPets = body.pets.map(normalizePet);
+      return {
+        latestUploadedAt: freshPets[0]?.uploadedAt || "",
+        total: body.total,
+        pets: freshPets
       };
     }
 
-    async function checkFreshPets() {
-      const total = await fetchFreshTotal();
+    async function fetchNewerUploads(uploadedAfter: string) {
+      const params = freshGalleryParams(query, activeTags, contentMode, activeKind, uploadedAfter);
+      const body = await readJson<GalleryResponse>(
+        await apiFetch(`/api/pets?${params}`, {}, session)
+      );
+      const freshPets = body.pets.map(normalizePet);
+      return {
+        latestUploadedAt: freshPets[0]?.uploadedAt || "",
+        total: body.total
+      };
+    }
+
+    async function resetFreshBaseline() {
+      const snapshot = await fetchFreshSnapshot();
       if (cancelled) return;
+      freshBaselineRef.current = { key, latestUploadedAt: snapshot.latestUploadedAt };
+      setFreshPetCount(0);
+    }
+
+    async function checkFreshPets() {
       const currentBaseline = freshBaselineRef.current;
-      if (!currentBaseline || currentBaseline.key !== key) return;
-      setFreshPetCount(Math.max(0, total - currentBaseline.total));
+      if (!currentBaseline || currentBaseline.key !== key) {
+        await resetFreshBaseline();
+        return;
+      }
+      const snapshot = currentBaseline.latestUploadedAt
+        ? await fetchNewerUploads(currentBaseline.latestUploadedAt)
+        : await fetchFreshSnapshot();
+      if (cancelled) return;
+      if (freshBaselineRef.current !== currentBaseline) return;
+      if (!snapshot.latestUploadedAt || !isNewerUpload(snapshot.latestUploadedAt, currentBaseline.latestUploadedAt)) {
+        setFreshPetCount(0);
+        return;
+      }
+      setFreshPetCount(snapshot.total);
     }
 
     const intervalId = window.setInterval(() => {
       void checkFreshPets().catch(() => {});
-    }, 20000);
+    }, 60000);
     void checkFreshPets().catch(() => {});
     return () => {
       cancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [route, query, activeTags, contentMode, activeKind, freshViewer, apiFetch, session, galleryMeta.total]);
+  }, [route, query, activeTags, contentMode, activeKind, freshViewer, apiFetch, session, freshBaselineVersion]);
 
   async function selectVisibleTag(tag: TagName, sourceTags: string[]) {
     const nextContent = tag === "nsfw" || sourceTags.includes("nsfw") ? "all" : contentMode;
@@ -418,11 +450,15 @@ function freshGalleryKey(search: string, tags: string[], content: ContentMode, k
   });
 }
 
-function freshGalleryParams(search: string, tags: string[], content: ContentMode, kind: PetKind) {
+function freshGalleryParams(search: string, tags: string[], content: ContentMode, kind: PetKind, uploadedAfter?: string) {
   const params = new URLSearchParams();
   params.set("page", "1");
   params.set("pageSize", "1");
+  params.set("sort", "new");
   params.set("freshPollAt", String(Date.now()));
+  if (uploadedAfter) {
+    params.set("uploadedAfter", uploadedAfter);
+  }
   if (search) {
     params.set("q", search);
   }
@@ -434,4 +470,10 @@ function freshGalleryParams(search: string, tags: string[], content: ContentMode
     params.set("content", "all");
   }
   return params.toString();
+}
+
+function isNewerUpload(uploadedAt: string, baselineUploadedAt: string) {
+  if (!uploadedAt) return false;
+  if (!baselineUploadedAt) return true;
+  return Date.parse(uploadedAt) > Date.parse(baselineUploadedAt);
 }

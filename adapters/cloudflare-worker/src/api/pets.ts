@@ -16,7 +16,8 @@ export async function handlePets(ctx: AppContext, parts: string[]) {
     const sort = parsePetSort(ctx.url.searchParams.get("sort"));
     const content = parseContentMode(ctx.url.searchParams.get("content"));
     const kind = parsePetKindFilter(ctx.url.searchParams.get("kind"));
-    return json(await listPets(ctx, ctx.url.searchParams.get("q") || "", undefined, ctx.url.searchParams.getAll("tag"), user, sort, parsePagination(ctx.url), content, kind));
+    const uploadedAfter = parseUploadedAfter(ctx.url.searchParams.get("uploadedAfter"));
+    return json(await listPets(ctx, ctx.url.searchParams.get("q") || "", undefined, ctx.url.searchParams.getAll("tag"), user, sort, parsePagination(ctx.url), content, kind, uploadedAfter));
   }
   if (ctx.request.method === "GET" && parts[0] === "favorites") return json({ pets: await favoritePets(ctx, await requireUser(ctx)) });
   if (ctx.request.method === "GET" && parts[0] === "mine") return json({ pets: (await listPets(ctx, ctx.url.searchParams.get("q") || "", (await requireUser(ctx)).id, ctx.url.searchParams.getAll("tag"), user, "new", undefined, "all")).pets });
@@ -46,11 +47,12 @@ export async function getVisiblePet(ctx: AppContext, petId: string, viewer: View
   return pet && canSeePet(pet, viewer) ? pet : null;
 }
 
-export async function listPets(ctx: AppContext, query = "", ownerId?: string, filterTags: string[] = [], viewer?: Viewer, sort: PetSort = "new", pagination?: Pagination, content: ContentMode = "safe", kind?: PetKind) {
+export async function listPets(ctx: AppContext, query = "", ownerId?: string, filterTags: string[] = [], viewer?: Viewer, sort: PetSort = "new", pagination?: Pagination, content: ContentMode = "safe", kind?: PetKind, uploadedAfter?: number) {
   const rows = (await all<PetRow>(petBaseQuery(ctx))).filter((row) =>
     matchesQuery(row, query)
     && (!ownerId || row.owner_id === ownerId)
     && (!kind || row.kind === kind)
+    && (!uploadedAfter || Date.parse(row.created_at) > uploadedAfter)
     && filterTags.every((tag) => tags(row).includes(validateTag(tag)))
     && canSeePet(row, viewer)
     && (content === "all" || !tags(row).includes("nsfw"))
@@ -82,7 +84,7 @@ export function serializePet(ctx: AppContext, row: PetRow, report?: ValidationRe
     ownerName: row.owner_display_name || (row.source === "seed" ? "Local package" : "Unknown"),
     uploadedAt: row.created_at,
     viewCount: row.view_count || 0,
-    downloadCount: canSeeDownloadCount(row, viewer) ? row.download_count || 0 : 0,
+    downloadCount: viewer?.isAdmin ? row.download_count || 0 : 0,
     likeCount: row.like_count || 0,
     likedByMe: likeContext?.has(row.id) || false,
     ownerShadowbanned: Boolean(viewer?.isAdmin && ownerShadowbanned(row)),
@@ -247,14 +249,14 @@ function petBaseQuery(ctx: AppContext, suffix = "") {
 
 function matchesQuery(row: PetRow, query: string) {
   const needle = query.trim().toLowerCase();
-  return !needle || `${row.id} ${row.display_name} ${row.description}`.toLowerCase().includes(needle);
+  return !needle || `${row.id} ${row.display_name} ${row.description} ${row.kind} ${row.owner_handle || ""} ${row.owner_display_name || ""} ${tags(row).join(" ")}`.toLowerCase().includes(needle);
 }
 
 function sortRows(rows: PetRow[], sort: PetSort) {
   const out = [...rows];
   if (sort === "random") return out.sort(() => Math.random() - 0.5);
   return out.sort((a, b) => sort === "popular"
-    ? (b.like_count - a.like_count) || (b.download_count - a.download_count) || Date.parse(b.created_at) - Date.parse(a.created_at)
+    ? (b.like_count - a.like_count) || Date.parse(b.created_at) - Date.parse(a.created_at)
     : sort === "views"
       ? (b.view_count - a.view_count) || (b.like_count - a.like_count) || Date.parse(b.created_at) - Date.parse(a.created_at)
       : Date.parse(b.created_at) - Date.parse(a.created_at) || a.display_name.localeCompare(b.display_name));
@@ -275,6 +277,13 @@ export function parseContentMode(value: string | null): ContentMode {
 function parsePetKindFilter(value: string | null) {
   if (!value || value === "all") return undefined;
   return parsePetKind(value);
+}
+
+function parseUploadedAfter(value: string | null) {
+  if (!value) return undefined;
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) throw new HttpError("uploadedAfter must be an ISO date", 400);
+  return parsed;
 }
 
 export function parsePagination(url: URL): Pagination {
@@ -309,10 +318,6 @@ function ownerShadowbanned(row: PetRow) {
 
 function canSeePet(row: PetRow, viewer: Viewer) {
   return !ownerShadowbanned(row) || Boolean(viewer?.isAdmin || (row.owner_id && viewer?.id === row.owner_id));
-}
-
-function canSeeDownloadCount(row: PetRow, viewer?: Viewer) {
-  return Boolean(viewer?.isAdmin || (row.owner_id && viewer?.id === row.owner_id));
 }
 
 async function readUploadForm(request: Request) {

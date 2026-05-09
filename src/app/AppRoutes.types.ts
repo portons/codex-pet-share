@@ -6,6 +6,7 @@ import type {
   CollectionSummary,
   ContentMode,
   Creator,
+  CreatorLeaderboardSort,
   CreatorLeaderboardItem,
   EditablePetKind,
   EntityShareTarget,
@@ -83,7 +84,9 @@ export type AppRoutesProps = {
   setUploadStatus: SetState<string>;
   submitUpload: (event: FormEvent) => void | Promise<void>;
   creators: CreatorLeaderboardItem[];
-  creatorsTotal: number;
+  creatorsMeta: GalleryMeta;
+  creatorsSort: CreatorLeaderboardSort;
+  creatorsQuery: string;
   creatorsLoading: boolean;
   collectionsLoading: boolean;
   setAuthMode: SetState<"login" | "register">;
@@ -107,6 +110,9 @@ export type AppRoutesProps = {
   creatorMeta: GalleryMeta;
   creatorLoading: boolean;
   selectCreatorPage: (page: number) => void | Promise<void>;
+  selectCreatorsPage: (page: number) => void | Promise<void>;
+  selectCreatorsSort: (sort: CreatorLeaderboardSort) => void | Promise<void>;
+  selectCreatorsQuery: (query: string) => void | Promise<void>;
   selectCollectionPage: (page: number) => void | Promise<void>;
   detailLoading: boolean;
   detailPet: Pet | null;

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { AdminCollection } from "../admin/AdminPage";
-import { defaultPageSize, randomRequestToken } from "../domain/config";
+import { trackEvent } from "../domain/analytics";
+import { defaultPageSize } from "../domain/config";
 import { readJson } from "../domain/http";
 import { normalizePet } from "../domain/pets";
 import type {
@@ -10,6 +11,7 @@ import type {
   CollectionSummary,
   ContentMode,
   Creator,
+  CreatorLeaderboardSort,
   CreatorLeaderboardItem,
   CreatorPetsResponse,
   CreatorsLeaderboardResponse,
@@ -35,6 +37,8 @@ type LoadGallery = (
   view: GalleryView,
   kind: PetKind
 ) => Promise<void>;
+
+const creatorsPageSize = 25;
 
 export function useAppEntityData({
   apiFetch,
@@ -76,7 +80,14 @@ export function useAppEntityData({
     totalPages: 0
   });
   const [creators, setCreators] = useState<CreatorLeaderboardItem[]>([]);
-  const [creatorsTotal, setCreatorsTotal] = useState(0);
+  const [creatorsMeta, setCreatorsMeta] = useState<GalleryMeta>({
+    page: 1,
+    pageSize: creatorsPageSize,
+    total: 0,
+    totalPages: 0
+  });
+  const [creatorsSort, setCreatorsSort] = useState<CreatorLeaderboardSort>("likes");
+  const [creatorsQuery, setCreatorsQuery] = useState("");
   const [collections, setCollections] = useState<Array<CollectionSummary>>([]);
   const [userCollections, setUserCollections] = useState<Array<CollectionSummary>>([]);
   const [adminCollections, setAdminCollections] = useState<Array<AdminCollection>>([]);
@@ -130,21 +141,21 @@ export function useAppEntityData({
     setDetailLoading(true);
     setMorePets([]);
     try {
-      const randomParams = new URLSearchParams({
+      const moreParams = new URLSearchParams({
         page: "1",
         pageSize: "6",
-        sort: "random",
-        random: randomRequestToken()
+        sort: "popular"
       });
       if (contentMode === "all") {
-        randomParams.set("content", "all");
+        moreParams.set("content", "all");
       }
-      const [body, randomBody] = await Promise.all([
+      const [body, moreBody] = await Promise.all([
         readJson<{ pet: Pet }>(await apiFetch(`/api/pets/${id}`)),
-        readJson<GalleryResponse>(await apiFetch(`/api/pets?${randomParams}`))
+        readJson<GalleryResponse>(await apiFetch(`/api/pets?${moreParams}`))
       ]);
       setDetailPet(normalizePet(body.pet));
-      setMorePets(randomBody.pets.map(normalizePet).filter((pet) => pet.id !== id).slice(0, 3));
+      setMorePets(moreBody.pets.map(normalizePet).filter((pet) => pet.id !== id).slice(0, 3));
+      trackEvent("pet_detail_open", { route: "detail", petId: id, user });
     } finally {
       setDetailLoading(false);
     }
@@ -173,11 +184,23 @@ export function useAppEntityData({
     }
   }
 
-  async function loadCreators(authSession = session, content = contentMode) {
+  async function loadCreators(
+    authSession = session,
+    content = contentMode,
+    page = creatorsMeta.page,
+    sort = creatorsSort,
+    query = creatorsQuery
+  ) {
     setCreatorsLoading(true);
     try {
       const params = new URLSearchParams();
-      params.set("limit", "25");
+      params.set("page", String(page));
+      params.set("pageSize", String(creatorsMeta.pageSize));
+      params.set("sort", sort);
+      const cleanQuery = query.trim();
+      if (cleanQuery) {
+        params.set("q", cleanQuery);
+      }
       if (content === "all") {
         params.set("content", "all");
       }
@@ -186,7 +209,14 @@ export function useAppEntityData({
         ...creator,
         topPets: creator.topPets.map(normalizePet)
       })));
-      setCreatorsTotal(body.total);
+      setCreatorsMeta({
+        page: body.page,
+        pageSize: body.pageSize,
+        total: body.total,
+        totalPages: body.totalPages
+      });
+      setCreatorsSort(sort);
+      setCreatorsQuery(cleanQuery);
     } finally {
       setCreatorsLoading(false);
     }
@@ -290,7 +320,7 @@ export function useAppEntityData({
       refreshes.push(loadCreator(route.id, creatorMeta.page, authSession, contentMode));
     }
     if (route.name === "creators") {
-      refreshes.push(loadCreators(authSession, contentMode));
+      refreshes.push(loadCreators(authSession, contentMode, creatorsMeta.page, creatorsSort, creatorsQuery));
     }
     if (route.name === "collections") {
       refreshes.push(loadCollections(authSession, contentMode), loadUserCollections(currentUser, authSession, contentMode));
@@ -316,7 +346,12 @@ export function useAppEntityData({
     creatorMeta,
     setCreatorMeta,
     creators,
-    creatorsTotal,
+    creatorsMeta,
+    creatorsSort,
+    creatorsQuery,
+    setCreatorsMeta,
+    setCreatorsSort,
+    setCreatorsQuery,
     collections,
     setCollections,
     userCollections,

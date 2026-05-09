@@ -50,9 +50,27 @@
   padding: 10px;
 }
 
+.detailInstall .downloadCommandRow {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.detailInstall .downloadCommandRow .commandCopyButton {
+  justify-self: end;
+  width: fit-content;
+}
+
 .downloadCommandRow > div {
   display: grid;
   gap: 8px;
+}
+
+.commandHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
 }
 
 .commandModeSwitch {
@@ -82,6 +100,24 @@
 
 .commandModeSwitch button:hover:not(.active) {
   color: var(--ink);
+}
+
+.commandDestination {
+  display: inline-flex;
+  align-items: baseline;
+  min-width: 0;
+  gap: 6px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+.commandDestination code {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 10.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .commandHelperText,
@@ -119,12 +155,13 @@
 }
 
 .terminalCommandLine {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
   min-width: 0;
   min-height: 40px;
   gap: 9px;
-  padding: 0 12px;
+  padding: 10px 12px;
   border: 1px solid var(--terminal-border);
   border-radius: var(--radius-sm);
   background: var(--terminal-bg);
@@ -155,8 +192,9 @@
 .terminalCommandLine code {
   min-width: 0;
   color: inherit;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* Spinner */

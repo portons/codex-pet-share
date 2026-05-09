@@ -1,5 +1,6 @@
 import { autoUpdate, flip, offset, shift, useFloating } from "@floating-ui/react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useRef, useState } from "react";
+import { trackEvent } from "../domain/analytics";
 import { type TagName } from "../domain/config";
 import { formatMetric } from "../domain/format";
 import { isNsfwPet } from "../domain/pets";
@@ -195,8 +196,14 @@ export function PetCard({
   const compact = view === "compact";
   const likeLabel = pet.likedByMe ? "Liked" : "Like";
   const canDeleteOwnPet = Boolean(!user?.isAdmin && user?.id && user.id === pet.ownerId);
-  const openPetPage = () => navigate(`/pets/${pet.id}`);
+  const openPetPage = () => {
+    trackEvent("card_detail_open", { route: "gallery_card", petId: pet.id, user });
+    navigate(`/pets/${pet.id}`);
+  };
   const stopCardPropagation = (event: MouseEvent<HTMLElement>) => event.stopPropagation();
+  const trackCardAction = (event: string, value?: string) => {
+    trackEvent(event, { route: "gallery_card", petId: pet.id, value, user });
+  };
   const handleCardBodyKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "Enter" && event.key !== " ") {
       return;
@@ -224,7 +231,10 @@ export function PetCard({
               aria-label="Preview on cursor"
               title="Preview on cursor"
               data-tooltip={previewActive ? "Stop cursor preview" : "Preview on cursor"}
-              onClick={() => onPreview(pet)}
+              onClick={() => {
+                trackCardAction("card_cursor_preview_click");
+                onPreview(pet);
+              }}
             >
               <Icon name="eye" size={14} />
             </button>
@@ -236,7 +246,10 @@ export function PetCard({
               aria-label="Open 3D playground"
               title="3D playground · WASD · shift sprint · space jump · E wave · Q sit · drag rotate · scroll zoom"
               data-tooltip="Open 3D playground"
-              onClick={() => onPlayground(pet)}
+              onClick={() => {
+                trackCardAction("card_playground_click");
+                onPlayground(pet);
+              }}
             >
               <Icon name="cube" size={14} />
             </button>
@@ -298,7 +311,10 @@ export function PetCard({
           type="button"
           aria-label="Download"
           title="Download"
-          onClick={() => onDownload(pet)}
+          onClick={() => {
+            trackCardAction("card_download_click");
+            onDownload(pet);
+          }}
         >
           <Icon name="download" size={13} />
           {!compact && "Download"}
@@ -308,7 +324,10 @@ export function PetCard({
           type="button"
           aria-label="Share"
           title="Share"
-          onClick={() => onShare(pet)}
+          onClick={() => {
+            trackCardAction("card_share_click");
+            onShare(pet);
+          }}
         >
           <Icon name="share" size={13} />
           {!compact && "Share"}
@@ -319,7 +338,10 @@ export function PetCard({
             type="button"
             aria-label="Add to collection"
             title="Add to collection"
-            onClick={() => onCollect(pet)}
+            onClick={() => {
+              trackCardAction("card_collect_click");
+              onCollect(pet);
+            }}
           >
             <Icon name="package" size={13} />
             {!compact && "Add to collection"}
@@ -368,9 +390,16 @@ export function PetCard({
           className={`btn btnSm likeButton ${pet.likedByMe ? "active" : ""}`}
           type="button"
           disabled={likeBusyId === pet.id}
-          aria-label={pet.likedByMe ? "Unlike" : "Like"}
-          title={pet.likedByMe ? "Unlike" : "Like"}
-          onClick={() => (user ? onLike(pet) : onSignIn())}
+            aria-label={pet.likedByMe ? "Unlike" : "Like"}
+            title={pet.likedByMe ? "Unlike" : "Like"}
+          onClick={() => {
+            trackCardAction("card_like_click", pet.likedByMe ? "unlike" : "like");
+            if (user) {
+              onLike(pet);
+            } else {
+              onSignIn();
+            }
+          }}
         >
           <Icon name="heart" size={13} />
           {compact ? formatMetric(pet.likeCount) : likeLabel}

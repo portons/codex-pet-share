@@ -17,7 +17,7 @@
   align-items: center;
   gap: 32px;
   min-height: 60px;
-  padding: 12px 0;
+  padding: 12px 18px;
   border-bottom: 1px solid var(--border-strong);
   background: var(--nav-bg);
   backdrop-filter: saturate(140%) blur(14px);
