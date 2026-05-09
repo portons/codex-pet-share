@@ -41,6 +41,10 @@
   letter-spacing: 0;
 }
 
+.creatorDetailSurface .resultBar {
+  border-top: 0;
+}
+
 .resultBar span:last-child {
   min-height: 18px;
   text-align: right;

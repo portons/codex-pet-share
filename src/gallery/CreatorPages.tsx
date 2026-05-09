@@ -73,7 +73,7 @@ export function CreatorPage({
   onPage: (page: number) => void;
 }) {
   return (
-    <section className="surface">
+    <section className="surface creatorDetailSurface">
       <header className="sectionHeader">
         <div>
           <p className="metaText">Creator</p>
