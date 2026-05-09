@@ -19,6 +19,8 @@ const NPC_GREET_DURATION_MS = 2400;
 const NPC_GREET_COOLDOWN_MS = 6000;
 const NPC_SPAWN_RADIUS_SCALE = 0.65;
 const NPC_POSITION_ATTEMPTS = 80;
+const NPC_STUCK_FRAME_LIMIT = 24;
+const NPC_AVOIDANCE_ANGLES = [0, Math.PI / 4, -Math.PI / 4, Math.PI / 2, -Math.PI / 2, Math.PI * 0.75, -Math.PI * 0.75];
 
 export const NPC_ATLAS_COLS = 8;
 export const NPC_ATLAS_ROWS = 9;
@@ -64,6 +66,7 @@ type Npc = {
   yVel: number;
   onGround: boolean;
   bounceCooldownUntil: number;
+  stuckFrames: number;
 };
 
 // Snapshot exposed to the modal each frame so cross-system effects (ball
@@ -203,7 +206,8 @@ export function makeNpcSystem(
       yPos: 0,
       yVel: 0,
       onGround: true,
-      bounceCooldownUntil: 0
+      bounceCooldownUntil: 0,
+      stuckFrames: 0
     };
     if (!pickWaypoint(npc)) {
       scene.remove(sprite);
@@ -328,25 +332,40 @@ export function makeNpcSystem(
   function moveNpc(n: Npc, nx: number, nz: number, dt: number, now: number) {
     const currentX = n.obj.position.x;
     const currentZ = n.obj.position.z;
-    const targetX = clampToPlaygroundFloor(currentX + nx * NPC_SPEED * dt, moveLimit);
-    const targetZ = clampToPlaygroundFloor(currentZ + nz * NPC_SPEED * dt, moveLimit);
-    let nextX = currentX;
-    let nextZ = currentZ;
+    const currentDistance = Math.hypot(n.wpX - currentX, n.wpZ - currentZ);
+    const step = NPC_SPEED * dt;
+    let bestX = currentX;
+    let bestZ = currentZ;
+    let bestScore = -Infinity;
 
-    if (canOccupyPlaygroundPosition(targetX, targetZ)) {
-      nextX = targetX;
-      nextZ = targetZ;
-    } else {
-      if (canOccupyPlaygroundPosition(targetX, currentZ)) nextX = targetX;
-      if (canOccupyPlaygroundPosition(nextX, targetZ)) nextZ = targetZ;
+    for (const angle of NPC_AVOIDANCE_ANGLES) {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      const dirX = nx * cos - nz * sin;
+      const dirZ = nx * sin + nz * cos;
+      const targetX = clampToPlaygroundFloor(currentX + dirX * step, moveLimit);
+      const targetZ = clampToPlaygroundFloor(currentZ + dirZ * step, moveLimit);
+      if (!canOccupyPlaygroundPosition(targetX, targetZ)) continue;
+
+      const nextDistance = Math.hypot(n.wpX - targetX, n.wpZ - targetZ);
+      const score = currentDistance - nextDistance - Math.abs(angle) * 0.02;
+      if (score > bestScore) {
+        bestScore = score;
+        bestX = targetX;
+        bestZ = targetZ;
+      }
     }
 
-    n.obj.position.x = nextX;
-    n.obj.position.z = nextZ;
-    n.vx = dt > 0 ? (nextX - currentX) / dt : 0;
-    n.vz = dt > 0 ? (nextZ - currentZ) / dt : 0;
+    n.obj.position.x = bestX;
+    n.obj.position.z = bestZ;
+    n.vx = dt > 0 ? (bestX - currentX) / dt : 0;
+    n.vz = dt > 0 ? (bestZ - currentZ) / dt : 0;
 
-    if (nextX === currentX && nextZ === currentZ) {
+    const moved = Math.hypot(bestX - currentX, bestZ - currentZ);
+    n.stuckFrames = moved > 0.01 && bestScore > 0.01 ? 0 : n.stuckFrames + 1;
+
+    if (n.stuckFrames >= NPC_STUCK_FRAME_LIMIT) {
+      n.stuckFrames = 0;
       setState(n, "idle", now);
       n.pauseAt = now + 300 + Math.random() * 500;
       pickWaypoint(n);

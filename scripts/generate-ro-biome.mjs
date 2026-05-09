@@ -11,6 +11,7 @@ const OUTPUT_DIR = "public/assets/biomes/ro-prontera";
 const GENERATED_TS = "src/playground/core/roPronteraBiome.generated.ts";
 const MODEL_CROP_PAD = 8;
 const MODEL_EDGE_EPSILON = 0.05;
+const OPAQUE_MASK_TEXTURE_SLUGS = [/wall/];
 
 class Reader {
   constructor(buffer) {
@@ -609,12 +610,48 @@ function decodeIndexedBmp(buffer) {
   return { width, height, rgba };
 }
 
+function shouldBakeMask(texturePath) {
+  const slug = assetSlug(texturePath);
+  return OPAQUE_MASK_TEXTURE_SLUGS.some((pattern) => pattern.test(slug));
+}
+
+function bakeTransparentPixels(rgba) {
+  let rTotal = 0;
+  let gTotal = 0;
+  let bTotal = 0;
+  let count = 0;
+
+  for (let index = 0; index < rgba.length; index += 4) {
+    if (rgba[index + 3] < 16) continue;
+    rTotal += rgba[index];
+    gTotal += rgba[index + 1];
+    bTotal += rgba[index + 2];
+    count += 1;
+  }
+
+  if (count === 0) return;
+
+  const r = Math.round(rTotal / count);
+  const g = Math.round(gTotal / count);
+  const b = Math.round(bTotal / count);
+  for (let index = 0; index < rgba.length; index += 4) {
+    if (rgba[index + 3] >= 16) continue;
+    rgba[index] = r;
+    rgba[index + 1] = g;
+    rgba[index + 2] = b;
+    rgba[index + 3] = 255;
+  }
+}
+
 async function convertTexture(texturePath, outputPath) {
   const sourcePath = path.join(WORK_DIR, "textures", `${assetSlug(texturePath)}${path.extname(texturePath).toLowerCase() || ".bin"}`);
   await download(textureUrl(texturePath), sourcePath);
   const buffer = await fs.readFile(sourcePath);
   if (buffer.toString("ascii", 0, 2) === "BM") {
     const bmp = decodeIndexedBmp(buffer);
+    if (shouldBakeMask(texturePath)) {
+      bakeTransparentPixels(bmp.rgba);
+    }
     await sharp(bmp.rgba, {
       raw: { width: bmp.width, height: bmp.height, channels: 4 }
     })
