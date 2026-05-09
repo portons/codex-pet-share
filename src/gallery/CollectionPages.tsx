@@ -239,7 +239,7 @@ function CollectionsPage({
                     href={`#/collections/${collection.slug}`}
                     aria-label={`Open ${collection.displayName}`}
                   >
-                    <CollectionPosterMosaic collection={collection} />
+                    <CollectionPosterMosaic collection={collection} effect="stack" />
                     <div className="collectionCardCopy">
                       <h2 className="collectionCardTitle">{collection.displayName}</h2>
                       <p className="collectionCardTopPets">{collectionTopPetsLabel(collection)}</p>
@@ -341,7 +341,7 @@ function UserCollectionsSection({
       <header className="userCollectionsHeader">
         <div>
           <p className="metaText">Your collections</p>
-          <h2>Custom packs</h2>
+          <h2>Your packs</h2>
           <p className="sectionSubhead">Private to manage, public to share.</p>
         </div>
         <div className="userCollectionsActions">
@@ -363,7 +363,7 @@ function UserCollectionsSection({
       ) : collections.length ? (
         <div className="userCollectionsGrid">
           {collections.map((collection) => (
-            <article className="userCollectionCard card" key={collection.slug}>
+            <article className="userCollectionCard card pocAmbientBento" key={collection.slug}>
               <div className="userCollectionCardHeader">
                 <div>
                   <h3 className="userCollectionCardTitle">{collection.displayName}</h3>
@@ -377,7 +377,7 @@ function UserCollectionsSection({
               </div>
               <a className="userCollectionPreview" href={`#/collections/${collection.slug}`} aria-label={`Open ${collection.displayName}`}>
                 {collection.topPets.length ? (
-                  <CollectionPosterMosaic collection={collection} compact />
+                  <CollectionPosterMosaic collection={collection} compact effect="ambient" />
                 ) : (
                   <span className="userCollectionEmptyPreview">empty</span>
                 )}
@@ -693,16 +693,21 @@ function CollectionAlphabetRail({
 
 function CollectionPosterMosaic({
   collection,
-  compact = false
+  compact = false,
+  effect
 }: {
   collection: CollectionSummary;
   compact?: boolean;
+  effect?: "stack" | "ambient";
 }) {
   const pets = collection.topPets.slice(0, compact ? 3 : 4);
   if (!pets.length) return <span className="collectionPosterEmpty">No pets yet</span>;
 
   return (
-    <div className={`collectionPosterMosaic ${compact ? "compact" : ""} petCount${pets.length}`} aria-hidden="true">
+    <div
+      className={`collectionPosterMosaic ${compact ? "compact" : ""} ${effect ? `${effect}Poc` : ""} petCount${pets.length}`}
+      aria-hidden="true"
+    >
       {pets.map((pet, index) => (
         <span className="collectionPosterTile" key={pet.id}>
           <img

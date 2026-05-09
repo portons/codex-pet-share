@@ -493,11 +493,12 @@ function CreatorMetric({
   label: string;
   value: number;
 }) {
+  const formattedValue = formatMetric(value);
   return (
-    <span className={`creatorMetric ${active ? "active" : ""}`}>
+    <span className={`creatorMetric ${active ? "active" : ""}`} aria-label={`${label}: ${formattedValue}`}>
       <Icon name={icon} size={13} />
       <span>{label}</span>
-      <strong>{formatMetric(value)}</strong>
+      <strong>{formattedValue}</strong>
     </span>
   );
 }

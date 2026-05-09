@@ -79,18 +79,30 @@ function pickGalleryPetState(petId: string): PetState {
   return petStates[Math.abs(hash) % petStates.length];
 }
 
-export function GalleryPetPreview({ pet, compact }: { pet: Pet; compact: boolean }) {
+export function GalleryPetPreview({
+  pet,
+  compact,
+  active
+}: {
+  pet: Pet;
+  compact: boolean;
+  active: boolean;
+}) {
   const state = useMemo(() => pickGalleryPetState(pet.id), [pet.id]);
-  const [interacting, setInteracting] = useState(false);
   const [fullSpriteRequested, setFullSpriteRequested] = useState(false);
   const [fullSpriteLoaded, setFullSpriteLoaded] = useState(false);
-  const animatedVisible = interacting && fullSpriteLoaded;
+  const animatedVisible = active && fullSpriteLoaded;
 
   useEffect(() => {
-    setInteracting(false);
     setFullSpriteRequested(false);
     setFullSpriteLoaded(false);
   }, [pet.id, pet.spritesheetUrl]);
+
+  useEffect(() => {
+    if (active) {
+      setFullSpriteRequested(true);
+    }
+  }, [active]);
 
   useEffect(() => {
     if (!fullSpriteRequested || fullSpriteLoaded) return;
@@ -108,23 +120,10 @@ export function GalleryPetPreview({ pet, compact }: { pet: Pet; compact: boolean
     };
   }, [fullSpriteLoaded, fullSpriteRequested, pet.spritesheetUrl]);
 
-  function startInteraction() {
-    setInteracting(true);
-    setFullSpriteRequested(true);
-  }
-
-  function stopInteraction() {
-    setInteracting(false);
-  }
-
   return (
     <div
       className={`spriteFrame transparent galleryPreviewFrame ${compact ? "compact" : ""} ${animatedVisible ? "isAnimating" : ""}`}
       aria-label={`${pet.displayName} animated preview`}
-      onFocus={startInteraction}
-      onBlur={stopInteraction}
-      onMouseEnter={startInteraction}
-      onMouseLeave={stopInteraction}
     >
       <img
         className="galleryPreviewStillImage"

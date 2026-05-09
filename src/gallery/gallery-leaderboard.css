@@ -451,12 +451,9 @@
   }
 
   .creatorFeatureCard {
+    grid-template-rows: auto auto auto;
+    gap: 12px;
     padding: 14px;
-  }
-
-  .creatorFeatureMetrics,
-  .creatorRankMetrics {
-    grid-template-columns: 1fr;
   }
 
   .creatorFeaturePets {
@@ -473,6 +470,33 @@
 
   .creatorFeaturePet img {
     max-width: 92px;
+  }
+
+  .creatorFeatureMetrics,
+  .creatorRankMetrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .creatorMetric {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 42px;
+    padding: 8px 6px;
+  }
+
+  .creatorMetric svg {
+    flex: 0 0 auto;
+  }
+
+  .creatorMetric span {
+    display: none;
+  }
+
+  .creatorMetric strong {
+    font-size: 17px;
+    line-height: 1;
   }
 
   .creatorRankRow {
@@ -499,6 +523,6 @@
   }
 
   .creatorRankMetrics {
-    gap: 0;
+    grid-column: 1 / -1;
   }
 }

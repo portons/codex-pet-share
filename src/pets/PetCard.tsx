@@ -1,5 +1,5 @@
 import { autoUpdate, flip, offset, shift, useFloating } from "@floating-ui/react";
-import { type KeyboardEvent, type MouseEvent, useEffect, useRef, useState } from "react";
+import { type FocusEvent, type KeyboardEvent, type MouseEvent, type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from "react";
 import { trackEvent } from "../domain/analytics";
 import { type TagName } from "../domain/config";
 import { formatMetric } from "../domain/format";
@@ -194,6 +194,8 @@ export function PetCard({
   onSignIn: () => void;
 }) {
   const compact = view === "compact";
+  const [cardPointerInside, setCardPointerInside] = useState(false);
+  const [cardFocusInside, setCardFocusInside] = useState(false);
   const likeLabel = pet.likedByMe ? "Liked" : "Like";
   const canDeleteOwnPet = Boolean(!user?.isAdmin && user?.id && user.id === pet.ownerId);
   const openPetPage = () => {
@@ -211,11 +213,52 @@ export function PetCard({
     event.preventDefault();
     openPetPage();
   };
+  const handleMagneticPointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    if (compact) return;
+    const card = event.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width;
+    const py = (event.clientY - rect.top) / rect.height;
+
+    card.style.setProperty("--magnetic-x", `${px * 100}%`);
+    card.style.setProperty("--magnetic-y", `${py * 100}%`);
+    card.style.setProperty("--magnetic-pull-x", `${(px - 0.5) * 13}px`);
+    card.style.setProperty("--magnetic-pull-y", `${(py - 0.5) * 11}px`);
+  };
+  const handleMagneticPointerLeave = (event: ReactPointerEvent<HTMLElement>) => {
+    if (compact) return;
+    const card = event.currentTarget;
+    card.style.setProperty("--magnetic-x", "50%");
+    card.style.setProperty("--magnetic-y", "38%");
+    card.style.setProperty("--magnetic-pull-x", "0px");
+    card.style.setProperty("--magnetic-pull-y", "0px");
+  };
+  const handleCardPointerLeave = (event: ReactPointerEvent<HTMLElement>) => {
+    setCardPointerInside(false);
+    handleMagneticPointerLeave(event);
+  };
+  const handleCardBlur = (event: FocusEvent<HTMLElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setCardFocusInside(false);
+    }
+  };
 
   const hasQuickAction = Boolean(onPreview || onPlayground);
+  const animateCardPreview = cardPointerInside || cardFocusInside;
 
   return (
-    <article className={`petCard card ${compact ? "compact" : ""}`}>
+    <article
+      className={`petCard card ${compact ? "compact" : "pocMagneticPlate"}`}
+      onMouseEnter={() => setCardPointerInside(true)}
+      onMouseOver={() => setCardPointerInside(true)}
+      onMouseLeave={() => setCardPointerInside(false)}
+      onPointerEnter={() => setCardPointerInside(true)}
+      onPointerOver={() => setCardPointerInside(true)}
+      onPointerMove={handleMagneticPointerMove}
+      onPointerLeave={handleCardPointerLeave}
+      onFocus={() => setCardFocusInside(true)}
+      onBlur={handleCardBlur}
+    >
       {hasQuickAction && (
         <div
           className="petCardQuickActions"
@@ -269,7 +312,7 @@ export function PetCard({
         </a>
       )}
       <button className="petCardPreview" type="button" onClick={openPetPage}>
-        <GalleryPetPreview pet={pet} compact={compact} />
+        <GalleryPetPreview pet={pet} compact={compact} active={animateCardPreview} />
       </button>
       <div
         className="petCardBody clickable"

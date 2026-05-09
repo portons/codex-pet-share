@@ -28,6 +28,12 @@
   text-overflow: ellipsis;
 }
 
+.accountButtonText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .accountButton {
   appearance: none;
   border: 0;

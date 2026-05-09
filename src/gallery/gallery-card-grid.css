@@ -23,6 +23,10 @@
 
 /* Pet card */
 .petCard {
+  --magnetic-x: 50%;
+  --magnetic-y: 38%;
+  --magnetic-pull-x: 0px;
+  --magnetic-pull-y: 0px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -45,10 +49,77 @@
   border-radius: var(--radius-md);
 }
 
+.petCardPreview {
+  border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+  overflow: hidden;
+}
+
+.petCard.compact .petCardPreview {
+  border-radius: calc(var(--radius-md) - 1px) calc(var(--radius-md) - 1px) 0 0;
+}
+
+.petCardActions {
+  border-radius: 0 0 calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px);
+}
+
+.petCard.compact .petCardActions {
+  border-radius: 0 0 calc(var(--radius-md) - 1px) calc(var(--radius-md) - 1px);
+}
+
 .petCard:hover {
   border-color: var(--border-strong);
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
+}
+
+.petCard.pocMagneticPlate::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  left: 1px;
+  height: 46%;
+  z-index: 0;
+  border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+  background:
+    radial-gradient(250px circle at var(--magnetic-x) var(--magnetic-y), color-mix(in srgb, var(--accent) 13%, transparent), transparent 64%),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms var(--ease-out);
+}
+
+.petCard.pocMagneticPlate:hover::before,
+.petCard.pocMagneticPlate:focus-within::before {
+  opacity: 1;
+}
+
+.petCard.pocMagneticPlate .petCardPreview {
+  transition: background 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+
+.petCard.pocMagneticPlate:hover .petCardPreview,
+.petCard.pocMagneticPlate:focus-within .petCardPreview {
+  background:
+    radial-gradient(176px circle at var(--magnetic-x) var(--magnetic-y), color-mix(in srgb, var(--accent) 15%, transparent), transparent 68%),
+    radial-gradient(circle at 50% 48%, var(--preview-halo) 0%, var(--preview-surface) 72%),
+    var(--preview-surface);
+}
+
+.petCard.pocMagneticPlate .petCardBody,
+.petCard.pocMagneticPlate .petCardActions {
+  background: var(--surface);
+}
+
+.petCard.pocMagneticPlate .petCardPreview .galleryPreviewFrame {
+  transition: transform 180ms var(--ease-out), filter 180ms var(--ease-out);
+}
+
+.petCard.pocMagneticPlate:hover .petCardPreview .galleryPreviewFrame,
+.petCard.pocMagneticPlate:focus-within .petCardPreview .galleryPreviewFrame {
+  filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.18));
+  transform: translate3d(calc(var(--magnetic-pull-x) * 0.72), calc(var(--magnetic-pull-y) * 0.72), 0) scale(1.018);
+  will-change: transform;
 }
 
 .petCardPreview {
@@ -260,9 +331,9 @@
 }
 
 .cardMeta {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 12px;
 }
 
@@ -464,6 +535,80 @@
   min-height: 126px;
 }
 
+.collectionPosterMosaic.stackPoc {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 154px;
+  min-height: 154px;
+  perspective: 820px;
+  transform-style: preserve-3d;
+}
+
+.collectionPosterMosaic.stackPoc .collectionPosterTile {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 108px;
+  height: 134px;
+  flex: none;
+  box-shadow: 0 18px 34px -28px rgba(0, 0, 0, 0.62);
+  transform-origin: 50% 86%;
+  transition: transform 260ms var(--ease-out), border-color 260ms var(--ease-out),
+    box-shadow 260ms var(--ease-out);
+}
+
+.collectionPosterMosaic.stackPoc .collectionPosterTile:first-child {
+  flex-basis: auto;
+}
+
+.collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(1) {
+  transform: translate3d(-94px, -50%, 8px) rotate(-8deg);
+  z-index: 3;
+}
+
+.collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(2) {
+  transform: translate3d(-48px, -54%, 28px) rotate(1deg);
+  z-index: 5;
+}
+
+.collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(3) {
+  transform: translate3d(6px, -49%, 16px) rotate(8deg);
+  z-index: 4;
+}
+
+.collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(4) {
+  transform: translate3d(42px, -45%, 2px) rotate(14deg);
+  z-index: 2;
+}
+
+.collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile,
+.collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile {
+  border-color: color-mix(in srgb, var(--accent) 26%, var(--border));
+  box-shadow: 0 22px 42px -28px rgba(0, 0, 0, 0.68);
+  will-change: transform;
+}
+
+.collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(1),
+.collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(1) {
+  transform: translate3d(-104px, -54%, 12px) rotate(-14deg);
+}
+
+.collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(2),
+.collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(2) {
+  transform: translate3d(-52px, -59%, 36px) rotate(-2deg);
+}
+
+.collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(3),
+.collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(3) {
+  transform: translate3d(8px, -54%, 24px) rotate(10deg);
+}
+
+.collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(4),
+.collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(4) {
+  transform: translate3d(48px, -49%, 6px) rotate(18deg);
+}
+
 .collectionPosterTile,
 .collectionPosterEmpty {
   display: grid;
@@ -487,6 +632,10 @@
   width: min(100%, 76px);
   height: auto;
   image-rendering: pixelated;
+}
+
+.collectionPosterMosaic.stackPoc .collectionPosterTile img {
+  width: min(100%, 94px);
 }
 
 .collectionPosterTile:first-child img {
@@ -560,5 +709,151 @@
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .petCard.pocMagneticPlate:hover .petCardPreview .galleryPreviewFrame,
+  .petCard.pocMagneticPlate:focus-within .petCardPreview .galleryPreviewFrame {
+    filter: none;
+    transform: none;
+  }
+
+  .collectionPosterMosaic.stackPoc .collectionPosterTile,
+  .collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile,
+  .collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile {
+    transform: none;
+  }
+
+  .collectionPosterMosaic.stackPoc {
+    display: flex;
+    height: auto;
+    min-height: 126px;
+  }
+
+  .collectionPosterMosaic.stackPoc .collectionPosterTile {
+    position: static;
+    width: auto;
+    height: auto;
+    flex: 0 0 74px;
+  }
+
+  .collectionPosterMosaic.stackPoc .collectionPosterTile:first-child {
+    flex-basis: 108px;
+  }
+}
+
+@media (max-width: 680px) {
+  .collectionsIndexShell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .collectionAlphabetRail {
+    position: sticky;
+    top: 8px;
+    grid-template-columns: repeat(13, minmax(0, 1fr));
+    width: 100%;
+    z-index: 6;
+    order: -1;
+  }
+
+  .collectionAlphabetItem {
+    width: 100%;
+  }
+
+  .collectionCard {
+    grid-template-columns: minmax(0, 1fr);
+    scroll-margin-top: 72px;
+  }
+
+  .collectionCardBody {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 16px;
+    padding: 14px;
+  }
+
+  .collectionCardTopPets {
+    display: none;
+  }
+
+  .collectionPosterMosaic.stackPoc {
+    display: flex;
+    height: auto;
+    min-height: 116px;
+    gap: 6px;
+    overflow: hidden;
+    perspective: none;
+  }
+
+  .collectionPosterMosaic.stackPoc .collectionPosterTile,
+  .collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile,
+  .collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile {
+    position: static;
+    width: auto;
+    height: 116px;
+    flex: 1 1 0;
+    min-width: 0;
+    transform: none;
+  }
+
+  .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(-n + 4),
+  .collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(-n + 4),
+  .collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(-n + 4) {
+    transform: none;
+  }
+
+  .collectionPosterMosaic.stackPoc .collectionPosterTile:first-child {
+    flex-basis: 0;
+  }
+
+  .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(n + 4) {
+    display: none;
+  }
+
+  .collectionPosterMosaic.stackPoc .collectionPosterTile img,
+  .collectionPosterMosaic.stackPoc .collectionPosterTile:first-child img {
+    width: min(100%, 82px);
+  }
+
+  .collectionCardFooter {
+    grid-template-rows: auto;
+    padding: 14px;
+    border-top: 1px solid var(--border-soft);
+    border-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .petCard.pocMagneticPlate .petCardPreview,
+  .petCard.pocMagneticPlate .petCardPreview .galleryPreviewFrame,
+  .collectionPosterMosaic.stackPoc .collectionPosterTile {
+    transition: none;
+  }
+
+  .petCard.pocMagneticPlate:hover .petCardPreview .galleryPreviewFrame,
+  .petCard.pocMagneticPlate:focus-within .petCardPreview .galleryPreviewFrame {
+    filter: none;
+    transform: none;
+  }
+
+  .collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(1),
+  .collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(1) {
+    transform: translate3d(-94px, -50%, 8px) rotate(-8deg);
+  }
+
+  .collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(2),
+  .collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(2) {
+    transform: translate3d(-48px, -54%, 28px) rotate(1deg);
+  }
+
+  .collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(3),
+  .collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(3) {
+    transform: translate3d(6px, -49%, 16px) rotate(8deg);
+  }
+
+  .collectionCard:hover .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(4),
+  .collectionCard:focus-within .collectionPosterMosaic.stackPoc .collectionPosterTile:nth-child(4) {
+    transform: translate3d(42px, -45%, 2px) rotate(14deg);
   }
 }

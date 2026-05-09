@@ -138,6 +138,12 @@
   justify-content: flex-start;
 }
 
+.mobileNavToggle,
+.mobileNavBackdrop,
+.mobileNavHeader {
+  display: none;
+}
+
 .navLinks a {
   position: relative;
   display: inline-flex;

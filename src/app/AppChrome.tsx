@@ -22,6 +22,7 @@ export function AppNav({
   onThemeToggle: () => void;
 }) {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -37,9 +38,32 @@ export function AppNav({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [accountMenuOpen]);
 
+  useEffect(() => {
+    if (!accountMenuOpen && !mobileNavOpen) {
+      return;
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+      if (accountMenuOpen) {
+        setAccountMenuOpen(false);
+      }
+      if (mobileNavOpen) {
+        setMobileNavOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [accountMenuOpen, mobileNavOpen]);
+
   function runAccountAction(action: () => void) {
     setAccountMenuOpen(false);
     action();
+  }
+
+  function closeMobileNav() {
+    setMobileNavOpen(false);
   }
 
   return (
@@ -52,20 +76,49 @@ export function AppNav({
           <span className="brandCursor" aria-hidden="true" />
         </span>
       </a>
-      <nav className="navLinks" aria-label="Primary navigation">
-        <a className={route.name === "gallery" ? "active" : ""} href="#/">
+      <button
+        className="mobileNavToggle"
+        type="button"
+        aria-label="Open navigation"
+        aria-controls="primary-navigation"
+        aria-expanded={mobileNavOpen}
+        onClick={() => setMobileNavOpen(true)}
+      >
+        <Icon name="menu" size={17} />
+      </button>
+      <button
+        className={`mobileNavBackdrop ${mobileNavOpen ? "open" : ""}`}
+        type="button"
+        aria-label="Close navigation"
+        aria-hidden={!mobileNavOpen}
+        tabIndex={mobileNavOpen ? 0 : -1}
+        onClick={closeMobileNav}
+      />
+      <nav
+        id="primary-navigation"
+        className={`navLinks ${mobileNavOpen ? "open" : ""}`}
+        aria-label="Primary navigation"
+      >
+        <div className="mobileNavHeader">
+          <span>Navigation</span>
+          <button type="button" aria-label="Close navigation" onClick={closeMobileNav}>
+            <Icon name="close" size={15} />
+          </button>
+        </div>
+        <a className={route.name === "gallery" ? "active" : ""} href="#/" onClick={closeMobileNav}>
           Gallery
         </a>
         <a
           className={route.name === "collections" || route.name === "collection" ? "active" : ""}
           href="#/collections"
+          onClick={closeMobileNav}
         >
           Collections
         </a>
-        <a className={route.name === "creators" ? "active" : ""} href="#/creators">
+        <a className={route.name === "creators" ? "active" : ""} href="#/creators" onClick={closeMobileNav}>
           Creators
         </a>
-        <a className={`navUploadLink ${route.name === "upload" ? "active" : ""}`} href="#/upload">
+        <a className={`navUploadLink ${route.name === "upload" ? "active" : ""}`} href="#/upload" onClick={closeMobileNav}>
           <Icon name="upload" size={13} />
           Upload
         </a>
@@ -97,7 +150,8 @@ export function AppNav({
               aria-expanded={accountMenuOpen}
               onClick={() => setAccountMenuOpen((current) => !current)}
             >
-              {user.displayName}
+              <Icon name="user" size={13} />
+              <span className="accountButtonText">{user.displayName}</span>
             </button>
             {accountMenuOpen && (
               <div className="accountMenuList" role="menu">
@@ -123,7 +177,8 @@ export function AppNav({
           </div>
         ) : (
           <button className="accountName accountButton" type="button" onClick={onSignIn}>
-            Sign in
+            <Icon name="user" size={13} />
+            <span className="accountButtonText">Sign in</span>
           </button>
         )}
       </div>

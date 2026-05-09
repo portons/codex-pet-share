@@ -43,6 +43,15 @@ export function GallerySearch({
   onContentMode: (value: ContentMode) => void;
   onSubmit: (event: FormEvent) => void;
 }) {
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const activeFilterCount =
+    (activeSort === "new" ? 0 : 1) +
+    (activeView === "standard" ? 0 : 1) +
+    (activeKind === "all" ? 0 : 1) +
+    (contentMode === "safe" ? 0 : 1) +
+    activeTags.length;
+  const filterSummary = activeFilterCount ? `${activeFilterCount} active` : "Default";
+
   return (
     <div className="galleryTools">
       <form className="galleryToolbar" onSubmit={onSubmit}>
@@ -61,7 +70,17 @@ export function GallerySearch({
           {loading ? "Finding" : "Find"}
         </button>
       </form>
-      <div className="galleryFilterRow">
+      <button
+        className="mobileFilterToggle"
+        type="button"
+        aria-expanded={mobileFiltersOpen}
+        aria-controls="gallery-filter-panel"
+        onClick={() => setMobileFiltersOpen((current) => !current)}
+      >
+        <span>Filters</span>
+        <strong>{filterSummary}</strong>
+      </button>
+      <div id="gallery-filter-panel" className={`galleryFilterRow ${mobileFiltersOpen ? "open" : ""}`}>
         <div className="galleryControlGroup">
           <SortControls activeSort={activeSort} onSort={onSort} />
           <ViewControls activeView={activeView} onView={onView} />
