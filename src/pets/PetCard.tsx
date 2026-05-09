@@ -76,7 +76,7 @@ export function AdminPetMenu({
       const opensAbove = availableAbove >= Math.min(menu.scrollHeight, 320) || availableAbove >= availableBelow;
       const maxHeight = Math.max(80, Math.min(320, viewportHeight - margin * 2, opensAbove ? availableAbove : availableBelow));
       const menuHeight = Math.min(menu.scrollHeight, maxHeight);
-      const left = Math.min(Math.max(margin, triggerRect.right - menuWidth), viewportWidth - menuWidth - margin);
+      const left = Math.min(Math.max(margin, triggerRect.left), viewportWidth - menuWidth - margin);
       const top = opensAbove
         ? Math.max(margin, triggerRect.top - gap - menuHeight)
         : Math.min(triggerRect.bottom + gap, viewportHeight - margin - menuHeight);
