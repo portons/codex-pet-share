@@ -2,7 +2,7 @@ import { APP_HANDLE } from "../branding/brand";
 import type { DownloadCommandMode } from "../downloads/DownloadCommandRow";
 import { galleryRequestTags, isEditablePetKind } from "./config";
 import { petAssetUrl } from "./http";
-import type { GalleryUrlState, Pet } from "./types";
+import type { CollectionSummary, GalleryUrlState, Pet } from "./types";
 
 export function petImportCommand(pet: Pet, mode: DownloadCommandMode) {
   if (mode === "cli") {
@@ -14,6 +14,17 @@ export function petImportCommand(pet: Pet, mode: DownloadCommandMode) {
 
 export function petCodexInstallUrl(pet: Pet) {
   const prompt = `Install this pet: ${petImportCommand(pet, "cli")}`;
+  return `codex://new?prompt=${encodeURIComponent(prompt)}`;
+}
+
+type CollectionInstallTarget = Pick<CollectionSummary, "slug">;
+
+export function collectionImportCommand(collection: CollectionInstallTarget) {
+  return `npx ${APP_HANDLE} add-collection ${collection.slug}`;
+}
+
+export function collectionCodexInstallUrl(collection: CollectionInstallTarget) {
+  const prompt = `Install this collection: ${collectionImportCommand(collection)}`;
   return `codex://new?prompt=${encodeURIComponent(prompt)}`;
 }
 

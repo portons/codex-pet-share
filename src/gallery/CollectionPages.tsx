@@ -1,7 +1,7 @@
 import { type CSSProperties, useState } from "react";
-import { APP_HANDLE } from "../branding/brand";
 import { type TagName } from "../domain/config";
 import { formatMetric } from "../domain/format";
+import { collectionCodexInstallUrl, collectionImportCommand } from "../domain/pets";
 import type { AuthSession, CollectionSummary, ContentMode, GalleryMeta, Pet, User } from "../domain/types";
 import { useCollectionPresenceCounts } from "../realtime/useCollectionPresenceCounts";
 import { PetCard } from "../pets/PetCard";
@@ -402,7 +402,8 @@ function CollectionDetailPage({
   onPage: (page: number) => void;
 }) {
   const [copiedCommand, setCopiedCommand] = useState(false);
-  const collectionCommand = collection ? `npx ${APP_HANDLE} add-collection ${collection.slug}` : "";
+  const collectionCommand = collection ? collectionImportCommand(collection) : "";
+  const codexInstallUrl = collection ? collectionCodexInstallUrl(collection) : "";
 
   async function copyCollectionCommand() {
     if (!collectionCommand) return;
@@ -435,8 +436,12 @@ function CollectionDetailPage({
         </div>
         {collection && (
           <div className="collectionHeaderActions">
-            <section className="collectionCommand card" aria-label="Collection install command">
-              <p className="commandHelperText">Add every pet in this collection.</p>
+            <section className="collectionCommand card" aria-label="Install collection">
+              <a className="btn btnPrimary collectionCommandCodex" href={codexInstallUrl}>
+                <Icon name="terminal" size={13} />
+                Open in Codex
+              </a>
+              <p className="commandHelperText">Terminal install command</p>
               <div className="terminalCommandLine" aria-label="Command">
                 <span aria-hidden="true">$</span>
                 <code>{collectionCommand}</code>
