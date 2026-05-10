@@ -236,10 +236,69 @@
   gap: 14px;
 }
 
-.authProviderList {
+.signupIdentityPanel {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+}
+
+.signupIdentityPanel label {
+  display: grid;
+  gap: 7px;
+}
+
+.signupIdentityPanel .input {
+  background: var(--surface);
+}
+
+.authFieldHint {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.authFieldHint.error {
+  color: #b91c1c;
+}
+
+.authProviderCluster {
   display: grid;
   gap: 10px;
   margin-bottom: 16px;
+}
+
+.authProviderList {
+  display: grid;
+  gap: 10px;
+}
+
+.signupProviderSet {
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.signupProviderSetHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.signupProviderSetHeader small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .authProviderButton {
@@ -271,9 +330,25 @@
   padding: 2px 0;
 }
 
+.authDivider.withLabel {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
 .authDivider span {
   height: 1px;
   background: var(--border);
+}
+
+.authDivider em {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-style: normal;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .authInlineAction {

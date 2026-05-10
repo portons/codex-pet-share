@@ -59,6 +59,11 @@ export function AuthModal({
     mode === "register" ? "New here" :
     mode === "forgot" ? "Email recovery" :
     "Password recovery";
+  const isRegister = mode === "register";
+  const showAuthProviders = mode === "login" && providers.length > 0;
+  const normalizedDisplayName = displayName.trim().replace(/\s+/g, " ");
+  const usernameStatus = isRegister && status.startsWith("Username") ? status : "";
+  const socialSignupDisabled = isRegister && normalizedDisplayName.length < 2;
   return (
     <div
       className="modalBackdrop"
@@ -105,27 +110,8 @@ export function AuthModal({
           <p className="metaText">{eyebrow}</p>
           <h2>{title}</h2>
         </div>
-        {(mode === "login" || mode === "register") && providers.length > 0 && (
-          <div className="authProviderList">
-            {providers.map((provider) => (
-              <button
-                className="btn btnLg authProviderButton"
-                type="button"
-                disabled={busy}
-                key={provider.id}
-                onClick={() => onOAuth(provider.id)}
-              >
-                <span className={`authProviderMark ${provider.id}`}>{provider.id === "google" ? "G" : "X"}</span>
-                Continue with {provider.label}
-              </button>
-            ))}
-            <div className="authDivider" aria-hidden="true">
-              <span />
-            </div>
-          </div>
-        )}
-        <form className="stackForm" onSubmit={onSubmit}>
-          {mode === "register" && (
+        {isRegister && (
+          <div className="signupIdentityPanel">
             <label>
               <span className="fieldLabel">Username</span>
               <input
@@ -139,10 +125,67 @@ export function AuthModal({
                 minLength={2}
                 maxLength={32}
                 disabled={busy}
-                required
+                aria-describedby="signup-username-help"
+                aria-invalid={Boolean(usernameStatus)}
               />
             </label>
-          )}
+            <p id="signup-username-help" className={`authFieldHint ${usernameStatus ? "error" : ""}`}>
+              {usernameStatus || "Required for Google, X, and email signup."}
+            </p>
+            {providers.length > 0 && (
+              <div className="signupProviderSet">
+                <div className="signupProviderSetHeader">
+                  <span className="fieldLabel">Social signup</span>
+                  <small>Uses this username</small>
+                </div>
+                <div className="authProviderList">
+                  {providers.map((provider) => (
+                    <button
+                      className="btn btnLg authProviderButton"
+                      type="button"
+                      disabled={busy || socialSignupDisabled}
+                      key={provider.id}
+                      onClick={() => onOAuth(provider.id)}
+                      aria-describedby="signup-username-help"
+                    >
+                      <span className={`authProviderMark ${provider.id}`}>{provider.id === "google" ? "G" : "X"}</span>
+                      Continue with {provider.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {showAuthProviders && (
+          <div className="authProviderCluster">
+            <div className="authProviderList">
+              {providers.map((provider) => (
+                <button
+                  className="btn btnLg authProviderButton"
+                  type="button"
+                  disabled={busy}
+                  key={provider.id}
+                  onClick={() => onOAuth(provider.id)}
+                >
+                  <span className={`authProviderMark ${provider.id}`}>{provider.id === "google" ? "G" : "X"}</span>
+                  Continue with {provider.label}
+                </button>
+              ))}
+            </div>
+            <div className="authDivider" aria-hidden="true">
+              <span />
+            </div>
+          </div>
+        )}
+        {isRegister && providers.length > 0 && (
+          <div className="authDivider withLabel">
+            <span />
+            <em>or use email</em>
+            <span />
+          </div>
+        )}
+        <form className="stackForm" onSubmit={onSubmit}>
           {mode !== "reset" && (
             <label>
               <span className="fieldLabel">Email</span>
@@ -196,7 +239,7 @@ export function AuthModal({
             Back to sign in
           </button>
         )}
-        {status && (
+        {status && !usernameStatus && (
           <p className="status" role="alert">
             {status}
           </p>
