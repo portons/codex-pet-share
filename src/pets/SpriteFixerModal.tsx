@@ -1067,25 +1067,8 @@ function AlignStage({
   const previewFrame = selectedEdit.frame === "all" ? 0 : selectedEdit.frame;
   return (
     <div className="spriteEditorAlignStage">
-      <section className="spriteEditorStagePanel primary">
-        <StageHeading title="Transform preview" label={formatAlignEditLabel(selectedEdit)} />
-        <div className="spriteEditorAlignCanvas">
-          <SpriteFrame pet={pet} row={state.row} frame={previewFrame} size={192} className="ghost" />
-          <SpriteFrame
-            pet={pet}
-            row={state.row}
-            frame={previewFrame}
-            size={192}
-            rotate={selectedEdit.rotate}
-            shiftX={selectedEdit.dx}
-            shiftY={selectedEdit.dy}
-            className="shifted"
-          />
-          <div className="spriteEditorAlignGround" />
-        </div>
-      </section>
-      <section className="spriteEditorStagePanel compact spriteEditorTransformMotionPanel">
-        <StageHeading title="Animation context" label="pending transform preview" />
+      <section className="spriteEditorStagePanel primary spriteEditorTransformMotionPanel">
+        <StageHeading title="All animation rows" label={transformCount === 0 ? "current vs after" : `after includes ${formatTransformCount(transformCount)}`} />
         <div className="spriteEditorTransformMotionGrid">
           {petStates.map((rowState) => {
             const edit = edits[rowState.row] || createDefaultAlignEdit();
@@ -1100,14 +1083,34 @@ function AlignStage({
                 type="button"
                 onClick={() => setRow(rowState.row)}
               >
-                <AnimatedSprite pet={pet} state={rowState} size={58} fps={8} alignEdits={edits} />
-                <span>
+                <span className="spriteEditorTransformMotionMeta">
                   <strong>{rowState.label}</strong>
-                  <small>{changed ? formatAlignEditLabel(edit) : "unchanged"}</small>
+                  <small>{changed ? formatMotionCardEditLabel(edit) : "unchanged"}</small>
+                </span>
+                <span className="spriteEditorTransformMotionPreview" aria-label={`${rowState.label} current and transformed animation`}>
+                  <AnimatedSprite pet={pet} state={rowState} size={54} fps={8} className="ghost" />
+                  <AnimatedSprite pet={pet} state={rowState} size={54} fps={8} alignEdits={edits} className="after" />
                 </span>
               </button>
             );
           })}
+        </div>
+      </section>
+      <section className="spriteEditorStagePanel compact spriteEditorTransformSelectedPanel">
+        <StageHeading title="Selected cell" label={formatAlignEditLabel(selectedEdit)} />
+        <div className="spriteEditorAlignCanvas">
+          <SpriteFrame pet={pet} row={state.row} frame={previewFrame} size={168} className="ghost" />
+          <SpriteFrame
+            pet={pet}
+            row={state.row}
+            frame={previewFrame}
+            size={168}
+            rotate={selectedEdit.rotate}
+            shiftX={selectedEdit.dx}
+            shiftY={selectedEdit.dy}
+            className="shifted"
+          />
+          <div className="spriteEditorAlignGround" />
         </div>
       </section>
       <section className="spriteEditorStagePanel compact spriteEditorAtlasPanel">
@@ -1434,7 +1437,8 @@ function AnimatedSprite({
   rowPlan,
   alignEdits,
   size,
-  fps
+  fps,
+  className = ""
 }: {
   pet: Pet;
   state: PetState;
@@ -1442,6 +1446,7 @@ function AnimatedSprite({
   alignEdits?: AlignDraftMap;
   size: number;
   fps: number;
+  className?: string;
 }) {
   const frame = useAnimationFrame(state.frames, fps);
   const plan = rowPlan?.[state.row] || { sourceRow: state.row, flipX: false };
@@ -1456,6 +1461,7 @@ function AnimatedSprite({
       shiftX={alignEdit?.dx || 0}
       shiftY={alignEdit?.dy || 0}
       rotate={alignEdit?.rotate || 0}
+      className={className}
     />
   );
 }
@@ -1924,6 +1930,14 @@ function formatAlignOffsetLabel(edit: AlignEdit) {
 function formatAlignAdjustmentLabel(edit: AlignEdit) {
   const rotateLabel = edit.rotate === 0 ? "" : ` / rotate ${edit.rotate}`;
   return `${formatAlignOffsetLabel(edit)}${rotateLabel}`;
+}
+
+function formatMotionCardEditLabel(edit: AlignEdit) {
+  const parts: string[] = [];
+  if (edit.dx !== 0) parts.push(`x ${formatSignedPixels(edit.dx)}`);
+  if (edit.dy !== 0) parts.push(`y ${formatSignedPixels(edit.dy)}`);
+  if (edit.rotate !== 0) parts.push(`r ${edit.rotate}`);
+  return `${formatAlignTargetLabel(edit.frame)} ${parts.join(" / ")}`;
 }
 
 function formatSignedPixels(value: number) {

@@ -797,10 +797,10 @@
 
 .spriteEditorAlignStage {
   display: grid;
-  grid-template-columns: minmax(270px, 0.72fr) minmax(480px, 1.28fr);
+  grid-template-columns: minmax(270px, 0.44fr) minmax(0, 1fr);
   grid-template-areas:
-    "preview motion"
-    "targets targets";
+    "motion motion"
+    "preview targets";
   grid-template-rows: auto minmax(0, 1fr);
   align-items: start;
   gap: 12px;
@@ -816,7 +816,7 @@
   grid-template-rows: auto minmax(0, 1fr);
 }
 
-.spriteEditorAlignStage .spriteEditorStagePanel.primary {
+.spriteEditorTransformSelectedPanel {
   grid-area: preview;
   align-content: start;
 }
@@ -862,18 +862,21 @@
 
 .spriteEditorTransformMotionGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
   gap: 7px;
   min-width: 0;
 }
 
 .spriteEditorTransformMotionCard {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "meta"
+    "preview";
+  align-items: stretch;
+  gap: 6px;
   min-width: 0;
-  min-height: 76px;
+  min-height: 98px;
   padding: 7px;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
@@ -901,13 +904,15 @@
   box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent) 76%, var(--border));
 }
 
-.spriteEditorTransformMotionCard > span {
+.spriteEditorTransformMotionMeta {
+  grid-area: meta;
   display: grid;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
 }
 
 .spriteEditorTransformMotionCard strong {
+  min-width: 0;
   overflow: hidden;
   color: var(--ink);
   font-size: 12px;
@@ -925,6 +930,40 @@
   letter-spacing: 0.02em;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.spriteEditorTransformMotionPreview {
+  position: relative;
+  grid-area: preview;
+  display: grid;
+  min-width: 0;
+  min-height: 64px;
+  place-items: center;
+  overflow: hidden;
+  padding: 4px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 72%, #11150f);
+}
+
+.spriteEditorTransformMotionPreview .spriteFrameClip {
+  grid-area: 1 / 1;
+  justify-self: center;
+  align-self: center;
+}
+
+.spriteEditorTransformMotionPreview .spriteFrameClip.ghost {
+  opacity: 0.28;
+  filter: grayscale(1);
+}
+
+.spriteEditorTransformMotionPreview .spriteFrameClip.after {
+  z-index: 2;
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border-soft));
+}
+
+.spriteEditorTransformSelectedPanel .spriteEditorAlignCanvas {
+  height: 246px;
 }
 
 .spriteEditorAtlasContext article.selected {
@@ -1293,14 +1332,14 @@ button.spriteEditorTimelineFrame:hover {
 
   .spriteEditorAlignStage {
     grid-template-areas:
-      "preview"
       "motion"
+      "preview"
       "targets";
     grid-template-rows: auto auto auto;
   }
 
   .spriteEditorTransformMotionGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .spriteEditorRunTile {
