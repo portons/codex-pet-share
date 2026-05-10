@@ -1110,7 +1110,6 @@ function AlignStage({
             shiftY={selectedEdit.dy}
             className="shifted"
           />
-          <div className="spriteEditorAlignGround" />
         </div>
       </section>
       <section className="spriteEditorStagePanel compact spriteEditorAtlasPanel">
@@ -1124,7 +1123,7 @@ function AlignStage({
                 <button className="spriteEditorAtlasRowHeader" type="button" onClick={() => setRow(rowState.row)}>
                   <strong>{rowState.label}</strong>
                   <span>{shifted ? formatAlignTargetLabel(edit.frame) : "unchanged"}</span>
-                  {shifted ? <em>{formatAlignAdjustmentLabel(edit)}</em> : null}
+                  <em className={shifted ? "" : "placeholder"}>{shifted ? formatAlignAdjustmentLabel(edit) : "x 0px / y 0px"}</em>
                 </button>
                 <div className="spriteEditorAtlasFrames">
                   <button
@@ -1286,6 +1285,7 @@ function FrameStripPicker({
       {Array.from({ length: frames }, (_, frame) => {
         const shouldShift = shiftFrameTarget === "all" || shiftFrameTarget === frame;
         const selected = selectedFrame === frame;
+        const hasTransform = shouldShift && (shiftX !== 0 || shiftY !== 0 || rotate !== 0);
         return (
           <button
             aria-label={`Choose frame ${frame + 1}`}
@@ -1296,6 +1296,7 @@ function FrameStripPicker({
             onClick={() => onSelect(frame)}
           >
             <SpriteFrame
+              className={hasTransform ? "transformRef" : ""}
               frame={frame}
               pet={pet}
               row={row}

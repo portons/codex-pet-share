@@ -587,6 +587,24 @@
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
+.spriteFrameClip.transformRef::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: 11px;
+  height: 11px;
+  border: 1px solid color-mix(in srgb, var(--accent) 70%, var(--ink));
+  border-radius: 999px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--accent) 76%, var(--ink)), color-mix(in srgb, var(--accent) 76%, var(--ink))) center / 1px 100% no-repeat,
+    linear-gradient(color-mix(in srgb, var(--accent) 76%, var(--ink)), color-mix(in srgb, var(--accent) 76%, var(--ink))) center / 100% 1px no-repeat;
+  opacity: 0.78;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
 .spriteFrameImage {
   background-repeat: no-repeat;
   image-rendering: pixelated;
@@ -946,6 +964,24 @@
   background: color-mix(in srgb, var(--surface) 72%, #11150f);
 }
 
+.spriteEditorTransformMotionPreview::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: 15px;
+  height: 15px;
+  border: 1px solid color-mix(in srgb, var(--accent) 72%, var(--ink));
+  border-radius: 999px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--accent) 80%, var(--ink)), color-mix(in srgb, var(--accent) 80%, var(--ink))) center / 1px 100% no-repeat,
+    linear-gradient(color-mix(in srgb, var(--accent) 80%, var(--ink)), color-mix(in srgb, var(--accent) 80%, var(--ink))) center / 100% 1px no-repeat;
+  opacity: 0.82;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
 .spriteEditorTransformMotionPreview .spriteFrameClip {
   grid-area: 1 / 1;
   justify-self: center;
@@ -1027,6 +1063,10 @@
   font-weight: 640;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.spriteEditorAtlasContext em.placeholder {
+  color: var(--subtle);
 }
 
 .spriteEditorTimelineFrame {
@@ -1210,9 +1250,25 @@ button.spriteEditorTimelineFrame:hover {
   overflow: hidden;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
+  background: #11150f;
+}
+
+.spriteEditorAlignCanvas::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: 4;
+  width: 22px;
+  height: 22px;
+  border: 1px solid color-mix(in srgb, var(--accent) 78%, var(--ink));
+  border-radius: 999px;
   background:
-    linear-gradient(to bottom, transparent 74%, color-mix(in srgb, var(--accent-soft) 24%, transparent) 74%),
-    #11150f;
+    linear-gradient(color-mix(in srgb, var(--accent) 82%, var(--ink)), color-mix(in srgb, var(--accent) 82%, var(--ink))) center / 1px 100% no-repeat,
+    linear-gradient(color-mix(in srgb, var(--accent) 82%, var(--ink)), color-mix(in srgb, var(--accent) 82%, var(--ink))) center / 100% 1px no-repeat;
+  opacity: 0.88;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
 }
 
 .spriteEditorAlignCanvas .spriteFrameClip {
@@ -1230,15 +1286,6 @@ button.spriteEditorTimelineFrame:hover {
 .spriteEditorAlignCanvas .spriteFrameClip.shifted {
   z-index: 2;
   border-color: color-mix(in srgb, var(--accent) 48%, var(--border));
-}
-
-.spriteEditorAlignGround {
-  position: absolute;
-  left: 14%;
-  right: 14%;
-  bottom: 64px;
-  height: 1px;
-  background: color-mix(in srgb, var(--accent) 58%, transparent);
 }
 
 .runtimeStage {
