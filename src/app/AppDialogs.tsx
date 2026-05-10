@@ -7,10 +7,13 @@ import type { CollectionPetAdderState } from "../collections/useUserCollections"
 import { DownloadModal } from "../downloads/DownloadModal";
 import { PetCollectionsModal, PetDeleteConfirmModal, TagEditorModal } from "../pets/PetManagementModals";
 import { EntityShareModal, ShareModal } from "../share/ShareModals";
-import type { CollectionSummary, EditablePetKind, EntityShareTarget, Pet } from "../domain/types";
+import type { CollectionSummary, ContentMode, EditablePetKind, EntityShareTarget, Pet, User } from "../domain/types";
 import type { TagName } from "../domain/config";
 
 export function AppDialogs({
+  user,
+  contentMode,
+  selectContentMode,
   authOpen,
   authMode,
   selectAuthMode,
@@ -92,6 +95,9 @@ export function AppDialogs({
   closeCollectionPetAdder,
   userCollections
 }: {
+  user: User | null;
+  contentMode: ContentMode;
+  selectContentMode: (mode: ContentMode) => void | Promise<void>;
   authOpen: boolean;
   authMode: AuthMode;
   selectAuthMode: (next: AuthMode) => void;
@@ -198,6 +204,9 @@ export function AppDialogs({
 
       {settingsOpen && (
         <AccountSettingsModal
+          user={user}
+          contentMode={contentMode}
+          onContentMode={selectContentMode}
           displayName={settingsDisplayName}
           setDisplayName={setSettingsDisplayName}
           currentPassword={settingsCurrentPassword}

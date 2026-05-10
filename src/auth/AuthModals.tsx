@@ -1,6 +1,7 @@
 import { type FormEvent } from "react";
 import { Icon } from "../ui/Icon";
 import { Spinner } from "../ui/Spinner";
+import type { ContentMode, User } from "../domain/types";
 import type { AuthMode, AuthProvider } from "./useAuthForms";
 
 export function AuthModal({
@@ -207,6 +208,9 @@ export function AuthModal({
 }
 
 export function AccountSettingsModal({
+  user,
+  contentMode,
+  onContentMode,
   displayName,
   setDisplayName,
   currentPassword,
@@ -218,6 +222,9 @@ export function AccountSettingsModal({
   onSubmit,
   onClose
 }: {
+  user: User | null;
+  contentMode: ContentMode;
+  onContentMode: (mode: ContentMode) => void | Promise<void>;
   displayName: string;
   setDisplayName: (value: string) => void;
   currentPassword: string;
@@ -229,6 +236,7 @@ export function AccountSettingsModal({
   onSubmit: (event: FormEvent) => void;
   onClose: () => void;
 }) {
+  const nsfwEnabled = contentMode === "all";
   return (
     <div
       className="modalBackdrop"
@@ -239,10 +247,10 @@ export function AccountSettingsModal({
         }
       }}
     >
-      <section className="authModal" role="dialog" aria-modal="true" aria-label="Account settings">
+      <section className="authModal" role="dialog" aria-modal="true" aria-label="Settings">
         <div className="modalHeader">
           <div className="modalTitle compact">
-            <p className="metaText">Account</p>
+            <p className="metaText">App</p>
             <h2>Settings</h2>
           </div>
           <button className="btn btnSm btnGhost modalCloseButton" type="button" onClick={onClose} disabled={busy}>
@@ -250,57 +258,79 @@ export function AccountSettingsModal({
             Close
           </button>
         </div>
-        <form className="stackForm" onSubmit={onSubmit}>
-          <label>
-            <span className="fieldLabel">Username</span>
-            <input
-              autoFocus
-              className="input"
-              value={displayName}
-              onChange={(event) => setDisplayName(event.target.value)}
-              type="text"
-              autoComplete="nickname"
-              minLength={2}
-              maxLength={32}
-              disabled={busy}
-              required
-            />
+        <div className="settingsPreferenceList">
+          <label className="settingsToggleRow">
+            <span className="settingsToggleCopy">
+              <span className="fieldLabel">NSFW content</span>
+              <small>{nsfwEnabled ? "Visible in gallery filters" : "Hidden from gallery filters"}</small>
+            </span>
+            <span className="contentModeSwitch">
+              <input
+                type="checkbox"
+                checked={nsfwEnabled}
+                onChange={(event) => void onContentMode(event.target.checked ? "all" : "safe")}
+              />
+              <span className="switchTrack" aria-hidden="true">
+                <span className="switchThumb" />
+              </span>
+            </span>
           </label>
-          <div className="settingsDivider" aria-hidden="true" />
-          <label>
-            <span className="fieldLabel">Current password</span>
-            <input
-              className="input"
-              value={currentPassword}
-              onChange={(event) => setCurrentPassword(event.target.value)}
-              placeholder="Leave blank when setting your first password"
-              type="password"
-              autoComplete="current-password"
-              disabled={busy}
-            />
-          </label>
-          <label>
-            <span className="fieldLabel">New password</span>
-            <input
-              className="input"
-              value={newPassword}
-              onChange={(event) => setNewPassword(event.target.value)}
-              placeholder="8 characters minimum"
-              type="password"
-              autoComplete="new-password"
-              minLength={8}
-              disabled={busy}
-            />
-          </label>
-          <button className="btn btnPrimary btnLg" type="submit" disabled={busy}>
-            {busy ? <Spinner size={14} /> : null}
-            {busy ? "Saving" : "Save"}
-          </button>
-        </form>
-        {status && (
-          <p className="status" role="alert">
-            {status}
-          </p>
+        </div>
+        {user && (
+          <>
+            <form className="stackForm" onSubmit={onSubmit}>
+              <label>
+                <span className="fieldLabel">Username</span>
+                <input
+                  autoFocus
+                  className="input"
+                  value={displayName}
+                  onChange={(event) => setDisplayName(event.target.value)}
+                  type="text"
+                  autoComplete="nickname"
+                  minLength={2}
+                  maxLength={32}
+                  disabled={busy}
+                  required
+                />
+              </label>
+              <div className="settingsDivider" aria-hidden="true" />
+              <label>
+                <span className="fieldLabel">Current password</span>
+                <input
+                  className="input"
+                  value={currentPassword}
+                  onChange={(event) => setCurrentPassword(event.target.value)}
+                  placeholder="Leave blank when setting your first password"
+                  type="password"
+                  autoComplete="current-password"
+                  disabled={busy}
+                />
+              </label>
+              <label>
+                <span className="fieldLabel">New password</span>
+                <input
+                  className="input"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  placeholder="8 characters minimum"
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={8}
+                  disabled={busy}
+                />
+              </label>
+              <button className="btn btnPrimary btnLg" type="submit" disabled={busy}>
+                {busy ? <Spinner size={14} /> : null}
+                {busy ? "Saving" : "Save"}
+              </button>
+            </form>
+            {status && (
+              <p className="status" role="alert">
+                {status}
+              </p>
+            )}
+          </>
         )}
       </section>
     </div>

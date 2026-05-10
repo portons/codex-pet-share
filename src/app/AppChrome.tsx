@@ -133,54 +133,55 @@ export function AppNav({
         >
           <Icon name={theme === "dark" ? "sun" : "moon"} size={14} />
         </button>
-        {user ? (
-          <div
-            ref={accountMenuRef}
-            className="accountMenu"
-            onBlur={(event) => {
-              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-                setAccountMenuOpen(false);
-              }
-            }}
+        <div
+          ref={accountMenuRef}
+          className="accountMenu"
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+              setAccountMenuOpen(false);
+            }
+          }}
+        >
+          <button
+            className="accountName accountButton"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded={accountMenuOpen}
+            onClick={() => setAccountMenuOpen((current) => !current)}
           >
-            <button
-              className="accountName accountButton"
-              type="button"
-              aria-haspopup="true"
-              aria-expanded={accountMenuOpen}
-              onClick={() => setAccountMenuOpen((current) => !current)}
-            >
-              <Icon name="user" size={13} />
-              <span className="accountButtonText">{user.displayName}</span>
-            </button>
-            {accountMenuOpen && (
-              <div className="accountMenuList" role="menu">
-                <button type="button" role="menuitem" onClick={() => runAccountAction(onAccount)}>
-                  Settings
-                </button>
-                <button type="button" role="menuitem" onClick={() => runAccountAction(() => navigate("/mine"))}>
-                  Your uploads
-                </button>
-                <button type="button" role="menuitem" onClick={() => runAccountAction(() => navigate("/favorites"))}>
-                  Favorites
-                </button>
-                {user.isAdmin && (
-                  <button type="button" role="menuitem" onClick={() => runAccountAction(() => navigate("/admin"))}>
-                    Admin
-                  </button>
-                )}
-                <button className="dangerMenuItem" type="button" role="menuitem" onClick={() => runAccountAction(onLogout)}>
-                  Log out
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <button className="accountName accountButton" type="button" onClick={onSignIn}>
             <Icon name="user" size={13} />
-            <span className="accountButtonText">Sign in</span>
+            <span className="accountButtonText">{user ? user.displayName : "Account"}</span>
           </button>
-        )}
+          {accountMenuOpen && (
+            <div className="accountMenuList" role="menu">
+              <button type="button" role="menuitem" onClick={() => runAccountAction(onAccount)}>
+                Settings
+              </button>
+              {user ? (
+                <>
+                  <button type="button" role="menuitem" onClick={() => runAccountAction(() => navigate("/mine"))}>
+                    Your uploads
+                  </button>
+                  <button type="button" role="menuitem" onClick={() => runAccountAction(() => navigate("/favorites"))}>
+                    Favorites
+                  </button>
+                  {user.isAdmin && (
+                    <button type="button" role="menuitem" onClick={() => runAccountAction(() => navigate("/admin"))}>
+                      Admin
+                    </button>
+                  )}
+                  <button className="dangerMenuItem" type="button" role="menuitem" onClick={() => runAccountAction(onLogout)}>
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <button type="button" role="menuitem" onClick={() => runAccountAction(onSignIn)}>
+                  Sign in
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

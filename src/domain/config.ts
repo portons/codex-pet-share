@@ -10,6 +10,7 @@ import type {
 export const apiBaseUrl = String(import.meta.env.VITE_APP_API_BASE_URL || "").replace(/\/$/, "");
 export const publicAppOrigin = String(import.meta.env.VITE_PUBLIC_APP_ORIGIN || "").replace(/\/$/, "");
 export const authStorageKey = "codex-pet-share.session";
+export const contentModeStorageKey = "codex-pet-share.content-mode";
 export const sessionRefreshWindowSeconds = 120;
 
 export const emptyUpload: UploadState = {
@@ -151,4 +152,13 @@ export function isEditablePetKind(value: string | null | undefined): value is Ed
 
 export function isContentMode(value: string | null): value is GalleryUrlState["content"] {
   return value === "safe" || value === "all";
+}
+
+export function storedContentMode(): GalleryUrlState["content"] {
+  const stored = window.localStorage.getItem(contentModeStorageKey);
+  return isContentMode(stored) ? stored : defaultGalleryUrlState.content;
+}
+
+export function saveContentModePreference(value: GalleryUrlState["content"]) {
+  window.localStorage.setItem(contentModeStorageKey, value);
 }

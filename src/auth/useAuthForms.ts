@@ -80,8 +80,7 @@ export function useAuthForms({
   }
 
   function openSettings() {
-    if (!user) return;
-    setSettingsDisplayName(user.displayName);
+    setSettingsDisplayName(user?.displayName ?? "");
     setSettingsCurrentPassword("");
     setSettingsNewPassword("");
     setSettingsStatus("");
@@ -233,11 +232,17 @@ export function useAuthForms({
 
   async function startOAuth(provider: AuthProvider["id"]) {
     if (authBusy) return;
+    const nextDisplayName = validateUsername(displayName);
+    if (authMode === "register" && nextDisplayName.error) {
+      setAuthStatus(nextDisplayName.error);
+      return;
+    }
     setAuthStatus("");
     setAuthBusy(true);
     try {
+      const query = authMode === "register" ? `?displayName=${encodeURIComponent(nextDisplayName.value)}` : "";
       const body = await readJson<{ url: string }>(
-        await apiFetch(`/api/auth/oauth/${provider}/start`, {}, null)
+        await apiFetch(`/api/auth/oauth/${provider}/start${query}`, {}, null)
       );
       window.location.assign(body.url);
     } catch (error) {
@@ -248,6 +253,7 @@ export function useAuthForms({
 
   async function submitSettings(event: FormEvent) {
     event.preventDefault();
+    if (!user) return;
     if (settingsBusy) return;
     const nextDisplayName = validateUsername(settingsDisplayName);
     if (nextDisplayName.error) {

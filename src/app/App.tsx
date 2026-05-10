@@ -489,12 +489,20 @@ function App() {
   }
 
   const viewProps = {
-    nav: { route, user, theme, onLogout: logout, onSignIn: openAuth, onAccount: openSettings, onThemeToggle: toggleTheme },
+    nav: {
+      route,
+      user,
+      theme,
+      onLogout: logout,
+      onSignIn: openAuth,
+      onAccount: openSettings,
+      onThemeToggle: toggleTheme
+    },
     routes: {
       route, user, session, pets, galleryMeta, loading, query, activeTags, activeSort, activeView, activeKind,
       contentMode, deletingPetId, shadowbanBusyOwnerId, nsfwBusyId, collections, userCollections,
       userCollectionsLoading, setQuery, selectTag,
-      clearTags, selectSort, selectView, selectKind, selectContentMode, selectPage, randomizeGallery,
+      clearTags, selectSort, selectView, selectKind, selectPage, randomizeGallery,
       freshPetCount, showFreshPets,
       submitSearch, likeBusyId, toggleLike, setSharingPet, setPlaygroundPet, setDownloadPet,
       selectVisibleTag, openTagEditor, openCollectionEditor, togglePetNsfw, toggleOwnerShadowban,
@@ -515,6 +523,7 @@ function App() {
       selectCollectionPage, detailLoading, detailPet, morePets
     },
     dialogs: {
+      user, contentMode, selectContentMode,
       authOpen, authMode, selectAuthMode, displayName, setDisplayName, email, setEmail, password,
       setPassword, authStatus, authBusy, resendBusy, authProviders, startOAuth, resendVerification, submitAuth,
       closeAuth, settingsOpen, settingsDisplayName,

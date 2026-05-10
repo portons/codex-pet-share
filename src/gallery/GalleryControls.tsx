@@ -24,7 +24,6 @@ export function GallerySearch({
   onSort,
   onView,
   onKind,
-  onContentMode,
   onSubmit
 }: {
   query: string;
@@ -40,7 +39,6 @@ export function GallerySearch({
   onSort: (value: GallerySort) => void;
   onView: (value: GalleryView) => void;
   onKind: (value: PetKind) => void;
-  onContentMode: (value: ContentMode) => void;
   onSubmit: (event: FormEvent) => void;
 }) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -48,7 +46,6 @@ export function GallerySearch({
     (activeSort === "new" ? 0 : 1) +
     (activeView === "standard" ? 0 : 1) +
     (activeKind === "all" ? 0 : 1) +
-    (contentMode === "safe" ? 0 : 1) +
     activeTags.length;
   const filterSummary = activeFilterCount ? `${activeFilterCount} active` : "Default";
 
@@ -85,9 +82,8 @@ export function GallerySearch({
           <SortControls activeSort={activeSort} onSort={onSort} />
           <ViewControls activeView={activeView} onView={onView} />
           <KindControls activeKind={activeKind} onKind={onKind} />
-          <ContentModeToggle value={contentMode} onChange={onContentMode} />
         </div>
-        <TagFilterDropdown activeTags={activeTags} onTagToggle={onTagToggle} onTagsClear={onTagsClear} />
+        <TagFilterDropdown contentMode={contentMode} activeTags={activeTags} onTagToggle={onTagToggle} onTagsClear={onTagsClear} />
       </div>
     </div>
   );
@@ -172,28 +168,13 @@ export function EditableKindControls({
   );
 }
 
-function ContentModeToggle({ value, onChange }: { value: ContentMode; onChange: (value: ContentMode) => void }) {
-  const checked = value === "all";
-  return (
-    <label className="contentModeSwitch">
-      <span>NSFW</span>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked ? "all" : "safe")}
-      />
-      <span className="switchTrack" aria-hidden="true">
-        <span className="switchThumb" />
-      </span>
-    </label>
-  );
-}
-
 function TagFilterDropdown({
+  contentMode,
   activeTags,
   onTagToggle,
   onTagsClear
 }: {
+  contentMode: ContentMode;
   activeTags: string[];
   onTagToggle: (value: TagName) => void;
   onTagsClear: () => void;
@@ -201,6 +182,7 @@ function TagFilterDropdown({
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const label = activeTags.length === 0 ? "All" : activeTags.length === 1 ? activeTags[0] : `${activeTags.length} selected`;
+  const tags = contentMode === "all" ? galleryFilterTags : galleryFilterTags.filter((tag) => tag !== "nsfw");
 
   useEffect(() => {
     if (!open) {
@@ -246,7 +228,7 @@ function TagFilterDropdown({
             ) : null}
           </div>
           <div className="tagDropdownList">
-            {galleryFilterTags.map((tag) => {
+            {tags.map((tag) => {
               const selected = activeTags.includes(tag);
               return (
                 <button

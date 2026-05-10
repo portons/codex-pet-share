@@ -51,7 +51,6 @@ export function AppRoutes({
   selectSort,
   selectView,
   selectKind,
-  selectContentMode,
   selectPage,
   randomizeGallery,
   freshPetCount,
@@ -147,7 +146,6 @@ export function AppRoutes({
           onSort={selectSort}
           onView={selectView}
           onKind={selectKind}
-          onContentMode={selectContentMode}
           onPage={selectPage}
           onRandomize={randomizeGallery}
           freshPetCount={freshPetCount}

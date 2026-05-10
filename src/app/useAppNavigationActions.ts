@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
+import { saveContentModePreference } from "../domain/config";
 import { collectionHash, creatorHash, creatorsHash, navigate, pushHash } from "../domain/routing";
 import type {
   AuthSession,
@@ -108,9 +109,11 @@ export function useAppNavigationActions({
 }) {
   async function selectContentMode(mode: ContentMode) {
     if (mode === contentMode) return;
+    saveContentModePreference(mode);
     setContentMode(mode);
+    const nextTags = mode === "safe" ? activeTags.filter((tag) => tag !== "nsfw") : activeTags;
     if (route.name === "gallery") {
-      const nextState = { query, tags: activeTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, content: mode };
+      const nextState = { query, tags: nextTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, content: mode };
       pushGalleryState(nextState);
       setLoading(true);
       try {

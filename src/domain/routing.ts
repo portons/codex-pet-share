@@ -4,7 +4,8 @@ import {
   isGallerySort,
   isGalleryView,
   isPetKind,
-  isTagName
+  isTagName,
+  storedContentMode
 } from "./config";
 import type { GalleryUrlState, Route } from "./types";
 import type { CreatorLeaderboardSort } from "./types";
@@ -86,14 +87,15 @@ export function galleryUrlStateFromHash(): GalleryUrlState {
   const view = params.get("view");
   const kind = params.get("kind");
   const content = params.get("content");
+  const contentMode = isContentMode(content) ? content : storedContentMode();
   return {
     query: params.get("q") || "",
-    tags: params.getAll("tag").filter(isTagName),
+    tags: params.getAll("tag").filter(isTagName).filter((tag) => contentMode === "all" || tag !== "nsfw"),
     sort: isGallerySort(sort) ? sort : defaultGalleryUrlState.sort,
     page: parsePositivePage(params.get("page")),
     view: isGalleryView(view) ? view : defaultGalleryUrlState.view,
     kind: isPetKind(kind) ? kind : defaultGalleryUrlState.kind,
-    content: isContentMode(content) ? content : defaultGalleryUrlState.content
+    content: contentMode
   };
 }
 

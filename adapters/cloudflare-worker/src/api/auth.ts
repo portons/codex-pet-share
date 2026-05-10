@@ -218,12 +218,15 @@ async function handleOAuth(ctx: AppContext, parts: string[]) {
 async function startOAuth(ctx: AppContext, provider: AuthProvider) {
   const codeVerifier = generateCodeVerifier();
   const state = generateState();
+  const signupDisplayName = ctx.url.searchParams.has("displayName")
+    ? validateDisplayName(ctx.url.searchParams.get("displayName"))
+    : undefined;
   const client = oauthClient(ctx, provider);
   const scopes = provider === "google"
     ? ["openid", "email", "profile"]
     : ["tweet.read", "users.read", "users.email"];
   const url = client.createAuthorizationURL(state, codeVerifier, scopes);
-  const cookie = await signedOAuthCookie(ctx, { provider, state, codeVerifier, createdAt: nowSeconds() });
+  const cookie = await signedOAuthCookie(ctx, { provider, state, codeVerifier, createdAt: nowSeconds(), signupDisplayName });
   return json({ url: url.toString() }, 200, {
     "Cache-Control": "no-store",
     "Set-Cookie": oauthCookieHeader(ctx, provider, cookie, oauthCookieTtlSeconds)
@@ -243,7 +246,7 @@ async function finishOAuth(ctx: AppContext, provider: AuthProvider) {
   const profile = provider === "google"
     ? await googleProfile(tokens.accessToken())
     : await xProfile(tokens.accessToken());
-  const user = await userForOAuthProfile(ctx, profile);
+  const user = await userForOAuthProfile(ctx, profile, cookie.signupDisplayName);
   const loginCode = await createAuthLoginCode(ctx, user.id);
   return authCallbackRedirect(ctx, loginCode, oauthCookieHeader(ctx, provider, "", 0));
 }
@@ -267,6 +270,7 @@ type OAuthCookiePayload = {
   state: string;
   codeVerifier: string;
   createdAt: number;
+  signupDisplayName?: string;
 };
 
 async function signedOAuthCookie(ctx: AppContext, payload: OAuthCookiePayload) {
@@ -372,7 +376,7 @@ async function xProfile(accessToken: string): Promise<OAuthProfile> {
   };
 }
 
-async function userForOAuthProfile(ctx: AppContext, profile: OAuthProfile) {
+async function userForOAuthProfile(ctx: AppContext, profile: OAuthProfile, signupDisplayName?: string) {
   const identity = await first<{ user_id: string }>(
     ctx.env.DB.prepare("select user_id from auth_identities where provider = ? and provider_user_id = ?")
       .bind(profile.provider, profile.providerUserId)
@@ -389,11 +393,12 @@ async function userForOAuthProfile(ctx: AppContext, profile: OAuthProfile) {
 
   let user = await userByEmail(ctx, profile.email);
   if (!user) {
+    if (!signupDisplayName) throw new HttpError("register with a username before social sign-in", 409);
     const id = uuid();
     await ctx.env.DB.prepare(`
       insert into users (id, email, password_hash, display_name, handle, email_verified_at, created_at, updated_at)
       values (?, ?, null, ?, ?, ?, ?, ?)
-    `).bind(id, profile.email, profile.displayName, await uniqueHandle(ctx, profile.displayName, id), nowIso(), nowIso(), nowIso()).run();
+    `).bind(id, profile.email, signupDisplayName, await uniqueHandle(ctx, signupDisplayName, id), nowIso(), nowIso(), nowIso()).run();
     user = await userById(ctx, id);
   } else if (!user.emailVerified) {
     await ctx.env.DB.prepare("update users set email_verified_at = ?, updated_at = ? where id = ?")

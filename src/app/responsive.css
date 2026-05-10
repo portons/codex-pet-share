@@ -128,6 +128,7 @@
   }
 
   .brand {
+    grid-column: 1;
     gap: 8px;
     overflow: hidden;
   }
@@ -187,6 +188,7 @@
   }
 
   .mobileNavToggle {
+    grid-column: 2;
     appearance: none;
     display: inline-flex;
     align-items: center;
@@ -245,6 +247,8 @@
   }
 
   .accountAction {
+    grid-column: 3;
+    justify-self: end;
     justify-content: flex-end;
     gap: 6px;
     min-width: 0;

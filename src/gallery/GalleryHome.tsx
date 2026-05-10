@@ -156,7 +156,6 @@ function Gallery({
   onSort,
   onView,
   onKind,
-  onContentMode,
   onPage,
   onRandomize,
   freshPetCount,
@@ -198,7 +197,6 @@ function Gallery({
   onSort: (value: GallerySort) => void;
   onView: (value: GalleryView) => void;
   onKind: (value: PetKind) => void;
-  onContentMode: (value: ContentMode) => void;
   onPage: (page: number) => void;
   onRandomize: () => void;
   freshPetCount: number;
@@ -265,7 +263,6 @@ function Gallery({
         onSort={onSort}
         onView={onView}
         onKind={onKind}
-        onContentMode={onContentMode}
         onSubmit={onSearch}
       />
       <div className={`galleryStatusRow ${freshPetCount > 0 ? "hasFresh" : ""}`}>

@@ -47,7 +47,6 @@ export type AppRoutesProps = {
   selectSort: (sort: GallerySort) => void | Promise<void>;
   selectView: (view: GalleryView) => void | Promise<void>;
   selectKind: (kind: PetKind) => void | Promise<void>;
-  selectContentMode: (mode: ContentMode) => void | Promise<void>;
   selectPage: (page: number) => void | Promise<void>;
   randomizeGallery: () => void | Promise<void>;
   freshPetCount: number;
