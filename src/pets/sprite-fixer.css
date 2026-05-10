@@ -1,333 +1,1329 @@
-.spriteFixerModal {
+.spriteEditorModal {
   position: relative;
-  width: min(900px, 100%);
-  max-height: min(760px, calc(100dvh - 48px));
-  overflow: auto;
-  padding: 30px 28px 24px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(1320px, calc(100vw - 28px));
+  height: min(660px, calc(100dvh - 28px));
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: var(--shadow-modal);
-  animation: modal-in 320ms var(--ease-spring);
+  animation: modal-in 260ms var(--ease-spring);
 }
 
-.spriteFixerForm {
-  display: grid;
-  gap: 18px;
-}
-
-.spriteFixerIntro {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+.spriteEditorHeader {
+  display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 15px 16px;
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
-  border-radius: var(--radius-md);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 82%, transparent), transparent 74%),
-    var(--surface-soft);
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface) 92%, var(--surface-soft));
 }
 
-.spriteFixerIntroIcon {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid color-mix(in srgb, var(--accent) 44%, var(--border));
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--accent-soft) 76%, var(--surface));
-  color: var(--accent-deep);
-}
-
-.spriteFixerIntro > div {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-
-.spriteFixerIntro strong,
-.spriteFixerColumn h3,
-.spriteFixerStateHeader span {
+.spriteEditorHeader h2 {
+  margin: 2px 0 0;
   color: var(--ink);
   font-family: var(--font-sans);
-  letter-spacing: -0.02em;
+  font-size: clamp(22px, 2.3vw, 30px);
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
 }
 
-.spriteFixerIntro strong {
-  font-size: 15px;
-  font-weight: 650;
+.spriteEditorHeaderActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.spriteFixerIntro p {
-  margin: 0;
+.spriteEditorModal .modalCloseButton {
+  position: static;
+  top: auto;
+  right: auto;
+}
+
+.spriteEditorDraftPill {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--muted) 28%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-soft) 64%, var(--surface));
   color: var(--muted);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 1.45;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
 }
 
-.spriteFixerToolbar {
+.spriteEditorShell {
   display: grid;
-  gap: 8px;
+  grid-template-columns: 132px minmax(0, 1fr) 334px;
+  height: 100%;
+  min-height: 0;
 }
 
-.spriteFixerSegments {
+.spriteEditorRail {
   display: grid;
-  grid-template-columns: 1fr 1.18fr 1.18fr;
+  align-content: start;
   gap: 6px;
-  padding: 4px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-soft);
+  min-height: 0;
+  padding: 12px;
+  border-right: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface-soft) 48%, var(--surface));
 }
 
-.spriteFixerSegment {
-  position: relative;
+.spriteEditorTool {
   display: grid;
-  align-content: center;
-  justify-content: center;
-  min-width: 0;
-  min-height: 54px;
-  padding: 8px 10px;
+  grid-template-columns: 18px minmax(0, 1fr);
+  grid-template-areas:
+    "icon label"
+    "icon kicker";
+  align-items: center;
+  gap: 1px 8px;
+  min-height: 46px;
+  padding: 8px 9px;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   color: var(--muted);
-  cursor: pointer;
-  transition: border-color 160ms var(--ease), background 160ms var(--ease), color 160ms var(--ease), transform 160ms var(--ease);
+  text-align: left;
+  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out), transform 80ms var(--ease-out);
 }
 
-.spriteFixerSegment:active {
-  transform: scale(0.98);
+.spriteEditorTool .icon {
+  grid-area: icon;
 }
 
-.spriteFixerSegment:has(input:focus-visible) {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+.spriteEditorTool span {
+  grid-area: label;
+  overflow: hidden;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 680;
+  letter-spacing: -0.012em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
 }
 
-.spriteFixerSegment.active {
+.spriteEditorTool small {
+  grid-area: kicker;
+  overflow: hidden;
+  color: var(--subtle);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 560;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.spriteEditorTool:hover:not(.active) {
   border-color: var(--border);
   background: var(--surface);
   color: var(--ink);
 }
 
-.spriteFixerSegment input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+.spriteEditorTool:active {
+  transform: translateY(1px);
 }
 
-.spriteFixerSegment span {
-  overflow: hidden;
-  max-width: 100%;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 650;
-  line-height: 1.15;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.spriteFixerSegment small {
-  overflow: hidden;
-  max-width: 100%;
-  margin-top: 3px;
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0;
-  line-height: 1.1;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.spriteFixerSegment.active small {
+.spriteEditorTool.active {
+  border-color: color-mix(in srgb, var(--accent) 46%, var(--border));
+  background: var(--surface);
   color: var(--accent-deep);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
-.spriteFixerModeDetail {
-  min-height: 18px;
-  margin: 0 4px;
-  color: var(--muted);
-  font-family: var(--font-sans);
-  font-size: 12px;
-  line-height: 1.35;
+.spriteEditorWorkbench,
+.spriteEditorInspector {
+  min-height: 0;
+  overflow: auto;
+  scrollbar-color: color-mix(in srgb, var(--accent) 42%, #5c6252) transparent;
+  scrollbar-width: thin;
 }
 
-.spriteFixerComparison {
+.spriteEditorWorkbench {
+  padding: 14px;
+}
+
+.spriteEditorInspector {
   display: grid;
-  grid-template-columns: minmax(230px, 0.72fr) minmax(0, 1.28fr);
-  gap: 16px;
+  align-content: start;
+  gap: 12px;
+  padding: 14px;
+  border-left: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface-soft) 34%, var(--surface));
 }
 
-.spriteFixerColumn {
+.spriteEditorStageStack {
   display: grid;
   gap: 12px;
-  min-width: 0;
-  padding: 16px;
-  border: 1px solid var(--border);
+}
+
+.spriteEditorConfirmOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: color-mix(in srgb, #0b0e0a 74%, transparent);
+}
+
+.spriteEditorConfirmPanel {
+  display: grid;
+  gap: 14px;
+  width: min(420px, 100%);
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
   border-radius: var(--radius-md);
   background: var(--surface);
+  box-shadow: var(--shadow-modal);
 }
 
-.spriteFixerColumn.source {
-  opacity: 0.84;
+.spriteEditorConfirmPanel h3,
+.spriteEditorConfirmPanel p {
+  margin: 0;
 }
 
-.spriteFixerColumn.result {
-  border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
+.spriteEditorConfirmPanel h3 {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 760;
+  letter-spacing: -0.025em;
+}
+
+.spriteEditorConfirmPanel p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.spriteEditorConfirmActions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.spriteEditorStagePanel,
+.spriteEditorInspectorPanel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+}
+
+.spriteEditorStagePanel {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+}
+
+.spriteEditorStagePanel.primary {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 44%, transparent), transparent 68%),
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 30%, transparent), transparent 56%),
     var(--surface);
 }
 
-.spriteFixerColumn.result .spriteFixerStates {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.spriteFixerColumn h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 650;
-  line-height: 1.1;
-}
-
-.spriteFixerStates {
-  display: grid;
+.spriteEditorStagePanel.compact {
   gap: 12px;
-}
-
-.spriteFixerState {
-  display: grid;
-  grid-template-columns: 104px minmax(0, 1fr);
-  align-items: center;
-  gap: 12px;
-}
-
-.spriteFixerState.source {
-  grid-template-columns: 88px minmax(0, 1fr);
-  gap: 10px;
-}
-
-.spriteFixerState.result {
-  grid-template-columns: 1fr;
-  align-content: start;
-  justify-items: stretch;
-  gap: 10px;
   padding: 12px;
-  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border-soft));
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--surface) 82%, transparent);
 }
 
-.spriteFixerStateHeader {
+.spriteEditorStageHeading,
+.spriteEditorPanelTitle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.spriteEditorStageHeading h3,
+.spriteEditorPanelTitle h3 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 740;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+.spriteEditorStageHeading span,
+.spriteEditorPanelTitle span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 560;
+  letter-spacing: 0.05em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.spriteEditorInspectorPanel {
   display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.spriteEditorPlanText,
+.spriteEditorInspectorNote,
+.spriteEditorFinePrint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.spriteEditorFinePrint {
+  padding: 0 2px;
+}
+
+.spriteEditorOptionStack,
+.spriteEditorRowMap {
+  display: grid;
+  gap: 8px;
+}
+
+.spriteEditorOption {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.spriteEditorOption input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spriteEditorOption span {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 680;
+  letter-spacing: -0.01em;
+}
+
+.spriteEditorOption small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.spriteEditorOption.active {
+  border-color: color-mix(in srgb, var(--accent) 52%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface));
+}
+
+.spriteEditorRangeField,
+.spriteEditorSegmentedField {
+  display: grid;
+  gap: 6px;
+}
+
+.spriteEditorRangeField > span,
+.spriteEditorSegmentedField > span {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.spriteEditorRangeField strong {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.spriteEditorRangeField input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.spriteEditorSegmented {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 45%, var(--surface));
+}
+
+.spriteEditorSegmented button {
+  min-height: 30px;
+  border-radius: calc(var(--radius-sm) - 2px);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.spriteEditorSegmented button.active {
+  background: var(--surface);
+  color: var(--accent-deep);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 42%, var(--border));
+}
+
+.spriteEditorActions {
+  position: sticky;
+  bottom: -14px;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 8px 0 0;
+  background: color-mix(in srgb, var(--surface-soft) 34%, var(--surface));
+}
+
+.spriteEditorFullAction {
+  grid-column: 1 / -1;
+}
+
+.spriteEditorDirectionCompare {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.74fr) minmax(420px, 1.26fr);
+  gap: 12px;
+  min-height: 0;
+}
+
+.spriteEditorDirectionColumn {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 26%, transparent);
+}
+
+.spriteEditorDirectionColumn.after {
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 12%, var(--surface));
+}
+
+.spriteEditorDirectionColumnHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.spriteEditorDirectionColumnHead h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 740;
+  letter-spacing: -0.02em;
+}
+
+.spriteEditorDirectionColumnHead span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 560;
+  letter-spacing: 0.05em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.spriteEditorDirectionStrips {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
   min-width: 0;
 }
 
-.spriteFixerStateHeader span {
-  font-size: 13px;
-  font-weight: 600;
+.spriteEditorDirectionStrips article {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 22%, transparent);
 }
 
-.spriteFixerStateHeader small {
+.spriteEditorDirectionStrips header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.spriteEditorDirectionStrips strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 730;
+}
+
+.spriteEditorDirectionStrips span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.spriteEditorRunPair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  align-items: center;
+}
+
+.spriteEditorRunPair.compact {
+  gap: 10px;
+}
+
+.spriteEditorRunTile {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  width: max-content;
+  min-width: 172px;
+  min-height: 190px;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 32%, transparent);
+}
+
+.spriteEditorRunTile.small {
+  min-width: 128px;
+  min-height: 128px;
+  padding: 10px;
+}
+
+.spriteEditorRunTile.small header span {
+  display: none;
+}
+
+.spriteEditorRunTile header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.spriteEditorRunTile strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.spriteEditorRunTile span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.spriteEditorRunTile .spriteFrameClip {
+  align-self: center;
+}
+
+.spriteEditorRunTile.left .spriteFrameClip {
+  justify-self: start;
+}
+
+.spriteEditorRunTile.right .spriteFrameClip {
+  justify-self: end;
+}
+
+.spriteEditorRunPair > .spriteEditorRunTile.left {
+  justify-self: start;
+}
+
+.spriteEditorRunPair > .spriteEditorRunTile.right {
+  justify-self: end;
+}
+
+.spriteFrameClip {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  border-radius: 7px;
+  background-color: #161914;
+  background-image:
+    linear-gradient(45deg, #20251c 25%, transparent 25%),
+    linear-gradient(-45deg, #20251c 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #20251c 75%),
+    linear-gradient(-45deg, transparent 75%, #20251c 75%);
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+  background-size: 12px 12px;
+  image-rendering: pixelated;
+}
+
+.spriteFrameClip.highlight {
+  border-color: color-mix(in srgb, var(--accent) 56%, var(--border));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.spriteFrameImage {
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  will-change: transform;
+}
+
+.spriteEditorRowsStage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(258px, 0.48fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.spriteEditorRowPreviewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
+  gap: 8px;
+}
+
+.spriteEditorFrameRepairStage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.spriteEditorFrameRepairStage > .spriteEditorStagePanel:first-child,
+.spriteEditorFrameRepairStage > .spriteEditorStagePanel.primary {
+  grid-column: 1 / -1;
+}
+
+.spriteEditorRowPreviewCard {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 28%, transparent);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  transition: border-color 160ms var(--ease-out), background 160ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.spriteEditorRowPreviewCard:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+}
+
+.spriteEditorRowPreviewCard:active {
+  transform: translateY(1px);
+}
+
+.spriteEditorRowPreviewCard.active {
+  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 22%, var(--surface));
+}
+
+.spriteEditorRowPreviewCard header {
+  display: grid;
+  gap: 2px;
+}
+
+.spriteEditorRowPreviewCard strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 740;
+}
+
+.spriteEditorRowPreviewCard span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.spriteEditorSelectionSummary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 5px 10px;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 26%, transparent);
+}
+
+.spriteEditorSelectionSummary span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 620;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.spriteEditorSelectionSummary strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 740;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorStrip,
+.spriteEditorTimeline,
+.spriteEditorFramePicker {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.spriteEditorStrip::-webkit-scrollbar,
+.spriteEditorTimeline::-webkit-scrollbar,
+.spriteEditorFramePicker::-webkit-scrollbar {
+  display: none;
+}
+
+.spriteEditorRowPicker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: 7px;
+  min-width: 0;
+}
+
+.spriteEditorCellPicker {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.spriteEditorRowPicker button,
+.spriteEditorFramePicker button,
+.spriteEditorAllFramesButton {
+  min-width: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 24%, transparent);
+  color: var(--muted);
+  transition: border-color 160ms var(--ease-out), background 160ms var(--ease-out), color 160ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.spriteEditorRowPicker button:hover,
+.spriteEditorFramePicker button:hover,
+.spriteEditorAllFramesButton:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  color: var(--ink);
+}
+
+.spriteEditorRowPicker button:active,
+.spriteEditorFramePicker button:active,
+.spriteEditorAllFramesButton:active {
+  transform: translateY(1px);
+}
+
+.spriteEditorRowPicker button.active,
+.spriteEditorFramePicker button.active,
+.spriteEditorAllFramesButton.active {
+  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 26%, var(--surface));
+  color: var(--accent-deep);
+}
+
+.spriteEditorRowPicker button {
+  display: grid;
+  grid-template-columns: auto minmax(68px, 1fr);
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 46px;
+  padding: 5px 8px 5px 5px;
+  text-align: left;
+}
+
+.spriteEditorRowPicker span {
+  overflow: hidden;
+  color: inherit;
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorFramePicker button {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 5px;
+}
+
+.spriteEditorFramePicker span {
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 620;
+}
+
+.spriteEditorAtlasContext {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.spriteEditorAlignStage {
+  display: grid;
+  grid-template-columns: minmax(270px, 0.72fr) minmax(480px, 1.28fr);
+  grid-template-areas:
+    "preview motion"
+    "targets targets";
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-height: 0;
+}
+
+.spriteEditorAlignStage .spriteEditorStagePanel {
+  min-height: 0;
+}
+
+.spriteEditorAtlasPanel {
+  grid-area: targets;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.spriteEditorAlignStage .spriteEditorStagePanel.primary {
+  grid-area: preview;
+  align-content: start;
+}
+
+.spriteEditorTransformMotionPanel {
+  grid-area: motion;
+}
+
+.spriteEditorAtlasPanel {
+  min-height: 0;
+}
+
+.spriteEditorAtlasContext article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 7px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 20%, transparent);
+}
+
+.spriteEditorAtlasFrames {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.spriteEditorAllFramesButton {
+  min-height: 42px;
+  padding: 0 5px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 680;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.spriteEditorTransformMotionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  min-width: 0;
+}
+
+.spriteEditorTransformMotionCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 76px;
+  padding: 7px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 24%, transparent);
+  color: var(--muted);
+  text-align: left;
+  transition: border-color 160ms var(--ease-out), background 160ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.spriteEditorTransformMotionCard:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  color: var(--ink);
+}
+
+.spriteEditorTransformMotionCard:active {
+  transform: translateY(1px);
+}
+
+.spriteEditorTransformMotionCard.selected {
+  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 18%, var(--surface));
+}
+
+.spriteEditorTransformMotionCard.changed {
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent) 76%, var(--border));
+}
+
+.spriteEditorTransformMotionCard > span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.spriteEditorTransformMotionCard strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 730;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorTransformMotionCard small {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 590;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorAtlasContext article.selected {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+}
+
+.spriteEditorAtlasContext article.shifted {
+  background: color-mix(in srgb, var(--accent-soft) 12%, var(--surface));
+}
+
+.spriteEditorAtlasRowHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 10px;
+  min-width: 0;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+}
+
+.spriteEditorAtlasFrames .spriteEditorFramePicker {
+  gap: 5px;
+  padding-bottom: 0;
+}
+
+.spriteEditorAtlasFrames .spriteEditorFramePicker button {
+  flex: 0 0 auto;
+  padding: 3px;
+}
+
+.spriteEditorAtlasFrames .spriteEditorFramePicker span {
+  display: none;
+}
+
+.spriteEditorAtlasContext strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 730;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorAtlasContext span {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorAtlasContext em {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 640;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorTimelineFrame {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 26%, transparent);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.spriteEditorTimelineFrame:not(button) {
+  cursor: default;
+}
+
+button.spriteEditorTimelineFrame {
+  font: inherit;
+  text-align: inherit;
+}
+
+button.spriteEditorTimelineFrame:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+}
+
+.spriteEditorTimelineFrame span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.spriteEditorTimelineFrame b {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  z-index: 1;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 82%, #1a220f);
+  color: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 760;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.spriteEditorTimelineFrame b.secondary {
+  top: 26px;
+  background: color-mix(in srgb, var(--muted) 70%, #1a1d17);
+  color: var(--ink);
+}
+
+.spriteEditorTimelineFrame.selectedTarget {
+  border-color: color-mix(in srgb, var(--accent) 70%, var(--border));
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.spriteEditorTimelineFrame.selectedSource {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted) 50%, transparent);
+}
+
+.spriteEditorTimelineFrame.replaced {
+  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+}
+
+.pixelStage {
+  min-height: min(660px, calc(100dvh - 220px));
+}
+
+.spriteEditorPixelLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px;
+  gap: 12px;
+  min-height: 0;
+}
+
+.spriteEditorPixelCanvasViewport {
+  min-width: 0;
+  max-height: min(640px, calc(100dvh - 260px));
+  overflow: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: #11150f;
+  scrollbar-color: color-mix(in srgb, var(--accent) 45%, #5c6252) #171b14;
+  scrollbar-width: thin;
+}
+
+.spriteEditorPixelCanvas {
+  display: block;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.spriteEditorPixelCanvas.erase {
+  cursor: crosshair;
+}
+
+.spriteEditorPixelCanvas.restore {
+  cursor: cell;
+}
+
+.spriteEditorPixelCanvas.sample {
+  cursor: copy;
+}
+
+.spriteEditorPixelPreview {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.spriteEditorPixelPreview > div {
+  display: grid;
+  gap: 5px;
+}
+
+.spriteEditorPixelPreview span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.spriteEditorPixelPreview p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.spriteEditorMiniCanvas {
+  width: 96px;
+  height: 104px;
+  border: 1px solid var(--border-soft);
+  border-radius: 7px;
+  image-rendering: pixelated;
+}
+
+.spriteEditorInlineStats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.spriteEditorInlineStats span {
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0;
 }
 
-.spriteFixerStage {
+.spriteEditorLoading {
+  display: grid;
+  min-height: 360px;
+  place-items: center;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.spriteEditorLoading.error {
+  color: #ff9b8f;
+}
+
+.spriteEditorAlignCanvas {
   position: relative;
+  display: grid;
+  height: 304px;
+  min-height: 0;
+  place-items: center;
   overflow: hidden;
-  width: 112px;
-  height: 78px;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
   background:
-    linear-gradient(45deg, rgba(127, 127, 127, 0.08) 25%, transparent 25% 75%, rgba(127, 127, 127, 0.08) 75%),
-    linear-gradient(45deg, rgba(127, 127, 127, 0.08) 25%, transparent 25% 75%, rgba(127, 127, 127, 0.08) 75%),
-    var(--preview-surface);
-  background-position: 0 0, 8px 8px;
-  background-size: 16px 16px;
+    linear-gradient(to bottom, transparent 74%, color-mix(in srgb, var(--accent-soft) 24%, transparent) 74%),
+    #11150f;
 }
 
-.spriteFixerState.source .spriteFixerStage {
-  width: 88px;
-  height: 86px;
-}
-
-.spriteFixerState.result .spriteFixerStage {
-  justify-self: stretch;
-  width: 100%;
-  height: 152px;
-}
-
-.spriteFixerSprite {
+.spriteEditorAlignCanvas .spriteFrameClip {
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: 192px;
-  height: 208px;
-  background-repeat: no-repeat;
-  background-position: 0 var(--sprite-y);
-  background-size: 1536px 1872px;
-  image-rendering: pixelated;
-  transform: translate(-50%, -50%) scale(0.5);
-  transform-origin: center center;
-  animation: sprite-play var(--sprite-duration) steps(var(--sprite-frames)) infinite;
-  will-change: background-position;
+  top: 46%;
+  transform: translate(-50%, -50%);
 }
 
-.spriteFixerState.source .spriteFixerSprite {
-  transform: translate(-50%, -50%) scale(0.41);
+.spriteEditorAlignCanvas .spriteFrameClip.ghost {
+  opacity: 0.28;
+  filter: grayscale(1);
 }
 
-.spriteFixerState.source .spriteFixerSprite.flipped {
-  transform: translate(-50%, -50%) scale(-0.41, 0.41);
+.spriteEditorAlignCanvas .spriteFrameClip.shifted {
+  z-index: 2;
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--border));
 }
 
-.spriteFixerState.result .spriteFixerSprite {
-  transform: translate(-50%, -50%) scale(0.68);
+.spriteEditorAlignGround {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: 64px;
+  height: 1px;
+  background: color-mix(in srgb, var(--accent) 58%, transparent);
 }
 
-.spriteFixerState.result .spriteFixerSprite.flipped {
-  transform: translate(-50%, -50%) scale(-0.68, 0.68);
+.runtimeStage {
+  align-content: start;
 }
 
-.spriteFixerSprite.flipped {
-  transform: translate(-50%, -50%) scale(-0.5, 0.5);
+.spriteEditorRuntimeCanvas {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background:
+    radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--accent-soft) 16%, transparent), transparent 42%),
+    #11150f;
 }
 
-.spriteFixerActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: flex-end;
+.spriteEditorRuntimeCanvas .spriteFrameClip {
+  z-index: 1;
 }
 
-@media (max-width: 760px) {
-  .spriteFixerModal {
-    max-height: calc(100dvh - 24px);
-    padding: 26px 18px 20px;
+@media (max-width: 1080px) {
+  .spriteEditorModal {
+    width: min(980px, calc(100vw - 20px));
   }
 
-  .spriteFixerComparison {
+  .spriteEditorShell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(360px, 1fr) auto;
+  }
+
+  .spriteEditorRail {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(118px, 1fr);
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .spriteEditorTool.active {
+    box-shadow: inset 0 -3px 0 var(--accent);
+  }
+
+  .spriteEditorInspector {
+    border-left: 0;
+    border-top: 1px solid var(--border-soft);
+  }
+}
+
+@media (max-width: 720px) {
+  .spriteEditorModal {
+    display: block;
+    width: calc(100vw - 12px);
+    height: auto;
+    max-height: calc(100dvh - 12px);
+    overflow: auto;
+  }
+
+  .spriteEditorHeader {
+    align-items: flex-start;
+    padding: 14px;
+  }
+
+  .spriteEditorHeaderActions {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .spriteEditorWorkbench,
+  .spriteEditorInspector {
+    overflow: visible;
+    padding: 10px;
+  }
+
+  .spriteEditorShell {
+    display: block;
+  }
+
+  .spriteEditorRunPair,
+  .spriteEditorDirectionCompare,
+  .spriteEditorAlignStage,
+  .spriteEditorRowsStage,
+  .spriteEditorFrameRepairStage,
+  .spriteEditorPixelLayout,
+  .spriteEditorAtlasFrames,
+  .spriteEditorAtlasContext article {
     grid-template-columns: 1fr;
   }
 
-  .spriteFixerSegments {
-    grid-template-columns: 1fr;
+  .spriteEditorAlignStage {
+    grid-template-areas:
+      "preview"
+      "motion"
+      "targets";
+    grid-template-rows: auto auto auto;
   }
 
-  .spriteFixerColumn.result .spriteFixerStates {
+  .spriteEditorTransformMotionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .spriteEditorRunTile {
+    min-height: 190px;
+  }
+
+  .spriteEditorRunTile.left .spriteFrameClip,
+  .spriteEditorRunTile.right .spriteFrameClip {
+    justify-self: center;
+  }
+
+  .spriteEditorAlignCanvas {
+    height: 300px;
+  }
+
+  .spriteEditorActions {
+    position: static;
     grid-template-columns: 1fr;
+    padding-top: 0;
+    background: transparent;
+  }
+
+  .spriteEditorRuntimeCanvas {
+    min-height: 300px;
   }
 }

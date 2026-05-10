@@ -5,12 +5,12 @@ import { readJson } from "../domain/http";
 import { normalizePet } from "../domain/pets";
 import type { EditablePetKind, Pet, User } from "../domain/types";
 import {
-  fetchSpritesheetFile,
-  fixRunningDirectionRows,
+  editPetSpritesheet,
+  fetchPetPackageSpritesheet,
   generatePosterImage,
   generatePreviewImage,
   generateShareImage,
-  type SpriteFixOperation
+  type PetSpriteEditorOperation
 } from "../uploads/uploadAssets";
 
 export function usePetEditors({
@@ -155,15 +155,15 @@ export function usePetEditors({
     setSpriteFixerStatus("");
   }
 
-  async function submitSpriteFixer(event: FormEvent, operation: SpriteFixOperation) {
+  async function submitSpriteFixer(event: FormEvent, operation: PetSpriteEditorOperation) {
     event.preventDefault();
     const pet = spriteFixerPet;
-    if (!pet || spriteFixerBusy) return;
+    if (!pet || spriteFixerBusy) return false;
     setSpriteFixerStatus("");
     setSpriteFixerBusy(true);
     try {
-      const currentSpritesheet = await fetchSpritesheetFile(pet.spritesheetUrl);
-      const spritesheet = await fixRunningDirectionRows(currentSpritesheet, operation);
+      const currentSpritesheet = await fetchPetPackageSpritesheet(pet.downloadUrl);
+      const spritesheet = await editPetSpritesheet(currentSpritesheet, operation);
       const manifest = {
         id: pet.id,
         displayName: pet.displayName,
@@ -189,8 +189,10 @@ export function usePetEditors({
       );
       reconcileTaggedPet(normalizePet(body.pet));
       setSpriteFixerPet(null);
+      return true;
     } catch (error) {
       setSpriteFixerStatus(error instanceof Error ? error.message : "Could not save sprites.");
+      return false;
     } finally {
       setSpriteFixerBusy(false);
     }

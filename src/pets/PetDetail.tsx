@@ -179,8 +179,8 @@ export function PetDetail({
             <div className="detailCreatorToolsButtons">
               {canFixSprites ? (
                 <button className="btn btnSm detailFixSpritesAction" type="button" onClick={() => onFixSprites(pet)}>
-                  <Icon name="swap" size={13} />
-                  Fix left/right
+                  <Icon name="sheet" size={13} />
+                  Edit sprites
                 </button>
               ) : null}
               {canDelete && (
@@ -310,13 +310,13 @@ export function PetDetail({
         {canFixSprites ? (
           <div className="detailSpriteFixPanel" role="note">
             <div className="detailSpriteFixCopy">
-              <span className="detailSpriteFixLabel">Pet tools</span>
-              <strong>Fix left/right run rows.</strong>
-              <p>Use this when the pet walks the wrong way, or when one side should be mirrored from the other.</p>
+              <span className="detailSpriteFixLabel">Sprite editor</span>
+              <strong>Repair directions, rows, frames, pixels, and sprite placement.</strong>
+              <p>Use this when the pet installs into Codex but a spritesheet row, frame, artifact, or cell position is wrong.</p>
             </div>
             <button className="btn btnPrimary btnSm detailSpriteFixButton" type="button" onClick={() => onFixSprites(pet)}>
-              <Icon name="swap" size={13} />
-              Open fixer
+              <Icon name="sheet" size={13} />
+              Open editor
             </button>
           </div>
         ) : null}

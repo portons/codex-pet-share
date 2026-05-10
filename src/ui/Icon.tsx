@@ -13,6 +13,7 @@ export type IconName =
   | "menu"
   | "moon"
   | "more"
+  | "move"
   | "package"
   | "search"
   | "share"
@@ -94,6 +95,16 @@ export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
         <circle cx="4" cy="8" r="0.75" />
         <circle cx="8" cy="8" r="0.75" />
         <circle cx="12" cy="8" r="0.75" />
+      </>
+    ),
+    move: (
+      <>
+        <path d="M8 2.5 V13.5" />
+        <path d="M5.5 5 L8 2.5 L10.5 5" />
+        <path d="M5.5 11 L8 13.5 L10.5 11" />
+        <path d="M2.5 8 H13.5" />
+        <path d="M5 5.5 L2.5 8 L5 10.5" />
+        <path d="M11 5.5 L13.5 8 L11 10.5" />
       </>
     ),
     package: (

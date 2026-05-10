@@ -88,10 +88,6 @@ export function YourUploads({
                         <h2>{pet.displayName}</h2>
                         <p>{pet.id}</p>
                         <PetTags tags={pet.tags} onTagClick={onTagClick} />
-                        <button className="uploadsFixLink" type="button" onClick={() => onFixSprites(pet)}>
-                          <Icon name="swap" size={12} />
-                          Fix sprites
-                        </button>
                       </div>
                     </div>
                   </td>

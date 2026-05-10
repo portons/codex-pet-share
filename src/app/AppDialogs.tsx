@@ -10,7 +10,7 @@ import { SpriteFixerModal } from "../pets/SpriteFixerModal";
 import { EntityShareModal, ShareModal } from "../share/ShareModals";
 import type { CollectionSummary, ContentMode, EditablePetKind, EntityShareTarget, Pet, User } from "../domain/types";
 import type { TagName } from "../domain/config";
-import type { SpriteFixOperation } from "../uploads/uploadAssets";
+import type { PetSpriteEditorOperation } from "../uploads/uploadAssets";
 
 export function AppDialogs({
   user,
@@ -151,7 +151,7 @@ export function AppDialogs({
   spriteFixerPet: Pet | null;
   spriteFixerStatus: string;
   spriteFixerBusy: boolean;
-  submitSpriteFixer: (event: FormEvent, operation: SpriteFixOperation) => void | Promise<void>;
+  submitSpriteFixer: (event: FormEvent, operation: PetSpriteEditorOperation) => boolean | Promise<boolean>;
   closeSpriteFixer: () => void;
   collectionEditorPet: Pet | null;
   adminCollections: AdminCollection[];
