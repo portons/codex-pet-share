@@ -63,6 +63,7 @@ export function AppRoutes({
   setDownloadPet,
   selectVisibleTag,
   openTagEditor,
+  openSpriteFixer,
   openCollectionEditor,
   openPetCollector,
   openCollectionCreator,
@@ -203,6 +204,7 @@ export function AppRoutes({
           deleteStatus={deleteStatus}
           contentMode={contentMode}
           onEditTags={openTagEditor}
+          onFixSprites={openSpriteFixer}
           onTagClick={selectVisibleTag}
           onDownload={setDownloadPet}
           onDelete={deleteUpload}
@@ -409,6 +411,7 @@ export function AppRoutes({
               onTagClick={selectVisibleTag}
               onSignIn={openAuth}
               onEditTags={openTagEditor}
+              onFixSprites={openSpriteFixer}
               onManageCollections={openCollectionEditor}
               onCollect={openPetCollector}
               onToggleNsfw={togglePetNsfw}

@@ -169,5 +169,61 @@
 .detailSocialActions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 8px;
+}
+
+.detailCreatorTools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: -10px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--border-soft);
+}
+
+.detailCreatorToolsLabel {
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.detailCreatorToolsButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
+.detailFixSpritesAction {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 76%, var(--surface));
+  color: var(--accent-deep);
+}
+
+.detailFixSpritesAction:hover:not(:disabled) {
+  border-color: var(--accent-deep);
+  background: color-mix(in srgb, var(--accent-soft) 88%, var(--surface));
+  color: var(--accent-deep);
+}
+
+@media (max-width: 680px) {
+  .detailHeroFooter {
+    align-items: start;
+  }
+
+  .detailSocialActions,
+  .detailCreatorTools,
+  .detailCreatorToolsButtons {
+    justify-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+  }
 }

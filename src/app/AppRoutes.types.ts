@@ -59,6 +59,7 @@ export type AppRoutesProps = {
   setDownloadPet: SetState<Pet | null>;
   selectVisibleTag: (tag: TagName, sourceTags: string[]) => void | Promise<void>;
   openTagEditor: (pet: Pet) => void;
+  openSpriteFixer: (pet: Pet) => void;
   openCollectionEditor: (pet: Pet) => void | Promise<void>;
   openPetCollector: (pet: Pet) => void | Promise<void>;
   openCollectionCreator: () => void | Promise<void>;

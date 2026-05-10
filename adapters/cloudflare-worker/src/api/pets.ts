@@ -30,6 +30,7 @@ export async function handlePets(ctx: AppContext, parts: string[]) {
   if (ctx.request.method === "DELETE" && parts.length === 1) return deletePet(ctx, petId, await requireUser(ctx));
   if ((ctx.request.method === "POST" || ctx.request.method === "DELETE") && parts[1] === "like") return setPetLike(ctx, petId, await requireUser(ctx), ctx.request.method === "POST");
   if (ctx.request.method === "PATCH" && parts[1] === "tags" && parts.length === 2) return updatePetMetadata(ctx, petId, await requireUser(ctx));
+  if (ctx.request.method === "PATCH" && parts[1] === "spritesheet" && parts.length === 2) return updatePetSpritesheet(ctx, petId, await requireUser(ctx));
   if (ctx.request.method === "GET" && parts[1] === "spritesheet") return visibleAsset(ctx, petId, user, `${petId}/spritesheet.webp`);
   if (ctx.request.method === "GET" && parts[1] === "share-image") return visibleAsset(ctx, petId, user, `${petId}/share.png`);
   if (ctx.request.method === "GET" && parts[1] === "preview") return visibleAsset(ctx, petId, user, `${petId}/preview.webp`);
@@ -168,6 +169,34 @@ async function updatePetMetadata(ctx: AppContext, petId: string, user: AuthUser)
     .bind(JSON.stringify(nextTags), parsePetKind(body.kind), nowIso(), petId).run();
   const next = await getPet(ctx, petId) as PetRow;
   return json({ pet: serializePet(ctx, next, undefined, await likeContextFor(ctx, [petId], user), user) });
+}
+
+async function updatePetSpritesheet(ctx: AppContext, petId: string, user: AuthUser) {
+  const pet = await getPet(ctx, petId);
+  if (!pet) return json({ error: "pet not found" }, 404);
+  if (pet.source !== "upload") return json({ error: "uploaded pet required" }, 403);
+  if (!user.isAdmin && pet.owner_id !== user.id) return json({ error: "owner required" }, 403);
+  const form = await readUploadForm(ctx.request);
+  const spritesheetFile = requireFile(form, "spritesheet");
+  const shareImageFile = requireFile(form, "shareImage");
+  const previewImageFile = requireFile(form, "previewImage");
+  const posterImageFile = requireFile(form, "posterImage");
+  validateSpritesheet(spritesheetFile.bytes); validateShareImage(shareImageFile.bytes); validatePreviewImage(previewImageFile.bytes); validatePosterImage(posterImageFile.bytes);
+  const report = validationFromBytes({
+    id: pet.id,
+    displayName: pet.display_name,
+    description: pet.description,
+    spritesheetPath: "spritesheet.webp",
+    kind: pet.kind
+  }, spritesheetFile.bytes);
+  await putAsset(ctx, `${pet.id}/spritesheet.webp`, spritesheetFile.bytes, "image/webp");
+  await putAsset(ctx, `${pet.id}/share.png`, shareImageFile.bytes, "image/png");
+  await putAsset(ctx, `${pet.id}/preview.webp`, previewImageFile.bytes, "image/webp");
+  await putAsset(ctx, `${pet.id}/poster.webp`, posterImageFile.bytes, "image/webp");
+  await ctx.env.DB.prepare("update pets set validation_report_json = ?, updated_at = ? where id = ?")
+    .bind(JSON.stringify(report), nowIso(), pet.id).run();
+  const next = await getPet(ctx, pet.id) as PetRow;
+  return json({ pet: serializePet(ctx, next, report, await likeContextFor(ctx, [pet.id], user), user) });
 }
 
 async function setPetLike(ctx: AppContext, petId: string, user: AuthUser, liked: boolean) {

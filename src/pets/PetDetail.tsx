@@ -32,6 +32,7 @@ export function PetDetail({
   onTagClick,
   onSignIn,
   onEditTags,
+  onFixSprites,
   onManageCollections,
   onCollect,
   onToggleNsfw,
@@ -55,6 +56,7 @@ export function PetDetail({
   onTagClick: (tag: TagName, sourceTags: string[]) => void;
   onSignIn: () => void;
   onEditTags: (pet: Pet) => void;
+  onFixSprites: (pet: Pet) => void;
   onManageCollections: (pet: Pet) => void;
   onCollect?: (pet: Pet) => void;
   onToggleNsfw: (pet: Pet) => void;
@@ -84,6 +86,8 @@ export function PetDetail({
   const specimenId = pet.id.length > 8 ? pet.id.slice(0, 8) : pet.id;
   const canDelete = Boolean(!user?.isAdmin && user?.id && user.id === pet.ownerId);
   const canEditTags = Boolean(!user?.isAdmin && user?.id && user.id === pet.ownerId);
+  const canFixSprites = Boolean((user?.isAdmin && pet.ownerId) || (user?.id && user.id === pet.ownerId));
+  const hasManagementActions = canFixSprites || canDelete || Boolean(user?.isAdmin);
   const downloadCommand = petImportCommand(pet, downloadCommandMode);
   const codexInstallUrl = petCodexInstallUrl(pet);
 
@@ -169,9 +173,47 @@ export function PetDetail({
           ) : null}
         </div>
 
+        {hasManagementActions ? (
+          <div className="detailCreatorTools" role="group" aria-label="Pet tools">
+            <span className="detailCreatorToolsLabel">Pet tools</span>
+            <div className="detailCreatorToolsButtons">
+              {canFixSprites ? (
+                <button className="btn btnSm detailFixSpritesAction" type="button" onClick={() => onFixSprites(pet)}>
+                  <Icon name="swap" size={13} />
+                  Fix left/right
+                </button>
+              ) : null}
+              {canDelete && (
+                <button
+                  className="btn btnDanger btnSm"
+                  type="button"
+                  disabled={Boolean(deletingPetId)}
+                  onClick={() => onDelete(pet)}
+                >
+                  <Icon name="trash" size={13} />
+                  {deletingPetId === pet.id ? "Deleting" : "Delete"}
+                </button>
+              )}
+              {user?.isAdmin && (
+                <AdminPetMenu
+                  pet={pet}
+                  deletingPetId={deletingPetId}
+                  shadowbanBusyOwnerId={shadowbanBusyOwnerId}
+                  nsfwBusyId={nsfwBusyId}
+                  onEditTags={onEditTags}
+                  onManageCollections={onManageCollections}
+                  onToggleNsfw={onToggleNsfw}
+                  onShadowbanOwner={onShadowbanOwner}
+                  onDelete={onDelete}
+                />
+              )}
+            </div>
+          </div>
+        ) : null}
+
         <div className="detailHeroFooter">
           <PetStats pet={pet} size="large" />
-          <div className="detailSocialActions">
+          <div className="detailSocialActions" aria-label="Pet actions">
             <button
               className={`btn btnSm likeButton ${pet.likedByMe ? "active" : ""}`}
               type="button"
@@ -202,30 +244,6 @@ export function PetDetail({
                 <Icon name="package" size={13} />
                 Add to collection
               </button>
-            )}
-            {canDelete && (
-              <button
-                className="btn btnDanger btnSm"
-                type="button"
-                disabled={Boolean(deletingPetId)}
-                onClick={() => onDelete(pet)}
-              >
-                <Icon name="trash" size={13} />
-                {deletingPetId === pet.id ? "Deleting" : "Delete"}
-              </button>
-            )}
-            {user?.isAdmin && (
-              <AdminPetMenu
-                pet={pet}
-                deletingPetId={deletingPetId}
-                shadowbanBusyOwnerId={shadowbanBusyOwnerId}
-                nsfwBusyId={nsfwBusyId}
-                onEditTags={onEditTags}
-                onManageCollections={onManageCollections}
-                onToggleNsfw={onToggleNsfw}
-                onShadowbanOwner={onShadowbanOwner}
-                onDelete={onDelete}
-              />
             )}
           </div>
         </div>
@@ -288,6 +306,19 @@ export function PetDetail({
           <p className="status detailStatesStatus" role="alert">
             {gifExportStatus}
           </p>
+        ) : null}
+        {canFixSprites ? (
+          <div className="detailSpriteFixPanel" role="note">
+            <div className="detailSpriteFixCopy">
+              <span className="detailSpriteFixLabel">Pet tools</span>
+              <strong>Fix left/right run rows.</strong>
+              <p>Use this when the pet walks the wrong way, or when one side should be mirrored from the other.</p>
+            </div>
+            <button className="btn btnPrimary btnSm detailSpriteFixButton" type="button" onClick={() => onFixSprites(pet)}>
+              <Icon name="swap" size={13} />
+              Open fixer
+            </button>
+          </div>
         ) : null}
         <div className="detailStatesGrid">
           {petStates.map((state) => (

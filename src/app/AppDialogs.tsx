@@ -6,9 +6,11 @@ import { CollectionPetAdderModal, PetCollectorModal, UserCollectionEditorModal }
 import type { CollectionPetAdderState } from "../collections/useUserCollections";
 import { DownloadModal } from "../downloads/DownloadModal";
 import { PetCollectionsModal, PetDeleteConfirmModal, TagEditorModal } from "../pets/PetManagementModals";
+import { SpriteFixerModal } from "../pets/SpriteFixerModal";
 import { EntityShareModal, ShareModal } from "../share/ShareModals";
 import type { CollectionSummary, ContentMode, EditablePetKind, EntityShareTarget, Pet, User } from "../domain/types";
 import type { TagName } from "../domain/config";
+import type { SpriteFixOperation } from "../uploads/uploadAssets";
 
 export function AppDialogs({
   user,
@@ -57,6 +59,11 @@ export function AppDialogs({
   toggleTagEditorTag,
   submitTagEditor,
   closeTagEditor,
+  spriteFixerPet,
+  spriteFixerStatus,
+  spriteFixerBusy,
+  submitSpriteFixer,
+  closeSpriteFixer,
   collectionEditorPet,
   adminCollections,
   collectionEditorSlugs,
@@ -141,6 +148,11 @@ export function AppDialogs({
   toggleTagEditorTag: (tag: TagName) => void;
   submitTagEditor: (event: FormEvent) => void | Promise<void>;
   closeTagEditor: () => void;
+  spriteFixerPet: Pet | null;
+  spriteFixerStatus: string;
+  spriteFixerBusy: boolean;
+  submitSpriteFixer: (event: FormEvent, operation: SpriteFixOperation) => void | Promise<void>;
+  closeSpriteFixer: () => void;
   collectionEditorPet: Pet | null;
   adminCollections: AdminCollection[];
   collectionEditorSlugs: string[];
@@ -235,6 +247,16 @@ export function AppDialogs({
           onToggle={toggleTagEditorTag}
           onSubmit={submitTagEditor}
           onClose={closeTagEditor}
+        />
+      )}
+
+      {spriteFixerPet && (
+        <SpriteFixerModal
+          pet={spriteFixerPet}
+          status={spriteFixerStatus}
+          busy={spriteFixerBusy}
+          onSubmit={submitSpriteFixer}
+          onClose={closeSpriteFixer}
         />
       )}
 

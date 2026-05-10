@@ -17,6 +17,7 @@ export type IconName =
   | "search"
   | "share"
   | "sheet"
+  | "swap"
   | "tag"
   | "terminal"
   | "trash"
@@ -121,6 +122,14 @@ export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
       <>
         <rect x="2.5" y="2.5" width="11" height="11" rx="1" />
         <path d="M2.5 6 H13.5 M2.5 9.5 H13.5 M6 2.5 V13.5 M9.5 2.5 V13.5" />
+      </>
+    ),
+    swap: (
+      <>
+        <path d="M3 5.25 H12" />
+        <path d="M9.5 2.75 L12 5.25 L9.5 7.75" />
+        <path d="M13 10.75 H4" />
+        <path d="M6.5 8.25 L4 10.75 L6.5 13.25" />
       </>
     ),
     tag: (

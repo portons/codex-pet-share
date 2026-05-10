@@ -4,6 +4,14 @@ import { isEditablePetKind, type TagName } from "../domain/config";
 import { readJson } from "../domain/http";
 import { normalizePet } from "../domain/pets";
 import type { EditablePetKind, Pet, User } from "../domain/types";
+import {
+  fetchSpritesheetFile,
+  fixRunningDirectionRows,
+  generatePosterImage,
+  generatePreviewImage,
+  generateShareImage,
+  type SpriteFixOperation
+} from "../uploads/uploadAssets";
 
 export function usePetEditors({
   user,
@@ -29,6 +37,9 @@ export function usePetEditors({
   const [collectionEditorSlugs, setCollectionEditorSlugs] = useState<Array<string>>([]);
   const [collectionEditorStatus, setCollectionEditorStatus] = useState("");
   const [collectionEditorBusy, setCollectionEditorBusy] = useState(false);
+  const [spriteFixerPet, setSpriteFixerPet] = useState<Pet | null>(null);
+  const [spriteFixerStatus, setSpriteFixerStatus] = useState("");
+  const [spriteFixerBusy, setSpriteFixerBusy] = useState(false);
 
   function openTagEditor(pet: Pet) {
     setTagEditorPet(pet);
@@ -132,6 +143,59 @@ export function usePetEditors({
     }
   }
 
+  function openSpriteFixer(pet: Pet) {
+    setSpriteFixerPet(pet);
+    setSpriteFixerStatus("");
+    setSpriteFixerBusy(false);
+  }
+
+  function closeSpriteFixer() {
+    if (spriteFixerBusy) return;
+    setSpriteFixerPet(null);
+    setSpriteFixerStatus("");
+  }
+
+  async function submitSpriteFixer(event: FormEvent, operation: SpriteFixOperation) {
+    event.preventDefault();
+    const pet = spriteFixerPet;
+    if (!pet || spriteFixerBusy) return;
+    setSpriteFixerStatus("");
+    setSpriteFixerBusy(true);
+    try {
+      const currentSpritesheet = await fetchSpritesheetFile(pet.spritesheetUrl);
+      const spritesheet = await fixRunningDirectionRows(currentSpritesheet, operation);
+      const manifest = {
+        id: pet.id,
+        displayName: pet.displayName,
+        description: pet.description,
+        spritesheetPath: pet.spritesheetPath,
+        kind: pet.kind
+      };
+      const [shareImage, previewImage, posterImage] = await Promise.all([
+        generateShareImage(manifest, spritesheet),
+        generatePreviewImage(spritesheet),
+        generatePosterImage(spritesheet)
+      ]);
+      const form = new FormData();
+      form.append("spritesheet", spritesheet);
+      form.append("shareImage", shareImage);
+      form.append("previewImage", previewImage);
+      form.append("posterImage", posterImage);
+      const body = await readJson<{ pet: Pet }>(
+        await apiFetch(`/api/pets/${pet.id}/spritesheet`, {
+          method: "PATCH",
+          body: form
+        })
+      );
+      reconcileTaggedPet(normalizePet(body.pet));
+      setSpriteFixerPet(null);
+    } catch (error) {
+      setSpriteFixerStatus(error instanceof Error ? error.message : "Could not save sprites.");
+    } finally {
+      setSpriteFixerBusy(false);
+    }
+  }
+
   return {
     tagEditorPet,
     tagEditorTags,
@@ -150,6 +214,12 @@ export function usePetEditors({
     openCollectionEditor,
     closeCollectionEditor,
     toggleCollectionEditorSlug,
-    submitCollectionEditor
+    submitCollectionEditor,
+    spriteFixerPet,
+    spriteFixerStatus,
+    spriteFixerBusy,
+    openSpriteFixer,
+    closeSpriteFixer,
+    submitSpriteFixer
   };
 }

@@ -1,10 +1,18 @@
 import { APP_HANDLE, APP_NAME } from "../branding/brand";
+import webpEncWasmUrl from "@jsquash/webp/codec/enc/webp_enc.wasm?url";
+import webpEncSimdWasmUrl from "@jsquash/webp/codec/enc/webp_enc_simd.wasm?url";
 import {
   isEditablePetKind,
   petStates,
-  previewFrameCount
+  spriteCellWidth,
+  previewFrameCount,
+  spriteCellHeight
 } from "../domain/config";
 import type { EditablePetKind, UploadManifest } from "../domain/types";
+
+export type SpriteFixOperation = "swap-running-rows" | "mirror-right-to-left" | "mirror-left-to-right";
+
+let webpEncodePromise: Promise<typeof import("@jsquash/webp/encode").default> | null = null;
 
 export async function readUploadManifest(file: File): Promise<UploadManifest> {
   let value: Partial<UploadManifest>;
@@ -178,6 +186,87 @@ export async function generatePosterImage(spritesheet: File) {
   } finally {
     URL.revokeObjectURL(imageUrl);
   }
+}
+
+export async function fetchSpritesheetFile(url: string) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error("Could not load spritesheet.");
+  }
+  const blob = await response.blob();
+  return new File([blob], "spritesheet.webp", { type: "image/webp" });
+}
+
+export async function fixRunningDirectionRows(spritesheet: File, operation: SpriteFixOperation) {
+  const imageUrl = URL.createObjectURL(spritesheet);
+  try {
+    const image = new Image();
+    image.decoding = "async";
+    image.src = imageUrl;
+    await image.decode();
+
+    const canvas = document.createElement("canvas");
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Could not repair spritesheet.");
+    }
+
+    context.imageSmoothingEnabled = false;
+    context.drawImage(image, 0, 0);
+    if (operation === "swap-running-rows") {
+      const runningRight = context.getImageData(0, spriteCellHeight, canvas.width, spriteCellHeight);
+      const runningLeft = context.getImageData(0, spriteCellHeight * 2, canvas.width, spriteCellHeight);
+      context.putImageData(runningLeft, 0, spriteCellHeight);
+      context.putImageData(runningRight, 0, spriteCellHeight * 2);
+    } else {
+      const sourceRow = operation === "mirror-right-to-left" ? 1 : 2;
+      const targetRow = operation === "mirror-right-to-left" ? 2 : 1;
+      const source = context.getImageData(0, sourceRow * spriteCellHeight, canvas.width, spriteCellHeight);
+      const target = context.createImageData(canvas.width, spriteCellHeight);
+      for (let frame = 0; frame < 8; frame += 1) {
+        for (let y = 0; y < spriteCellHeight; y += 1) {
+          for (let x = 0; x < spriteCellWidth; x += 1) {
+            const sourceIndex = (y * canvas.width + frame * spriteCellWidth + x) * 4;
+            const targetIndex = (y * canvas.width + frame * spriteCellWidth + spriteCellWidth - 1 - x) * 4;
+            target.data[targetIndex] = source.data[sourceIndex];
+            target.data[targetIndex + 1] = source.data[sourceIndex + 1];
+            target.data[targetIndex + 2] = source.data[sourceIndex + 2];
+            target.data[targetIndex + 3] = source.data[sourceIndex + 3];
+          }
+        }
+      }
+      context.putImageData(target, 0, targetRow * spriteCellHeight);
+    }
+
+    return encodeCanvasAsLosslessWebp(canvas, "spritesheet.webp");
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
+async function encodeCanvasAsLosslessWebp(canvas: HTMLCanvasElement, fileName: string) {
+  const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error(`Could not create ${fileName}.`);
+  }
+  const encode = await loadWebpEncoder();
+  const buffer = await encode(context.getImageData(0, 0, canvas.width, canvas.height), {
+    lossless: 1,
+    exact: 1
+  });
+  return new File([buffer], fileName, { type: "image/webp" });
+}
+
+function loadWebpEncoder() {
+  webpEncodePromise ??= import("@jsquash/webp/encode").then(async ({ default: encode, init }) => {
+    await init({
+      locateFile: (path: string) => path.includes("simd") ? webpEncSimdWasmUrl : webpEncWasmUrl
+    });
+    return encode;
+  });
+  return webpEncodePromise;
 }
 
 async function encodeCanvasAsWebp(

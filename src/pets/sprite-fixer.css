@@ -1,0 +1,333 @@
+.spriteFixerModal {
+  position: relative;
+  width: min(900px, 100%);
+  max-height: min(760px, calc(100dvh - 48px));
+  overflow: auto;
+  padding: 30px 28px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-modal);
+  animation: modal-in 320ms var(--ease-spring);
+}
+
+.spriteFixerForm {
+  display: grid;
+  gap: 18px;
+}
+
+.spriteFixerIntro {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 15px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 82%, transparent), transparent 74%),
+    var(--surface-soft);
+}
+
+.spriteFixerIntroIcon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid color-mix(in srgb, var(--accent) 44%, var(--border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent-soft) 76%, var(--surface));
+  color: var(--accent-deep);
+}
+
+.spriteFixerIntro > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.spriteFixerIntro strong,
+.spriteFixerColumn h3,
+.spriteFixerStateHeader span {
+  color: var(--ink);
+  font-family: var(--font-sans);
+  letter-spacing: -0.02em;
+}
+
+.spriteFixerIntro strong {
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.spriteFixerIntro p {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.spriteFixerToolbar {
+  display: grid;
+  gap: 8px;
+}
+
+.spriteFixerSegments {
+  display: grid;
+  grid-template-columns: 1fr 1.18fr 1.18fr;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+}
+
+.spriteFixerSegment {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 54px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 160ms var(--ease), background 160ms var(--ease), color 160ms var(--ease), transform 160ms var(--ease);
+}
+
+.spriteFixerSegment:active {
+  transform: scale(0.98);
+}
+
+.spriteFixerSegment:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.spriteFixerSegment.active {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.spriteFixerSegment input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.spriteFixerSegment span {
+  overflow: hidden;
+  max-width: 100%;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.15;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteFixerSegment small {
+  overflow: hidden;
+  max-width: 100%;
+  margin-top: 3px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0;
+  line-height: 1.1;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteFixerSegment.active small {
+  color: var(--accent-deep);
+}
+
+.spriteFixerModeDetail {
+  min-height: 18px;
+  margin: 0 4px;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.spriteFixerComparison {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.72fr) minmax(0, 1.28fr);
+  gap: 16px;
+}
+
+.spriteFixerColumn {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.spriteFixerColumn.source {
+  opacity: 0.84;
+}
+
+.spriteFixerColumn.result {
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 44%, transparent), transparent 68%),
+    var(--surface);
+}
+
+.spriteFixerColumn.result .spriteFixerStates {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.spriteFixerColumn h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.1;
+}
+
+.spriteFixerStates {
+  display: grid;
+  gap: 12px;
+}
+
+.spriteFixerState {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.spriteFixerState.source {
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.spriteFixerState.result {
+  grid-template-columns: 1fr;
+  align-content: start;
+  justify-items: stretch;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border-soft));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+}
+
+.spriteFixerStateHeader {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.spriteFixerStateHeader span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.spriteFixerStateHeader small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.spriteFixerStage {
+  position: relative;
+  overflow: hidden;
+  width: 112px;
+  height: 78px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(45deg, rgba(127, 127, 127, 0.08) 25%, transparent 25% 75%, rgba(127, 127, 127, 0.08) 75%),
+    linear-gradient(45deg, rgba(127, 127, 127, 0.08) 25%, transparent 25% 75%, rgba(127, 127, 127, 0.08) 75%),
+    var(--preview-surface);
+  background-position: 0 0, 8px 8px;
+  background-size: 16px 16px;
+}
+
+.spriteFixerState.source .spriteFixerStage {
+  width: 88px;
+  height: 86px;
+}
+
+.spriteFixerState.result .spriteFixerStage {
+  justify-self: stretch;
+  width: 100%;
+  height: 152px;
+}
+
+.spriteFixerSprite {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 192px;
+  height: 208px;
+  background-repeat: no-repeat;
+  background-position: 0 var(--sprite-y);
+  background-size: 1536px 1872px;
+  image-rendering: pixelated;
+  transform: translate(-50%, -50%) scale(0.5);
+  transform-origin: center center;
+  animation: sprite-play var(--sprite-duration) steps(var(--sprite-frames)) infinite;
+  will-change: background-position;
+}
+
+.spriteFixerState.source .spriteFixerSprite {
+  transform: translate(-50%, -50%) scale(0.41);
+}
+
+.spriteFixerState.source .spriteFixerSprite.flipped {
+  transform: translate(-50%, -50%) scale(-0.41, 0.41);
+}
+
+.spriteFixerState.result .spriteFixerSprite {
+  transform: translate(-50%, -50%) scale(0.68);
+}
+
+.spriteFixerState.result .spriteFixerSprite.flipped {
+  transform: translate(-50%, -50%) scale(-0.68, 0.68);
+}
+
+.spriteFixerSprite.flipped {
+  transform: translate(-50%, -50%) scale(-0.5, 0.5);
+}
+
+.spriteFixerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 760px) {
+  .spriteFixerModal {
+    max-height: calc(100dvh - 24px);
+    padding: 26px 18px 20px;
+  }
+
+  .spriteFixerComparison {
+    grid-template-columns: 1fr;
+  }
+
+  .spriteFixerSegments {
+    grid-template-columns: 1fr;
+  }
+
+  .spriteFixerColumn.result .spriteFixerStates {
+    grid-template-columns: 1fr;
+  }
+}

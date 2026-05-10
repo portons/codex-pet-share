@@ -40,6 +40,7 @@ The frontend expects an API under `VITE_APP_API_BASE_URL` with these groups:
 - `GET /api/pets`, `GET /api/pets/:id`, `POST /api/pets`
 - `GET /api/pets/mine`, `GET /api/pets/favorites`
 - `POST|DELETE /api/pets/:id/like`
+- `PATCH /api/pets/:id/spritesheet` for owner/admin replacement of an uploaded pet's generated sprite assets
 - `GET /api/pets/:id/download`, `GET /api/pets/:id/spritesheet`,
   `GET /api/pets/:id/share-image`
 - `POST /api/auth/login`, `POST /api/auth/register`,
