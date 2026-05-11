@@ -370,7 +370,7 @@ export function AppRoutes({
               title: creator.displayName,
               subtitle,
               shareUrl: creatorShareUrl(creator),
-              imageUrl: creatorCompositeUrl(creator),
+              imageUrl: creatorCompositeUrl(creator, creatorPets, petCount),
               shareText: `${creator.displayName} on ${APP_NAME}`,
               ariaLabel: `Share ${creator.displayName}`
             });

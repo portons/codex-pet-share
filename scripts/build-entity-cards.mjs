@@ -15,7 +15,7 @@
 // like at build time. Re-run + redeploy when you want to refresh.
 
 import sharp from "sharp";
-import { mkdir, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
 
 const APP_NAME = requiredEnv("APP_NAME");
 const APP_HANDLE = requiredEnv("APP_HANDLE");
@@ -183,13 +183,23 @@ async function buildCollections() {
 
 async function buildCreators() {
   console.log(`Fetching creators from ${API_BASE}/api/creators/leaderboard ...`);
-  const res = await fetch(`${API_BASE}/api/creators/leaderboard?limit=200`);
-  if (!res.ok) {
-    throw new Error(`creators fetch failed: HTTP ${res.status}`);
+  const creators = [];
+  const pageSize = 60;
+  let page = 1;
+  while (true) {
+    const res = await fetch(`${API_BASE}/api/creators/leaderboard?page=${page}&pageSize=${pageSize}`);
+    if (!res.ok) {
+      throw new Error(`creators fetch failed page ${page}: HTTP ${res.status}`);
+    }
+    const body = await res.json();
+    const pageCreators = Array.isArray(body.creators) ? body.creators : [];
+    creators.push(...pageCreators);
+    if (page >= Number(body.totalPages || 1) || pageCreators.length < pageSize) break;
+    page += 1;
   }
-  const { creators } = await res.json();
   console.log(`  ${creators.length} creators.`);
 
+  await rm("public/assets/social/creators", { recursive: true, force: true });
   await mkdir("public/assets/social/creators", { recursive: true });
 
   for (const creator of creators) {

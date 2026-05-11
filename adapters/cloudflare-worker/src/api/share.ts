@@ -2,10 +2,10 @@ import { collectionPets, collectionRow } from "./collections";
 import { currentUser, publicUser } from "./auth";
 import { getVisiblePet, listPets } from "./pets";
 import { slugPattern } from "./constants";
-import { collectionSocialPreviewImageUrl } from "./socialPreview";
+import { collectionSocialPreviewImageUrl, creatorSocialPreviewImageUrl } from "./socialPreview";
 import { escapeHtml, html } from "../core/http";
 import { petAssetUrl } from "../storage/assets";
-import type { AppContext, Viewer } from "../core/types";
+import type { AppContext } from "../core/types";
 
 export async function handleSharePet(ctx: AppContext, petId?: string) {
   if (!petId || !slugPattern.test(petId)) return html("<!doctype html><title>Pet not found</title><p>Pet not found.</p>", 404);
@@ -61,13 +61,12 @@ export async function handleEntityShare(ctx: AppContext, kind: "collections" | "
   if (kind === "users" && id) {
     const user = await publicUser(ctx, id, viewer);
     if (!user) return html("<!doctype html><title>Creator not found</title><p>Creator not found.</p>", 404);
-    const result = await listPets(ctx, "", user.id, [], viewer, "new", { page: 1, pageSize: 4 }, "safe");
-    const stats = await creatorStats(ctx, user.id, viewer);
-    const featured = result.pets[0] || null;
+    const result = await listPets(ctx, "", user.id, [], viewer, "new", undefined, "safe");
+    const previewPets = result.pets.slice(0, 4);
     const title = `${user.displayName} - ${ctx.env.APP_NAME}`;
-    const description = creatorDescription(user.displayName, result.pets, stats.petCount, ctx.env.APP_NAME);
+    const description = creatorDescription(user.displayName, previewPets, result.total, ctx.env.APP_NAME);
     const handleOrId = user.handle || user.id;
-    const image = featured ? `${ctx.url.origin}/api/pets/${featured.id}/share-image` : `${ctx.env.PUBLIC_APP_ORIGIN}/assets/petshare-social-preview.png`;
+    const image = creatorSocialPreviewImageUrl(ctx, user, result.pets, result.total);
     return entityHtml(ctx, {
       title,
       description,
@@ -75,20 +74,11 @@ export async function handleEntityShare(ctx: AppContext, kind: "collections" | "
       shareUrl: `${ctx.env.PUBLIC_APP_ORIGIN}/users/${handleOrId}`,
       image,
       imageAlt: `${user.displayName} creator preview`,
-      imageType: "image/png",
+      imageType: "image/svg+xml",
       body: `<h1>${escapeHtml(user.displayName)}</h1><p>${escapeHtml(description)}</p>`
     });
   }
   return html("<!doctype html><title>Not found</title>", 404);
-}
-
-async function creatorStats(ctx: AppContext, ownerId: string, viewer: Viewer) {
-  const result = await listPets(ctx, "", ownerId, [], viewer, "new", undefined, "safe");
-  return {
-    petCount: result.total,
-    viewCount: result.pets.reduce((total, pet) => total + pet.viewCount, 0),
-    likeCount: result.pets.reduce((total, pet) => total + pet.likeCount, 0)
-  };
 }
 
 function creatorDescription(displayName: string, pets: Array<{ displayName: string }>, petCount: number, appName: string) {

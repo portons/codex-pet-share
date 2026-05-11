@@ -1,5 +1,3 @@
-import { creators as creatorManifest, version as cardVersion } from "../_social-manifest.js";
-
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HANDLE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -12,7 +10,7 @@ export async function onRequestGet(context) {
     return userNotFound();
   }
 
-  const response = await fetch(`${apiBase}/api/users/${encodeURIComponent(id)}/pets?page=1&pageSize=4`);
+  const response = await fetch(`${apiBase}/api/users/${encodeURIComponent(id)}/pets?page=1&pageSize=8`);
   if (!response.ok) {
     return userNotFound();
   }
@@ -26,7 +24,6 @@ export async function onRequestGet(context) {
   const stats = body.stats || {};
   const pets = Array.isArray(body.pets) ? body.pets : [];
   const safePets = pets.filter((pet) => !(Array.isArray(pet?.tags) && pet.tags.includes("nsfw")));
-  const featured = safePets[0] || null;
   const petCount = Number(stats.petCount || body.total || pets.length || 0);
 
   const title = `${user.displayName} - ${appName}`;
@@ -34,18 +31,8 @@ export async function onRequestGet(context) {
   const handleOrId = user.handle || user.id;
   const shareUrl = `${appOrigin}/users/${handleOrId}`;
   const appUrl = `${appOrigin}/#/users/${handleOrId}`;
-  const fallbackImageUrl = `${appOrigin}/assets/petshare-social-preview.png`;
-  const compositeKey = user.handle || user.id;
-  const compositeUrl = creatorManifest.has(compositeKey)
-    ? `${appOrigin}/assets/social/creators/${compositeKey}.png?v=${cardVersion}`
-    : null;
-  const imageUrl = compositeUrl
-    || (featured ? `${apiBase}/api/pets/${featured.id}/share-image` : fallbackImageUrl);
-  const imageAlt = compositeUrl
-    ? `${user.displayName}'s pixel pets on ${appName}`
-    : (featured
-      ? `${featured.displayName}, a pet by ${user.displayName}`
-      : `${user.displayName}'s pets`);
+  const imageUrl = `${apiBase}/api/users/${encodeURIComponent(handleOrId)}/social-image?v=${encodeURIComponent(creatorSocialVersion({ user, safePets, petCount, appOrigin }))}`;
+  const imageAlt = `${user.displayName}'s pixel pets on ${appName}`;
 
   return html(`<!doctype html>
 <html lang="en">
@@ -61,7 +48,7 @@ export async function onRequestGet(context) {
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:image" content="${escapeHtml(imageUrl)}">
   <meta property="og:image:secure_url" content="${escapeHtml(imageUrl)}">
-  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:type" content="image/svg+xml">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${escapeHtml(imageAlt)}">
@@ -110,6 +97,27 @@ function buildDescription({ displayName, safePets, petCount, appName }) {
     return `${displayName} made ${safePets[0].displayName} and ${remaining} more pixel pet${remaining === 1 ? "" : "s"} for ${appName}.`;
   }
   return `${displayName} has ${petCount} pixel pet${petCount === 1 ? "" : "s"} for ${appName}.`;
+}
+
+function creatorSocialVersion({ user, safePets, petCount, appOrigin }) {
+  return hashVersion([
+    "2",
+    appOrigin,
+    user.id,
+    user.handle || "",
+    user.displayName,
+    String(petCount),
+    ...safePets.slice(0, 8).map((pet) => `${pet.id}:${pet.shareImageUrl || ""}`)
+  ].join("|"));
+}
+
+function hashVersion(input) {
+  let hash = 2166136261;
+  for (let index = 0; index < input.length; index += 1) {
+    hash ^= input.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
 }
 
 function requiredEnv(env, name) {

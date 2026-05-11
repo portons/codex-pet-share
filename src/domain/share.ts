@@ -40,10 +40,33 @@ export function collectionSocialPreviewUrl(collection: { slug: string; ownerId?:
   return `${publicAppOrigin}/api/collections/${encodeURIComponent(collection.slug)}/social-image?v=${encodeURIComponent(collection.updatedAt)}`;
 }
 
-export function creatorCompositeUrl(creator: { id: string; handle?: string | null }): string {
-  return `${publicAppOrigin}/assets/social/creators/${encodeURIComponent(creator.handle || creator.id)}.png`;
+export function creatorCompositeUrl(
+  creator: { id: string; handle?: string | null; displayName?: string },
+  pets: Array<Pick<Pet, "id" | "shareImageUrl">> = [],
+  petCount = pets.length
+): string {
+  const handleOrId = creator.handle || creator.id;
+  const version = hashVersion([
+    "2",
+    publicAppOrigin,
+    creator.id,
+    creator.handle || "",
+    creator.displayName || "",
+    String(petCount),
+    ...pets.slice(0, 8).map((pet) => `${pet.id}:${pet.shareImageUrl}`)
+  ].join("|"));
+  return `${publicAppOrigin}/api/users/${encodeURIComponent(handleOrId)}/social-image?v=${encodeURIComponent(version)}`;
 }
 
 export function petCompositeUrl(petId: string): string {
   return `${publicAppOrigin}/assets/social/pets/${encodeURIComponent(petId)}.png`;
+}
+
+function hashVersion(input: string) {
+  let hash = 2166136261;
+  for (let index = 0; index < input.length; index += 1) {
+    hash ^= input.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
 }
