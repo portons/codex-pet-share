@@ -44,7 +44,7 @@ The frontend expects an API under `VITE_APP_API_BASE_URL` with these groups:
 - `GET /api/pets/:id/download`, `GET /api/pets/:id/spritesheet`,
   `GET /api/pets/:id/share-image`
 - `POST /api/auth/login`, `POST /api/auth/register`,
-  `POST /api/auth/refresh`, `GET /api/auth/me`
+  `POST /api/auth/refresh`, `GET|PATCH|DELETE /api/auth/me`
 - `GET /api/users/:id/pets`, `GET /api/creators/leaderboard`
 - `GET /api/collections`, `GET /api/collections/:slug?page=<n>&pageSize=<n>`
 - `POST /api/rooms`, `GET /api/rooms/:id`, `POST /api/rooms/:id/close`
@@ -71,6 +71,10 @@ Auth responses return:
 
 The frontend stores this session in localStorage and refreshes through
 `POST /api/auth/refresh`.
+
+Account removal is `DELETE /api/auth/me` with `{ "deletePets": boolean }`.
+When `deletePets` is false, uploaded pets remain public with no owner and are
+rendered as `Anonymous`.
 
 ## Realtime Contract
 

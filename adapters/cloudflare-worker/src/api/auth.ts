@@ -1,9 +1,10 @@
 import { Google, Twitter, generateCodeVerifier, generateState } from "arctic";
 import { bearerToken, escapeHtml, HttpError, json, readJsonBody } from "../core/http";
 import { decodePayload, encodePayload, hmac, randomId, sha256Hex, timingSafeEqual, uuid } from "../core/crypto";
-import { first, nowIso, serializeUser } from "../core/db";
+import { all, first, nowIso, serializeUser } from "../core/db";
 import { hashPassword, verifyPassword } from "../core/password";
-import type { AppContext, AuthSession, AuthUser } from "../core/types";
+import { deleteAsset } from "../storage/assets";
+import type { AppContext, AuthSession, AuthUser, PetRow } from "../core/types";
 
 const accessTtlSeconds = 60 * 15;
 const refreshTtlSeconds = 60 * 60 * 24 * 30;
@@ -72,6 +73,20 @@ export async function handleAuth(ctx: AppContext, partsOrAction: string[] | stri
       .bind(nextDisplayName, nowIso(), user.id)
       .run();
     return json({ user: { ...user, displayName: nextDisplayName } });
+  }
+
+  if (ctx.request.method === "DELETE" && action === "me") {
+    const user = await requireUser(ctx);
+    const { deletePets } = await readJsonBody<{ deletePets?: unknown }>(ctx.request);
+    if (typeof deletePets !== "boolean") throw new HttpError("deletePets must be boolean", 400);
+    const removedPetIds = deletePets ? await deleteOwnUploads(ctx, user.id) : [];
+    if (!deletePets) {
+      await ctx.env.DB.prepare("update pets set owner_id = null, updated_at = ? where owner_id = ? and source = 'upload'")
+        .bind(nowIso(), user.id)
+        .run();
+    }
+    await ctx.env.DB.prepare("delete from users where id = ?").bind(user.id).run();
+    return json({ ok: true, deletedPets: removedPetIds.length });
   }
 
   if (ctx.request.method === "POST" && action === "password") {
@@ -179,6 +194,17 @@ export async function userById(ctx: AppContext, id: string) {
 export async function userByEmail(ctx: AppContext, email: string) {
   const row = await first<UserRow>(ctx.env.DB.prepare("select * from users where email = ?").bind(email));
   return row ? serializeUser(row) : null;
+}
+
+async function deleteOwnUploads(ctx: AppContext, userId: string) {
+  const pets = await all<PetRow>(ctx.env.DB.prepare("select * from pets where owner_id = ? and source = 'upload'").bind(userId));
+  const removedPetIds: string[] = [];
+  for (const pet of pets) {
+    await Promise.all(["pet.json", "spritesheet.webp", "share.png", "preview.webp", "poster.webp"].map((name) => deleteAsset(ctx, `${pet.id}/${name}`)));
+    await ctx.env.DB.prepare("delete from pets where id = ?").bind(pet.id).run();
+    removedPetIds.push(pet.id);
+  }
+  return removedPetIds;
 }
 
 export async function publicUser(ctx: AppContext, idOrHandle: string, viewer: AuthUser | null) {

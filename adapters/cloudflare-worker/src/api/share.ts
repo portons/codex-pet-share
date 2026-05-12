@@ -13,7 +13,7 @@ export async function handleSharePet(ctx: AppContext, petId?: string) {
   if (!pet) return html("<!doctype html><title>Pet not found</title><p>Pet not found.</p>", 404);
   const version = String(Date.parse(pet.updated_at || pet.created_at));
   const title = `${pet.display_name} - ${ctx.env.APP_NAME}`;
-  const creator = pet.owner_display_name || (pet.source === "seed" ? "Local package" : "Unknown");
+  const creator = pet.owner_display_name || (pet.source === "seed" ? "Local package" : "Anonymous");
   const nsfw = JSON.parse(pet.tags_json).includes("nsfw");
   return entityHtml(ctx, {
     title,

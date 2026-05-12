@@ -26,7 +26,8 @@ export function useAuthForms({
   applySession,
   setUser,
   onAuthenticated,
-  onSettingsSaved
+  onSettingsSaved,
+  onAccountDeleted
 }: {
   user: User | null;
   apiFetch: (path: string, init?: RequestInit, authSession?: AuthSession | null) => Promise<Response>;
@@ -34,6 +35,7 @@ export function useAuthForms({
   setUser: (nextUser: User | null) => void;
   onAuthenticated: (nextUser: User, nextSession: AuthSession) => Promise<void>;
   onSettingsSaved: (nextUser: User) => Promise<void>;
+  onAccountDeleted: () => void | Promise<void>;
 }) {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>("login");
@@ -304,6 +306,31 @@ export function useAuthForms({
     }
   }
 
+  async function deleteAccount(deletePets: boolean) {
+    if (!user || settingsBusy) return;
+    setSettingsStatus("");
+    setSettingsBusy(true);
+    try {
+      await readJson<{ ok: true; deletedPets: number }>(
+        await apiFetch("/api/auth/me", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deletePets })
+        })
+      );
+      applySession(null);
+      setUser(null);
+      setSettingsOpen(false);
+      setSettingsCurrentPassword("");
+      setSettingsNewPassword("");
+      await onAccountDeleted();
+    } catch (error) {
+      setSettingsStatus(error instanceof Error ? error.message : "Could not delete account.");
+    } finally {
+      setSettingsBusy(false);
+    }
+  }
+
   return {
     authOpen,
     authMode,
@@ -337,6 +364,7 @@ export function useAuthForms({
     settingsStatus,
     settingsBusy,
     submitSettings,
+    deleteAccount,
     openSettings,
     closeSettings,
     setAuthMode

@@ -132,6 +132,19 @@ function App() {
   const [sharingEntity, setSharingEntity] = useState<EntityShareTarget | null>(null);
   const [downloadPet, setDownloadPet] = useState<Pet | null>(null);
   const [playgroundPet, setPlaygroundPet] = useState<Pet | null>(null);
+
+  async function handleAccountDeleted() {
+    setMinePets([]);
+    setFavoritePets([]);
+    setUserCollections([]);
+    setAdminCollections([]);
+    setDetailPet(null);
+    setCreator(null);
+    setCreatorPets([]);
+    navigate("/");
+    setRoute(routeFromHash());
+  }
+
   const {
     authOpen,
     authMode,
@@ -162,6 +175,7 @@ function App() {
     settingsStatus,
     settingsBusy,
     submitSettings,
+    deleteAccount,
     openSettings,
     openPasswordReset,
     closeSettings,
@@ -172,7 +186,8 @@ function App() {
     applySession,
     setUser,
     onAuthenticated: refreshAfterAuth,
-    onSettingsSaved: refreshAfterSettings
+    onSettingsSaved: refreshAfterSettings,
+    onAccountDeleted: handleAccountDeleted
   });
   const {
     deleteStatus,
@@ -534,7 +549,7 @@ function App() {
       setPassword, authStatus, authBusy, resendBusy, authProviders, startOAuth, resendVerification, submitAuth,
       closeAuth, settingsOpen, settingsDisplayName,
       setSettingsDisplayName, settingsCurrentPassword, setSettingsCurrentPassword, settingsNewPassword,
-      setSettingsNewPassword, settingsStatus, settingsBusy, submitSettings, closeSettings, sharingPet,
+      setSettingsNewPassword, settingsStatus, settingsBusy, submitSettings, deleteAccount, closeSettings, sharingPet,
       setSharingPet, sharingEntity, setSharingEntity, downloadPet, setDownloadPet, tagEditorPet,
       tagEditorTags, tagEditorKind, tagEditorStatus, tagEditorBusy, setTagEditorKind, toggleTagEditorTag,
       submitTagEditor, closeTagEditor, spriteFixerPet, spriteFixerStatus, spriteFixerBusy,

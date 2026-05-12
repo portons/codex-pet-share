@@ -43,6 +43,7 @@ export function AppDialogs({
   settingsStatus,
   settingsBusy,
   submitSettings,
+  deleteAccount,
   closeSettings,
   sharingPet,
   setSharingPet,
@@ -132,6 +133,7 @@ export function AppDialogs({
   settingsStatus: string;
   settingsBusy: boolean;
   submitSettings: (event: FormEvent) => void | Promise<void>;
+  deleteAccount: (deletePets: boolean) => void | Promise<void>;
   closeSettings: () => void;
   sharingPet: Pet | null;
   setSharingPet: Dispatch<SetStateAction<Pet | null>>;
@@ -228,6 +230,7 @@ export function AppDialogs({
           status={settingsStatus}
           busy={settingsBusy}
           onSubmit={submitSettings}
+          onDeleteAccount={deleteAccount}
           onClose={closeSettings}
         />
       )}

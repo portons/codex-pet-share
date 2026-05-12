@@ -82,7 +82,7 @@ export function serializePet(ctx: AppContext, row: PetRow, report?: ValidationRe
     kind: row.kind,
     ownerId: row.owner_id,
     ownerHandle: row.owner_handle || null,
-    ownerName: row.owner_display_name || (row.source === "seed" ? "Local package" : "Unknown"),
+    ownerName: row.owner_display_name || (row.source === "seed" ? "Local package" : "Anonymous"),
     uploadedAt: row.created_at,
     viewCount: row.view_count || 0,
     downloadCount: viewer?.isAdmin ? row.download_count || 0 : 0,
