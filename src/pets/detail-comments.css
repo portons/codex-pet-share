@@ -1,0 +1,208 @@
+.petComments {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.petCommentsHeader > div {
+  display: grid;
+  gap: 4px;
+}
+
+.petCommentComposer {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-warm);
+}
+
+.petCommentComposer label {
+  display: grid;
+  gap: 8px;
+}
+
+.petCommentInput {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.petCommentChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.petCommentChips button,
+.petCommentReactions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--floating-control-bg);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.petCommentChips button:hover:not(:disabled),
+.petCommentReactions button:hover:not(:disabled),
+.petCommentReactions button.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.petCommentChips button:active,
+.petCommentReactions button:active {
+  transform: translateY(1px);
+}
+
+.petCommentComposerFooter,
+.petCommentSignedOut,
+.petCommentMeta,
+.petCommentMore {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.petCommentLimit {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.petCommentLimit.warning {
+  color: var(--danger-fg);
+}
+
+.petCommentSignedOut {
+  flex-wrap: wrap;
+}
+
+.petCommentSignedOut p,
+.petCommentEmpty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.petCommentsStatus {
+  margin: 0;
+}
+
+.petCommentList {
+  display: grid;
+  gap: 10px;
+}
+
+.petCommentLoading {
+  display: grid;
+  place-items: center;
+  min-height: 72px;
+  color: var(--muted);
+}
+
+.petComment {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.petCommentMeta > div {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.petCommentMeta strong {
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.petCommentMeta span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+.petCommentDelete {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--muted);
+  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out);
+}
+
+.petCommentDelete:hover:not(:disabled) {
+  border-color: var(--danger-border);
+  background: var(--danger-bg-hover);
+  color: var(--danger-fg-hover);
+}
+
+.petComment p {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.petCommentReactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.petCommentReactions button {
+  min-height: 26px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.petCommentReactions strong {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.petCommentMore {
+  justify-self: start;
+}
+
+@media (max-width: 680px) {
+  .petComments {
+    padding: 20px;
+  }
+
+  .petCommentComposerFooter {
+    align-items: stretch;
+  }
+
+  .petCommentComposerFooter .btn {
+    justify-content: center;
+  }
+}

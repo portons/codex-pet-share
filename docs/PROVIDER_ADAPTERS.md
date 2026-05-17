@@ -40,6 +40,10 @@ The frontend expects an API under `VITE_APP_API_BASE_URL` with these groups:
 - `GET /api/pets`, `GET /api/pets/:id`, `POST /api/pets`
 - `GET /api/pets/mine`, `GET /api/pets/favorites`
 - `POST|DELETE /api/pets/:id/like`
+- `GET /api/pets/:id/comments`,
+  `POST /api/pets/:id/comments`,
+  `DELETE /api/pets/:id/comments/:commentId`,
+  `POST|DELETE /api/pets/:id/comments/:commentId/reactions`
 - `PATCH /api/pets/:id/spritesheet` for owner/admin replacement of an uploaded pet's generated sprite assets
 - `GET /api/pets/:id/download`, `GET /api/pets/:id/spritesheet`,
   `GET /api/pets/:id/share-image`
@@ -75,6 +79,12 @@ The frontend stores this session in localStorage and refreshes through
 Account removal is `DELETE /api/auth/me` with `{ "deletePets": boolean }`.
 When `deletePets` is false, uploaded pets remain public with no owner and are
 rendered as `Anonymous`.
+
+Pet comments are flat, pet-scoped notes. Visitors who can see a pet can read
+its visible comments. Signed-in, non-shadowbanned users can post comments and
+toggle comment reactions. Comment authors, pet owners, and admins can delete
+comments. When a user is deleted, their comments remain visible as `Anonymous`
+unless the commented pet itself is deleted.
 
 ## Realtime Contract
 

@@ -4,6 +4,7 @@ export type IconName =
   | "ban"
   | "check"
   | "close"
+  | "comment"
   | "copy"
   | "cube"
   | "download"
@@ -43,6 +44,13 @@ export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
       <>
         <path d="M4 4 L12 12" />
         <path d="M12 4 L4 12" />
+      </>
+    ),
+    comment: (
+      <>
+        <path d="M3 3.5 H13 V10.5 H8 L4.5 13 V10.5 H3 Z" />
+        <path d="M5.5 6 H10.5" />
+        <path d="M5.5 8 H8.5" />
       </>
     ),
     copy: (

@@ -120,7 +120,16 @@ export function AppRoutes({
   selectCollectionPage,
   detailLoading,
   detailPet,
-  morePets
+  morePets,
+  comments,
+  commentsLoading,
+  commentsBusy,
+  commentsStatus,
+  commentsMeta,
+  loadComments,
+  submitComment,
+  deleteComment,
+  toggleReaction
 }: AppRoutesProps) {
   return (
     <>
@@ -401,6 +410,11 @@ export function AppRoutes({
               shadowbanBusyOwnerId={shadowbanBusyOwnerId}
               nsfwBusyId={nsfwBusyId}
               deleteStatus={deleteStatus}
+              comments={comments}
+              commentsLoading={commentsLoading}
+              commentsBusy={commentsBusy}
+              commentsStatus={commentsStatus}
+              commentsMeta={commentsMeta}
               contentMode={contentMode}
               hasCollections={collections.length > 0}
               morePets={morePets}
@@ -417,6 +431,10 @@ export function AppRoutes({
               onToggleNsfw={togglePetNsfw}
               onShadowbanOwner={toggleOwnerShadowban}
               onDelete={deleteUpload}
+              onSubmitComment={(body) => submitComment(detailPet, body)}
+              onDeleteComment={(comment) => deleteComment(detailPet, comment)}
+              onReactToComment={(comment, reaction) => toggleReaction(detailPet, comment, reaction)}
+              onLoadMoreComments={() => loadComments(detailPet.id, commentsMeta.page + 1)}
             />
           )
         )

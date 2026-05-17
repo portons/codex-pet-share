@@ -87,6 +87,7 @@ export function serializePet(ctx: AppContext, row: PetRow, report?: ValidationRe
     viewCount: row.view_count || 0,
     downloadCount: viewer?.isAdmin ? row.download_count || 0 : 0,
     likeCount: row.like_count || 0,
+    commentCount: row.comment_count || 0,
     likedByMe: likeContext?.has(row.id) || false,
     ownerShadowbanned: Boolean(viewer?.isAdmin && ownerShadowbanned(row)),
     tags: tags(row),
@@ -271,7 +272,13 @@ async function recordPetStat(ctx: AppContext, petId: string, eventType: "view" |
 
 function petBaseQuery(ctx: AppContext, suffix = "") {
   return ctx.env.DB.prepare(`
-    select p.*, u.handle as owner_handle, u.display_name as owner_display_name, u.shadowbanned_at as owner_shadowbanned_at
+    select p.*, u.handle as owner_handle, u.display_name as owner_display_name, u.shadowbanned_at as owner_shadowbanned_at,
+      (
+        select count(*)
+        from pet_comments pc
+        left join users cu on cu.id = pc.author_id
+        where pc.pet_id = p.id and cu.shadowbanned_at is null
+      ) as comment_count
     from pets p left join users u on u.id = p.owner_id ${suffix}
   `);
 }

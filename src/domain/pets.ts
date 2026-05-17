@@ -39,6 +39,7 @@ export function normalizePet(pet: Pet): Pet {
     ...pet,
     tags: pet.tags || [],
     likeCount: pet.likeCount || 0,
+    commentCount: pet.commentCount || 0,
     likedByMe: Boolean(pet.likedByMe),
     ownerShadowbanned: Boolean(pet.ownerShadowbanned),
     spritesheetUrl: petAssetUrl(pet.spritesheetUrl),

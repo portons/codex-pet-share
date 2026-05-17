@@ -3,13 +3,14 @@ import { DownloadCommandRow, type DownloadCommandMode } from "../downloads/Downl
 import { trackEvent } from "../domain/analytics";
 import { petStates, type TagName } from "../domain/config";
 import { isNsfwPet, petCodexInstallUrl, petImportCommand } from "../domain/pets";
-import type { ContentMode, Pet, User } from "../domain/types";
+import type { ContentMode, GalleryMeta, Pet, PetComment, User } from "../domain/types";
 import { copyText } from "../ui/clipboard";
 import { Icon } from "../ui/Icon";
 import { Spinner } from "../ui/Spinner";
 import { ValidationReportCard } from "../ui/ValidationCard";
 import { CursorPetPreview, useCursorPreviewAssets, useCursorPreviewMotion, useCursorPreviewSupport } from "./CursorPreview";
 import { AdminPetMenu, PetCard } from "./PetCard";
+import { PetComments } from "./PetComments";
 import { OwnerLabel, PetStats, PetTags } from "./PetMeta";
 import { PetSprite } from "./PetPreview";
 import { usePetGifExport } from "./usePetGifExport";
@@ -22,6 +23,11 @@ export function PetDetail({
   shadowbanBusyOwnerId,
   nsfwBusyId,
   deleteStatus,
+  comments,
+  commentsLoading,
+  commentsBusy,
+  commentsStatus,
+  commentsMeta,
   contentMode,
   hasCollections,
   morePets,
@@ -37,7 +43,11 @@ export function PetDetail({
   onCollect,
   onToggleNsfw,
   onShadowbanOwner,
-  onDelete
+  onDelete,
+  onSubmitComment,
+  onDeleteComment,
+  onReactToComment,
+  onLoadMoreComments
 }: {
   pet: Pet;
   user: User | null;
@@ -46,6 +56,11 @@ export function PetDetail({
   shadowbanBusyOwnerId: string;
   nsfwBusyId: string;
   deleteStatus: string;
+  comments: PetComment[];
+  commentsLoading: boolean;
+  commentsBusy: string;
+  commentsStatus: string;
+  commentsMeta: GalleryMeta;
   contentMode: ContentMode;
   hasCollections: boolean;
   morePets: Array<Pet>;
@@ -62,6 +77,10 @@ export function PetDetail({
   onToggleNsfw: (pet: Pet) => void;
   onShadowbanOwner: (pet: Pet) => void;
   onDelete: (pet: Pet) => void;
+  onSubmitComment: (body: string) => Promise<boolean>;
+  onDeleteComment: (comment: PetComment) => void | Promise<void>;
+  onReactToComment: (comment: PetComment, reaction: string) => void | Promise<void>;
+  onLoadMoreComments: () => void | Promise<void>;
 }) {
   const [activeStateId, setActiveStateId] = useState<(typeof petStates)[number]["id"]>("idle");
   const [cursorPreview, setCursorPreview] = useState(false);
@@ -362,6 +381,23 @@ export function PetDetail({
           ))}
         </div>
       </article>
+
+      <PetComments
+        pet={pet}
+        user={user}
+        comments={comments}
+        total={commentsMeta.total}
+        totalPages={commentsMeta.totalPages}
+        page={commentsMeta.page}
+        loading={commentsLoading}
+        busy={commentsBusy}
+        status={commentsStatus}
+        onSubmit={onSubmitComment}
+        onDelete={onDeleteComment}
+        onReact={onReactToComment}
+        onLoadMore={onLoadMoreComments}
+        onSignIn={onSignIn}
+      />
 
       {(canEditTags || Boolean(deleteStatus)) && (
         <div className="detailAdminBar">

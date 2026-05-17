@@ -14,6 +14,7 @@ import type {
   GallerySort,
   GalleryView,
   Pet,
+  PetComment,
   PetKind,
   Route,
   UploadState,
@@ -117,5 +118,14 @@ export type AppRoutesProps = {
   detailLoading: boolean;
   detailPet: Pet | null;
   morePets: Pet[];
+  comments: PetComment[];
+  commentsLoading: boolean;
+  commentsBusy: string;
+  commentsStatus: string;
+  commentsMeta: GalleryMeta;
+  loadComments: (petId: string, page?: number) => void | Promise<void>;
+  submitComment: (pet: Pet, body: string) => Promise<boolean>;
+  deleteComment: (pet: Pet, comment: PetComment) => void | Promise<void>;
+  toggleReaction: (pet: Pet, comment: PetComment, reaction: string) => void | Promise<void>;
   openTagKind?: (kind: EditablePetKind) => void;
 };

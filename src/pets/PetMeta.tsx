@@ -22,6 +22,10 @@ export function PetStats({
         <Icon name="heart" size={13} />
         {formatMetric(pet.likeCount)}
       </span>
+      <span>
+        <Icon name="comment" size={13} />
+        {formatMetric(pet.commentCount)}
+      </span>
     </div>
   );
 }

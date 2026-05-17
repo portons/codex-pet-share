@@ -25,6 +25,7 @@ export type Pet = {
   viewCount: number;
   downloadCount: number;
   likeCount: number;
+  commentCount: number;
   likedByMe: boolean;
   ownerShadowbanned: boolean;
   tags: string[];
@@ -35,6 +36,29 @@ export type AuthSession = {
   accessToken: string;
   refreshToken?: string;
   expiresAt?: number;
+};
+
+export type PetCommentReaction = {
+  reaction: string;
+  count: number;
+  reactedByMe: boolean;
+};
+
+export type PetComment = {
+  id: string;
+  petId: string;
+  authorId: string | null;
+  authorHandle: string | null;
+  authorName: string;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+  canDelete: boolean;
+  reactions: PetCommentReaction[];
+};
+
+export type PetCommentsResponse = GalleryMeta & {
+  comments: PetComment[];
 };
 
 export type Route =

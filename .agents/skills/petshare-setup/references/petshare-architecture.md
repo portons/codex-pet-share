@@ -178,6 +178,13 @@ Gallery API responses are typed in `src/domain/types.ts`. Browse surfaces
 support query, tags, kind, content mode, sort, page size, favorites, user pages,
 collections, creator leaderboard, likes, views, downloads, and share modals.
 
+Pet detail pages also support a flat guestbook-style comments surface. The
+provider API owns persistence and authorization under `/api/pets/:id/comments`:
+visible viewers can read comments, signed-in non-shadowbanned users can post and
+react, and comment authors, pet owners, or admins can delete comments. Deleted
+users' comments remain under `Anonymous`, while deleted pets cascade-delete
+their comments.
+
 Visibility rules matter:
 
 - Shadowbanned users cannot upload through the checked-in backend.

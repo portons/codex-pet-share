@@ -78,6 +78,7 @@ export type PetRow = {
   view_count: number;
   download_count: number;
   like_count: number;
+  comment_count?: number;
   tags_json: string;
   validation_report_json: string | null;
   owner_handle?: string | null;

@@ -11,6 +11,7 @@ import { readJson } from "../domain/http";
 import { useUploadWorkflow } from "../uploads/useUploadWorkflow";
 import { usePetEditors } from "../pets/usePetEditors";
 import { usePetMutations } from "../pets/usePetMutations";
+import { usePetComments } from "../pets/usePetComments";
 import { useGalleryBrowser } from "../gallery/useGalleryBrowser";
 import { useUserCollections } from "../collections/useUserCollections";
 import { useTheme } from "./useTheme";
@@ -238,6 +239,24 @@ function App() {
     openAuth
   });
   const {
+    comments,
+    commentsLoading,
+    commentsBusy,
+    commentsStatus,
+    commentsMeta,
+    clearComments,
+    loadComments,
+    submitComment,
+    deleteComment,
+    toggleReaction
+  } = usePetComments({
+    apiFetch,
+    session,
+    user,
+    setDetailPet,
+    openAuth
+  });
+  const {
     adminStatus,
     setAdminStatus,
     adminModerationBusy,
@@ -459,6 +478,16 @@ function App() {
     setAdminStatus
   });
 
+  useEffect(() => {
+    if (route.name !== "detail") {
+      clearComments();
+      return;
+    }
+    loadComments(route.id).catch((error) =>
+      setAuthStatus(error instanceof Error ? error.message : "failed to load comments")
+    );
+  }, [route.name, route.name === "detail" ? route.id : "", user?.id, session?.accessToken]);
+
   const {
     selectContentMode,
     selectCreatorPage,
@@ -541,7 +570,9 @@ function App() {
       adminCollectionBusySlug, adminModerationBusy, adminStatus, setAdminUserShadowban, removeAdminUser,
       createCollection, updateCollection, deleteCollection, creator, creatorPets, creatorMeta,
       creatorLoading, selectCreatorPage, selectCreatorsPage, selectCreatorsSort, selectCreatorsQuery,
-      selectCollectionPage, detailLoading, detailPet, morePets
+      selectCollectionPage, detailLoading, detailPet, morePets, comments, commentsLoading,
+      commentsBusy, commentsStatus, commentsMeta, loadComments, submitComment,
+      deleteComment, toggleReaction
     },
     dialogs: {
       user, contentMode, selectContentMode,

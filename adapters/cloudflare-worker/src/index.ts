@@ -1,5 +1,6 @@
 import { handleAuth } from "./api/auth";
 import { handleAdmin, handleCollections, handleCreators, handleUsers } from "./api/collections";
+import { handlePetComments } from "./api/comments";
 import { handlePets } from "./api/pets";
 import { handleRooms, roomAuth } from "./api/rooms";
 import { handleEntityShare, handleSharePet } from "./api/share";
@@ -102,6 +103,7 @@ async function route(ctx: AppContext, parts: string[]) {
   if (parts[1] === "auth") return handleAuth(ctx, parts.slice(2));
   if (parts[1] === "telemetry") return handleTelemetry(ctx);
   if (parts[1] === "admin") return handleAdmin(ctx, parts.slice(2));
+  if (parts[1] === "pets" && parts[2] && parts[3] === "comments") return handlePetComments(ctx, parts[2], parts.slice(4));
   if (parts[1] === "pets") return handlePets(ctx, parts.slice(2));
   if ((ctx.request.method === "GET" || ctx.request.method === "HEAD") && parts[1] === "users" && parts[2] && parts[3] === "social-image" && parts.length === 4) return handleCreatorSocialImage(ctx, parts[2]);
   if (parts[1] === "users") return handleUsers(ctx, parts.slice(2));
