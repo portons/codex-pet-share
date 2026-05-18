@@ -1,10 +1,36 @@
 .petComments {
+  position: relative;
   display: grid;
   gap: 18px;
   padding: 24px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--accent-soft) 62%, transparent), transparent 32%),
+    linear-gradient(145deg, color-mix(in srgb, var(--surface) 96%, var(--accent-soft)), var(--surface) 54%),
+    var(--surface);
+  box-shadow:
+    inset 0 1px 0 var(--inset-highlight),
+    0 20px 46px -34px color-mix(in srgb, var(--accent) 70%, transparent),
+    var(--shadow-md);
+}
+
+.petComments::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--accent) 14%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(135deg, rgba(15, 15, 14, 0.7), transparent 58%);
+  opacity: 0.34;
+}
+
+.petCommentsHeader {
+  position: relative;
 }
 
 .petCommentsHeader > div {
@@ -12,13 +38,35 @@
   gap: 4px;
 }
 
+.petCommentsSignal {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 0 11px;
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 76%, var(--accent-soft));
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+}
+
 .petCommentComposer {
+  position: relative;
   display: grid;
-  gap: 12px;
+  gap: 13px;
   padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-warm);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 86%, var(--accent-soft)), transparent 74%),
+    color-mix(in srgb, var(--surface-warm) 88%, var(--surface));
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
 }
 
 .petCommentComposer label {
@@ -27,7 +75,7 @@
 }
 
 .petCommentInput {
-  min-height: 92px;
+  min-height: 104px;
   resize: vertical;
   line-height: 1.45;
 }
@@ -35,15 +83,15 @@
 .petCommentChips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 7px;
 }
 
 .petCommentChips button,
 .petCommentReactions button {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  min-height: 28px;
+  gap: 6px;
+  min-height: 29px;
   padding: 0 10px;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -52,26 +100,29 @@
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0;
-  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out),
-    color 160ms var(--ease-out), transform 80ms var(--ease-out);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+  transition:
+    background 180ms var(--ease-out),
+    border-color 180ms var(--ease-out),
+    color 180ms var(--ease-out),
+    transform 90ms var(--ease-out);
 }
 
 .petCommentChips button:hover:not(:disabled),
 .petCommentReactions button:hover:not(:disabled),
 .petCommentReactions button.active {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 52%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 82%, var(--surface));
   color: var(--ink);
 }
 
 .petCommentChips button:active,
 .petCommentReactions button:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.99);
 }
 
 .petCommentComposerFooter,
 .petCommentSignedOut,
-.petCommentMeta,
 .petCommentMore {
   display: flex;
   align-items: center;
@@ -91,6 +142,7 @@
 
 .petCommentSignedOut {
   flex-wrap: wrap;
+  padding: 4px 0;
 }
 
 .petCommentSignedOut p,
@@ -104,28 +156,82 @@
   margin: 0;
 }
 
-.petCommentList {
+.petCommentList,
+.petCommentSkeletons {
   display: grid;
   gap: 10px;
 }
 
-.petCommentLoading {
-  display: grid;
-  place-items: center;
-  min-height: 72px;
-  color: var(--muted);
-}
-
 .petComment {
+  position: relative;
   display: grid;
   gap: 10px;
   padding: 14px;
   border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  background: var(--surface);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, var(--accent-soft)), var(--surface) 62%),
+    var(--surface);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+  animation: pet-comment-in 340ms var(--ease-out) both;
+  animation-delay: calc(var(--comment-index) * 46ms);
+  transition:
+    border-color 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out),
+    transform 120ms var(--ease-out);
 }
 
-.petCommentMeta > div {
+.petComment:hover {
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
+  box-shadow:
+    inset 0 1px 0 var(--inset-highlight),
+    0 14px 32px -28px color-mix(in srgb, var(--accent) 72%, transparent);
+  transform: translateY(-1px);
+}
+
+.petComment.highlighted {
+  border-color: color-mix(in srgb, var(--accent) 68%, var(--border));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent),
+    inset 0 1px 0 var(--inset-highlight),
+    0 18px 38px -28px color-mix(in srgb, var(--accent) 90%, transparent);
+}
+
+.petComment:focus {
+  outline: 2px solid color-mix(in srgb, var(--accent) 42%, transparent);
+  outline-offset: 3px;
+}
+
+.petCommentMeta {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.petCommentAvatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 35% 20%, var(--inset-highlight), transparent 40%),
+    color-mix(in srgb, var(--accent-soft) 58%, var(--surface));
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.petCommentByline {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.petCommentByline > div {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
@@ -133,28 +239,55 @@
   min-width: 0;
 }
 
-.petCommentMeta strong {
+.petCommentByline strong,
+.petCommentAuthorLink {
   color: var(--ink);
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
 }
 
-.petCommentMeta span {
+.petCommentAuthorLink {
+  border-bottom: 1px solid transparent;
+  transition: border-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.petCommentAuthorLink:hover {
+  border-color: currentColor;
+  color: var(--accent-deep);
+}
+
+.petCommentByline span,
+.petCommentByline small,
+.petCommentHandleLink {
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 10.5px;
+  font-style: normal;
+}
+
+.petCommentHandleLink {
+  justify-self: start;
+  transition: color 160ms var(--ease-out);
+}
+
+.petCommentHandleLink:hover {
+  color: var(--accent-deep);
 }
 
 .petCommentDelete {
   display: inline-grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border: 1px solid transparent;
   border-radius: 999px;
   color: var(--muted);
-  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out),
-    color 160ms var(--ease-out);
+  transition:
+    background 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out),
+    transform 90ms var(--ease-out);
 }
 
 .petCommentDelete:hover:not(:disabled) {
@@ -163,39 +296,75 @@
   color: var(--danger-fg-hover);
 }
 
+.petCommentDelete:active {
+  transform: translateY(1px) scale(0.98);
+}
+
 .petComment p {
   margin: 0;
   color: var(--foreground);
   font-size: 14px;
-  line-height: 1.45;
+  line-height: 1.48;
   overflow-wrap: anywhere;
 }
 
 .petCommentReactions {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 7px;
 }
 
 .petCommentReactions button {
-  min-height: 26px;
+  min-height: 28px;
   padding: 0 8px;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .petCommentReactions strong {
   font-family: var(--font-mono);
   font-size: 10.5px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .petCommentMore {
   justify-self: start;
 }
 
+.skeletonComment {
+  pointer-events: none;
+}
+
+.skeletonComment:hover {
+  transform: none;
+}
+
+.skeletonComment .line {
+  margin: 0;
+}
+
+@keyframes pet-comment-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 680px) {
   .petComments {
-    padding: 20px;
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .petCommentsHeader {
+    align-items: start;
+  }
+
+  .petCommentsSignal {
+    justify-self: start;
   }
 
   .petCommentComposerFooter {
@@ -204,5 +373,18 @@
 
   .petCommentComposerFooter .btn {
     justify-content: center;
+  }
+
+  .petCommentMeta {
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+  }
+
+  .petCommentAvatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .petCommentReactions button span {
+    display: none;
   }
 }

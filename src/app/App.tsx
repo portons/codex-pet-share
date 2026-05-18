@@ -16,6 +16,7 @@ import { useGalleryBrowser } from "../gallery/useGalleryBrowser";
 import { useUserCollections } from "../collections/useUserCollections";
 import { useTheme } from "./useTheme";
 import { refreshAfterAuthRoute, refreshAppSession } from "./appRefreshActions";
+import { useCommentNotifications } from "../comments/useCommentNotifications";
 import type {
   AuthSession,
   CollectionSummary,
@@ -256,6 +257,11 @@ function App() {
     setDetailPet,
     openAuth
   });
+  const commentNotifications = useCommentNotifications({
+    apiFetch,
+    session,
+    user
+  });
   const {
     adminStatus,
     setAdminStatus,
@@ -483,10 +489,10 @@ function App() {
       clearComments();
       return;
     }
-    loadComments(route.id).catch((error) =>
+    loadComments(route.id, 1, route.commentId).catch((error) =>
       setAuthStatus(error instanceof Error ? error.message : "failed to load comments")
     );
-  }, [route.name, route.name === "detail" ? route.id : "", user?.id, session?.accessToken]);
+  }, [route.name, route.name === "detail" ? route.id : "", route.name === "detail" ? route.commentId : "", user?.id, session?.accessToken]);
 
   const {
     selectContentMode,
@@ -546,7 +552,15 @@ function App() {
       onLogout: logout,
       onSignIn: openAuth,
       onAccount: openSettings,
-      onThemeToggle: toggleTheme
+      onThemeToggle: toggleTheme,
+      commentNotifications: {
+        notifications: commentNotifications.notifications,
+        unreadCount: commentNotifications.unreadCount,
+        loading: commentNotifications.loading,
+        status: commentNotifications.status,
+        onOpen: commentNotifications.openCommentNotification,
+        onDismiss: commentNotifications.dismissCommentNotifications
+      }
     },
     routes: {
       route, user, session, pets, galleryMeta, loading, query, activeTags, activeSort, activeView, activeKind,

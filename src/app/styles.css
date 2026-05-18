@@ -1,5 +1,6 @@
 @import "./base.css";
 @import "../collections/user-collections.css";
+@import "../comments/comment-notifications.css";
 @import "../gallery/gallery.css";
 @import "../pets/pet-surfaces.css";
 @import "../pets/sprite-fixer.css";

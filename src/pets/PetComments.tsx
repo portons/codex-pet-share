@@ -1,7 +1,7 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { formatDate, formatMetric } from "../domain/format";
 import type { Pet, PetComment, User } from "../domain/types";
-import { Icon } from "../ui/Icon";
+import { Icon, type IconName } from "../ui/Icon";
 import { Spinner } from "../ui/Spinner";
 
 const maxCommentLength = 280;
@@ -15,12 +15,12 @@ const promptChips = [
 ];
 
 const commentReactions = [
-  { id: "heart", glyph: "💚", label: "Love" },
-  { id: "sparkle", glyph: "✨", label: "Sparkle" },
-  { id: "laugh", glyph: "😂", label: "Laugh" },
-  { id: "party", glyph: "🎉", label: "Celebrate" },
-  { id: "eyes", glyph: "👀", label: "Watching" }
-];
+  { id: "heart", icon: "heart", label: "Love" },
+  { id: "sparkle", icon: "sparkle", label: "Sparkle" },
+  { id: "laugh", icon: "smile", label: "Laugh" },
+  { id: "party", icon: "party", label: "Celebrate" },
+  { id: "eyes", icon: "eye", label: "Watching" }
+] satisfies Array<{ id: string; icon: IconName; label: string }>;
 
 export function PetComments({
   pet,
@@ -32,6 +32,7 @@ export function PetComments({
   loading,
   busy,
   status,
+  focusCommentId,
   onSubmit,
   onDelete,
   onReact,
@@ -47,6 +48,7 @@ export function PetComments({
   loading: boolean;
   busy: string;
   status: string;
+  focusCommentId?: string;
   onSubmit: (body: string) => Promise<boolean>;
   onDelete: (comment: PetComment) => void | Promise<void>;
   onReact: (comment: PetComment, reaction: string) => void | Promise<void>;
@@ -54,6 +56,7 @@ export function PetComments({
   onSignIn: () => void;
 }) {
   const [draft, setDraft] = useState("");
+  const [highlightedCommentId, setHighlightedCommentId] = useState("");
   const remaining = maxCommentLength - draft.length;
   const loadedLabel = useMemo(() => {
     if (!total) return "No comments yet";
@@ -73,13 +76,32 @@ export function PetComments({
     });
   }
 
+  useEffect(() => {
+    if (!focusCommentId || loading) return;
+    const target = document.getElementById(commentDomId(focusCommentId));
+    const fallback = document.getElementById("pet-comments");
+    const node = target || fallback;
+    if (!node) return;
+    node.scrollIntoView({ block: target ? "center" : "start", behavior: "smooth" });
+    if (target instanceof HTMLElement) {
+      target.focus({ preventScroll: true });
+      setHighlightedCommentId(focusCommentId);
+      const timer = window.setTimeout(() => setHighlightedCommentId(""), 2800);
+      return () => window.clearTimeout(timer);
+    }
+  }, [focusCommentId, loading, comments]);
+
   return (
-    <article className="petComments" aria-label={`Comments for ${pet.displayName}`}>
+    <article className="petComments" id="pet-comments" aria-label={`Comments for ${pet.displayName}`}>
       <header className="detailSectionHeader petCommentsHeader">
         <div>
           <span className="detailSectionLabel">Guestbook</span>
           <p className="detailSectionHint">{loadedLabel}</p>
         </div>
+        <span className="petCommentsSignal" aria-hidden="true">
+          <Icon name="comment" size={13} />
+          Live notes
+        </span>
       </header>
 
       <form className="petCommentComposer" onSubmit={submit}>
@@ -104,7 +126,9 @@ export function PetComments({
               ))}
             </div>
             <div className="petCommentComposerFooter">
-              <span className={remaining < 24 ? "petCommentLimit warning" : "petCommentLimit"}>{remaining}</span>
+              <span className={remaining < 24 ? "petCommentLimit warning" : "petCommentLimit"}>
+                {remaining} left
+              </span>
               <button className="btn btnPrimary btnSm" type="submit" disabled={busy === "new" || !draft.trim()}>
                 {busy === "new" ? <Spinner size={13} /> : <Icon name="comment" size={13} />}
                 {busy === "new" ? "Posting" : "Post comment"}
@@ -123,15 +147,15 @@ export function PetComments({
 
       <div className="petCommentList" aria-busy={loading}>
         {loading && comments.length === 0 ? (
-          <div className="petCommentLoading">
-            <Spinner size={16} />
-          </div>
+          <CommentSkeleton />
         ) : comments.length ? (
-          comments.map((comment) => (
+          comments.map((comment, index) => (
             <CommentItem
               key={comment.id}
               comment={comment}
+              index={index}
               busy={busy}
+              highlighted={comment.id === highlightedCommentId}
               onDelete={() => onDelete(comment)}
               onReact={(reaction) => onReact(comment, reaction)}
             />
@@ -153,21 +177,47 @@ export function PetComments({
 
 function CommentItem({
   comment,
+  index,
   busy,
+  highlighted,
   onDelete,
   onReact
 }: {
   comment: PetComment;
+  index: number;
   busy: string;
+  highlighted: boolean;
   onDelete: () => void | Promise<void>;
   onReact: (reaction: string) => void | Promise<void>;
 }) {
+  const authorHref = comment.authorId ? `#/users/${comment.authorHandle || comment.authorId}` : "";
   return (
-    <section className="petComment">
+    <section
+      className={`petComment ${highlighted ? "highlighted" : ""}`}
+      id={commentDomId(comment.id)}
+      tabIndex={-1}
+      style={{ "--comment-index": index } as CSSProperties}
+    >
       <header className="petCommentMeta">
-        <div>
-          <strong>{comment.authorName}</strong>
-          <span>{formatDate(comment.createdAt)}</span>
+        <span className="petCommentAvatar" aria-hidden="true">{initials(comment.authorName)}</span>
+        <div className="petCommentByline">
+          <div>
+            {authorHref ? (
+              <a className="petCommentAuthorLink" href={authorHref}>
+                {comment.authorName}
+              </a>
+            ) : (
+              <strong>{comment.authorName}</strong>
+            )}
+            <span>{formatDate(comment.createdAt)}</span>
+          </div>
+          {authorHref ? (
+            <a className="petCommentHandleLink" href={authorHref}>
+              {comment.authorHandle ? `@${comment.authorHandle}` : "View uploads"}
+            </a>
+          ) : (
+            <small>Guestbook note</small>
+          )}
         </div>
         {comment.canDelete ? (
           <button
@@ -198,7 +248,8 @@ function CommentItem({
               disabled={busy === `reaction:${comment.id}:${reaction.id}`}
               onClick={() => onReact(reaction.id)}
             >
-              <span aria-hidden="true">{reaction.glyph}</span>
+              <Icon name={reaction.icon} size={12} />
+              <span>{reaction.label}</span>
               {count ? <strong>{formatMetric(count)}</strong> : null}
             </button>
           );
@@ -206,4 +257,34 @@ function CommentItem({
       </div>
     </section>
   );
+}
+
+function CommentSkeleton() {
+  return (
+    <div className="petCommentSkeletons" aria-label="Loading comments">
+      {[0, 1].map((item) => (
+        <div className="petComment skeletonComment" key={item}>
+          <div className="petCommentMeta">
+            <span className="skeleton petCommentAvatar" />
+            <div className="petCommentByline">
+              <span className="skeleton line short" />
+              <span className="skeleton line medium" />
+            </div>
+          </div>
+          <span className="skeleton line" />
+          <span className="skeleton line medium" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const text = `${parts[0]?.[0] || "A"}${parts[1]?.[0] || ""}`.toUpperCase();
+  return text.slice(0, 2);
+}
+
+function commentDomId(id: string) {
+  return `pet-comment-${id}`;
 }

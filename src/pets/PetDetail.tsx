@@ -28,6 +28,7 @@ export function PetDetail({
   commentsBusy,
   commentsStatus,
   commentsMeta,
+  focusCommentId,
   contentMode,
   hasCollections,
   morePets,
@@ -61,6 +62,7 @@ export function PetDetail({
   commentsBusy: string;
   commentsStatus: string;
   commentsMeta: GalleryMeta;
+  focusCommentId?: string;
   contentMode: ContentMode;
   hasCollections: boolean;
   morePets: Array<Pet>;
@@ -392,6 +394,7 @@ export function PetDetail({
         loading={commentsLoading}
         busy={commentsBusy}
         status={commentsStatus}
+        focusCommentId={focusCommentId}
         onSubmit={onSubmitComment}
         onDelete={onDeleteComment}
         onReact={onReactToComment}

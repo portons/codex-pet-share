@@ -41,7 +41,7 @@ export function usePetComments({
     });
   }
 
-  async function loadComments(petId: string, page = 1) {
+  async function loadComments(petId: string, page = 1, commentId = "") {
     setCommentsLoading(true);
     setCommentsStatus("");
     try {
@@ -49,6 +49,9 @@ export function usePetComments({
         page: String(page),
         pageSize: String(commentsPageSize)
       });
+      if (commentId) {
+        params.set("commentId", commentId);
+      }
       const body = await readJson<PetCommentsResponse>(
         await apiFetch(`/api/pets/${petId}/comments?${params}`, {}, session)
       );

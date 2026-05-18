@@ -44,6 +44,8 @@ The frontend expects an API under `VITE_APP_API_BASE_URL` with these groups:
   `POST /api/pets/:id/comments`,
   `DELETE /api/pets/:id/comments/:commentId`,
   `POST|DELETE /api/pets/:id/comments/:commentId/reactions`
+- `GET /api/comments/notifications`,
+  `POST /api/comments/notifications/read`
 - `PATCH /api/pets/:id/spritesheet` for owner/admin replacement of an uploaded pet's generated sprite assets
 - `GET /api/pets/:id/download`, `GET /api/pets/:id/spritesheet`,
   `GET /api/pets/:id/share-image`
@@ -85,6 +87,12 @@ its visible comments. Signed-in, non-shadowbanned users can post comments and
 toggle comment reactions. Comment authors, pet owners, and admins can delete
 comments. When a user is deleted, their comments remain visible as `Anonymous`
 unless the commented pet itself is deleted.
+
+Comment notifications are computed for signed-in owners of uploaded pets. They
+include unread comments on the viewer's own pets, exclude the viewer's own
+comments, and expose a `commentId` that can be used with
+`GET /api/pets/:id/comments?commentId=<commentId>` to load the page containing
+that comment.
 
 ## Realtime Contract
 

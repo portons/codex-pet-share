@@ -123,7 +123,7 @@ export type AppRoutesProps = {
   commentsBusy: string;
   commentsStatus: string;
   commentsMeta: GalleryMeta;
-  loadComments: (petId: string, page?: number) => void | Promise<void>;
+  loadComments: (petId: string, page?: number, commentId?: string) => void | Promise<void>;
   submitComment: (pet: Pet, body: string) => Promise<boolean>;
   deleteComment: (pet: Pet, comment: PetComment) => void | Promise<void>;
   toggleReaction: (pet: Pet, comment: PetComment, reaction: string) => void | Promise<void>;

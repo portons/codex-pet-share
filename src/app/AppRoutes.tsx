@@ -415,6 +415,7 @@ export function AppRoutes({
               commentsBusy={commentsBusy}
               commentsStatus={commentsStatus}
               commentsMeta={commentsMeta}
+              focusCommentId={route.commentId}
               contentMode={contentMode}
               hasCollections={collections.length > 0}
               morePets={morePets}

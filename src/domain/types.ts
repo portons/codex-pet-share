@@ -44,6 +44,18 @@ export type PetCommentReaction = {
   reactedByMe: boolean;
 };
 
+export type CommentNotification = {
+  id: string;
+  commentId: string;
+  petId: string;
+  petDisplayName: string;
+  authorId: string | null;
+  authorHandle: string | null;
+  authorName: string;
+  body: string;
+  createdAt: string;
+};
+
 export type PetComment = {
   id: string;
   petId: string;
@@ -59,6 +71,12 @@ export type PetComment = {
 
 export type PetCommentsResponse = GalleryMeta & {
   comments: PetComment[];
+  focusCommentId?: string | null;
+};
+
+export type CommentNotificationsResponse = {
+  unreadCount: number;
+  notifications: CommentNotification[];
 };
 
 export type Route =
@@ -71,7 +89,7 @@ export type Route =
   | { name: "collection"; slug: string }
   | { name: "legal"; page: "privacy" | "terms" }
   | { name: "admin" }
-  | { name: "detail"; id: string }
+  | { name: "detail"; id: string; commentId?: string }
   | { name: "user"; id: string }
   | { name: "room"; id: string }
   | { name: "collectionRoom"; slug: string };

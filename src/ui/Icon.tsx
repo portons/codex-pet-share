@@ -19,6 +19,7 @@ export type IconName =
   | "search"
   | "share"
   | "sheet"
+  | "smile"
   | "swap"
   | "tag"
   | "terminal"
@@ -27,6 +28,7 @@ export type IconName =
   | "user"
   | "x"
   | "play"
+  | "party"
   | "link"
   | "sparkle"
   | "sun";
@@ -143,6 +145,14 @@ export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
         <path d="M2.5 6 H13.5 M2.5 9.5 H13.5 M6 2.5 V13.5 M9.5 2.5 V13.5" />
       </>
     ),
+    smile: (
+      <>
+        <circle cx="8" cy="8" r="5.5" />
+        <path d="M5.7 6.5 H5.75" />
+        <path d="M10.25 6.5 H10.3" />
+        <path d="M5.8 9.3 C6.7 10.45 9.3 10.45 10.2 9.3" />
+      </>
+    ),
     swap: (
       <>
         <path d="M3 5.25 H12" />
@@ -193,6 +203,15 @@ export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
     ),
     play: (
       <path d="M5 3.5 L12.5 8 L5 12.5 Z" fill="currentColor" stroke="currentColor" strokeLinejoin="round" />
+    ),
+    party: (
+      <>
+        <path d="M4 13 L6.2 5.8 L12 11.6 Z" />
+        <path d="M6.5 9.9 L8.4 8" />
+        <path d="M9.1 3.5 C10.3 2.7 11.5 3.3 11.8 4.4" />
+        <path d="M11.6 6.8 C13 6.4 14 7.3 13.9 8.6" />
+        <path d="M5.2 3.1 C4.5 2.2 3.3 2.4 2.8 3.3" />
+      </>
     ),
     link: (
       <>

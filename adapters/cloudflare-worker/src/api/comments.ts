@@ -45,8 +45,8 @@ async function listPetComments(ctx: AppContext, petId: string) {
   const pet = await getVisiblePet(ctx, petId, viewer);
   if (!pet) return json({ error: "pet not found" }, 404);
 
-  const pagination = parsePagination(ctx.url);
   const filter = visibleCommentFilter(viewer);
+  const pagination = await focusedPagination(ctx, petId, filter);
   const totalRow = await first<{ total: number }>(
     ctx.env.DB.prepare(`
       select count(*) as total
@@ -72,6 +72,7 @@ async function listPetComments(ctx: AppContext, petId: string) {
     page: pagination.page,
     pageSize: pagination.pageSize,
     total,
+    focusCommentId: ctx.url.searchParams.get("commentId") || null,
     totalPages: Math.ceil(total / pagination.pageSize)
   });
 }
@@ -222,4 +223,32 @@ async function commentReactionContext(ctx: AppContext, commentIds: string[], vie
     byComment.set(row.comment_id, group);
   }
   return byComment;
+}
+
+async function focusedPagination(ctx: AppContext, petId: string, filter: { sql: string; bindings: Array<string | number> }) {
+  const pagination = parsePagination(ctx.url);
+  const commentId = ctx.url.searchParams.get("commentId") || "";
+  if (!commentId) return pagination;
+  const row = await first<Pick<PetCommentRow, "id" | "created_at">>(
+    ctx.env.DB.prepare(`
+      select c.id, c.created_at
+      from pet_comments c
+      left join users u on u.id = c.author_id
+      where c.pet_id = ? and c.id = ? and ${filter.sql}
+    `).bind(petId, commentId, ...filter.bindings)
+  );
+  if (!row) return pagination;
+  const beforeRow = await first<{ total: number }>(
+    ctx.env.DB.prepare(`
+      select count(*) as total
+      from pet_comments c
+      left join users u on u.id = c.author_id
+      where c.pet_id = ? and ${filter.sql}
+        and (c.created_at > ? or (c.created_at = ? and c.id > ?))
+    `).bind(petId, ...filter.bindings, row.created_at, row.created_at, row.id)
+  );
+  return {
+    ...pagination,
+    page: Math.floor(Number(beforeRow?.total || 0) / pagination.pageSize) + 1
+  };
 }

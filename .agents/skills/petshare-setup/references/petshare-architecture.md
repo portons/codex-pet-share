@@ -183,7 +183,10 @@ provider API owns persistence and authorization under `/api/pets/:id/comments`:
 visible viewers can read comments, signed-in non-shadowbanned users can post and
 react, and comment authors, pet owners, or admins can delete comments. Deleted
 users' comments remain under `Anonymous`, while deleted pets cascade-delete
-their comments.
+their comments. Comment notifications live under `/api/comments/notifications`
+and are scoped to unread comments on the signed-in user's own pets; the
+notification payload carries `petId` and `commentId` so the app can navigate to
+the exact guestbook entry.
 
 Visibility rules matter:
 

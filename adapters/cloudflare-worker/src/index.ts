@@ -1,5 +1,6 @@
 import { handleAuth } from "./api/auth";
 import { handleAdmin, handleCollections, handleCreators, handleUsers } from "./api/collections";
+import { handleCommentNotifications } from "./api/commentNotifications";
 import { handlePetComments } from "./api/comments";
 import { handlePets } from "./api/pets";
 import { handleRooms, roomAuth } from "./api/rooms";
@@ -102,6 +103,7 @@ async function route(ctx: AppContext, parts: string[]) {
   if (parts[0] !== "api") return ctx.env.ASSETS.fetch(ctx.request);
   if (parts[1] === "auth") return handleAuth(ctx, parts.slice(2));
   if (parts[1] === "telemetry") return handleTelemetry(ctx);
+  if (parts[1] === "comments") return handleCommentNotifications(ctx, parts.slice(2));
   if (parts[1] === "admin") return handleAdmin(ctx, parts.slice(2));
   if (parts[1] === "pets" && parts[2] && parts[3] === "comments") return handlePetComments(ctx, parts[2], parts.slice(4));
   if (parts[1] === "pets") return handlePets(ctx, parts.slice(2));

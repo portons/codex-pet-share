@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { APP_HANDLE, APP_NAME, APP_REPO_URL } from "../branding/brand";
+import { CommentNotifications } from "../comments/CommentNotifications";
 import { navigate } from "../domain/routing";
 import type { Route, User } from "../domain/types";
 import { Icon } from "../ui/Icon";
@@ -11,7 +12,8 @@ export function AppNav({
   onLogout,
   onSignIn,
   onAccount,
-  onThemeToggle
+  onThemeToggle,
+  commentNotifications
 }: {
   route: Route;
   user: User | null;
@@ -20,6 +22,7 @@ export function AppNav({
   onSignIn: () => void;
   onAccount: () => void;
   onThemeToggle: () => void;
+  commentNotifications: ComponentProps<typeof CommentNotifications>;
 }) {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -124,6 +127,7 @@ export function AppNav({
         </a>
       </nav>
       <div className="accountAction">
+        {user ? <CommentNotifications {...commentNotifications} /> : null}
         <button
           className="themeToggle"
           type="button"

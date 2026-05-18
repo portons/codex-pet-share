@@ -52,7 +52,8 @@ export function routeFromHash(): Route {
     return { name: "admin" };
   }
   if (cleanPath.startsWith("pets/")) {
-    return { name: "detail", id: cleanPath.slice("pets/".length) };
+    const { params } = hashParts();
+    return { name: "detail", id: cleanPath.slice("pets/".length), commentId: params.get("comment") || undefined };
   }
   if (cleanPath.startsWith("users/")) {
     return { name: "user", id: cleanPath.slice("users/".length) };
