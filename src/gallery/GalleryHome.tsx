@@ -177,7 +177,10 @@ function RecentCommentList({ comments }: { comments: GalleryRecentComment[] }) {
             style={{ "--discussion-index": index } as CSSProperties}
           >
             <div className="recentCommentBody">
-              <a className="recentCommentPet" href={petHref}>{comment.petDisplayName}</a>
+              <span className="recentCommentPetContext">
+                <span>Pet discussed</span>
+                <a className="recentCommentPet" href={petHref}>{comment.petDisplayName}</a>
+              </span>
               <a className="recentCommentText" href={commentHref}>{comment.body}</a>
             </div>
             <span className="recentCommentMeta">

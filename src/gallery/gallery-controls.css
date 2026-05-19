@@ -203,23 +203,33 @@
 .recentCommentBody {
   display: grid;
   align-content: start;
-  gap: 6px;
+  gap: 7px;
   min-width: 0;
   color: inherit;
 }
 
+.recentCommentPetContext {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
 .recentCommentPet {
-  width: fit-content;
-  max-width: 100%;
   min-width: 0;
   overflow: hidden;
   color: var(--accent-deep);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0;
   text-decoration: none;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-transform: none;
 }
 
 .recentCommentText {
