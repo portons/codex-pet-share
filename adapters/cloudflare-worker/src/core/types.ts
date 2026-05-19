@@ -53,7 +53,7 @@ export type PublicUser = {
 };
 
 export type PetKind = "object" | "animal" | "person" | "creature";
-export type PetSort = "new" | "popular" | "views" | "random";
+export type PetSort = "new" | "popular" | "views" | "discussed" | "random";
 export type ContentMode = "safe" | "all";
 
 export type ValidationReport = {
@@ -79,6 +79,7 @@ export type PetRow = {
   download_count: number;
   like_count: number;
   comment_count?: number;
+  latest_comment_at?: string | null;
   tags_json: string;
   validation_report_json: string | null;
   owner_handle?: string | null;

@@ -1,6 +1,7 @@
 import { type CSSProperties, type FormEvent, useEffect, useMemo, useState } from "react";
 import { type TagName } from "../domain/config";
-import type { AuthSession, CollectionSummary, ContentMode, GalleryMeta, GallerySort, GalleryView, Pet, PetKind, User } from "../domain/types";
+import { formatDate, formatMetric } from "../domain/format";
+import type { AuthSession, CollectionSummary, ContentMode, GalleryMeta, GalleryRecentComment, GallerySort, GalleryView, Pet, PetKind, User } from "../domain/types";
 import { useCollectionPresenceCounts } from "../realtime/useCollectionPresenceCounts";
 import { CursorPetPreview, useCursorPreviewAssets, useCursorPreviewMotion, useCursorPreviewSupport } from "../pets/CursorPreview";
 import { PetCard } from "../pets/PetCard";
@@ -134,8 +135,200 @@ function LiveCollectionsStrip({
   );
 }
 
+function DiscussionContextRail({
+  comments,
+  loading
+}: {
+  comments: GalleryRecentComment[];
+  loading: boolean;
+}) {
+  if (loading && comments.length === 0) {
+    return null;
+  }
+
+  return (
+    <aside className="discussionRail" aria-label="Recent comments">
+      <div className="discussionRailIntro">
+        <span className="discussionRailKicker">
+          <Icon name="comment" size={13} />
+          Recent comments
+        </span>
+      </div>
+      <RecentCommentList comments={comments} />
+    </aside>
+  );
+}
+
+function RecentCommentList({ comments }: { comments: GalleryRecentComment[] }) {
+  if (!comments.length) {
+    return <p className="discussionEmpty">No recent comments match these filters.</p>;
+  }
+
+  return (
+    <ol className="recentCommentList">
+      {comments.map((comment, index) => {
+        const commentHref = `#/pets/${comment.petId}?comment=${encodeURIComponent(comment.id)}`;
+        const petHref = `#/pets/${comment.petId}`;
+        const authorHref = comment.authorId ? `#/users/${comment.authorHandle || comment.authorId}` : "";
+        return (
+          <li
+            key={comment.id}
+            className="recentCommentItem"
+            style={{ "--discussion-index": index } as CSSProperties}
+          >
+            <div className="recentCommentBody">
+              <a className="recentCommentPet" href={petHref}>{comment.petDisplayName}</a>
+              <a className="recentCommentText" href={commentHref}>{comment.body}</a>
+            </div>
+            <span className="recentCommentMeta">
+              {authorHref ? (
+                <a href={authorHref}>{comment.authorName}</a>
+              ) : (
+                <span>{comment.authorName}</span>
+              )}
+              <span>{formatDate(comment.createdAt)}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function DiscussionLeaderboard({
+  pets,
+  meta,
+  loading,
+  onPage
+}: {
+  pets: Pet[];
+  meta: GalleryMeta;
+  loading: boolean;
+  onPage: (page: number) => void;
+}) {
+  const rankedPets = pets.map((pet, index) => ({
+    pet,
+    rank: (meta.page - 1) * meta.pageSize + index + 1
+  }));
+  const featuredPets = rankedPets.filter((item) => item.rank <= 3);
+  const remainingPets = rankedPets.filter((item) => item.rank > 3);
+
+  if (loading) {
+    return <GallerySkeleton view="compact" />;
+  }
+
+  if (!pets.length) {
+    return <EmptyState text="No discussed pets yet." />;
+  }
+
+  return (
+    <section className="discussionLeaderboard" aria-label="Most discussed pets">
+      <header className="discussionLeaderboardHeader">
+        <div>
+          <p className="metaText">Pets</p>
+          <h2>Most discussed</h2>
+          <p className="sectionSubhead">
+            {formatMetric(meta.total)} {meta.total === 1 ? "pet" : "pets"} ranked by message count
+            {meta.totalPages > 1 ? ` · page ${meta.page} of ${meta.totalPages}` : ""}
+          </p>
+        </div>
+      </header>
+      <div className="discussionLeaderboardBoard">
+        {meta.totalPages > 1 ? (
+          <div className="creatorTopPagination">
+            <PaginationControls meta={meta} loading={loading} onPage={onPage} />
+          </div>
+        ) : null}
+        {featuredPets.length ? (
+          <div className="discussionTopThree" aria-label="Top discussed pets">
+            {featuredPets.map(({ pet, rank }) => (
+              <DiscussionFeatureCard key={pet.id} pet={pet} rank={rank} />
+            ))}
+          </div>
+        ) : null}
+        {remainingPets.length ? (
+          <div className="discussionRankList" aria-label="Pet discussion rankings">
+            {remainingPets.map(({ pet, rank }) => (
+              <DiscussionRankRow key={pet.id} pet={pet} rank={rank} />
+            ))}
+          </div>
+        ) : null}
+        <PaginationControls meta={meta} loading={loading} onPage={onPage} />
+      </div>
+    </section>
+  );
+}
+
+function DiscussionFeatureCard({ pet, rank }: { pet: Pet; rank: number }) {
+  return (
+    <article className="discussionFeatureCard">
+      <div className="discussionFeatureCopy">
+        <p className="creatorSpotlightKicker">Rank {rank}</p>
+        <a className="discussionFeatureName" href={`#/pets/${pet.id}`}>{pet.displayName}</a>
+        <a className="discussionOwnerLink" href={pet.ownerId ? `#/users/${pet.ownerHandle || pet.ownerId}` : `#/pets/${pet.id}`}>
+          by {pet.ownerName}
+        </a>
+      </div>
+      <a className="discussionFeaturePet" href={`#/pets/${pet.id}`} aria-label={pet.displayName}>
+        <img
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          draggable={false}
+          height={208}
+          loading="lazy"
+          src={pet.posterUrl}
+          width={192}
+        />
+      </a>
+      <DiscussionMetrics pet={pet} />
+    </article>
+  );
+}
+
+function DiscussionRankRow({ pet, rank }: { pet: Pet; rank: number }) {
+  return (
+    <article
+      className="discussionRankRow"
+      style={{ "--delay": `${Math.min(rank - 2, 8) * 48}ms` } as CSSProperties}
+    >
+      <span className={`leaderRank ${rank <= 3 ? `rank${rank}` : ""}`}>{rank}</span>
+      <div className="discussionRankIdentity">
+        <a className="discussionRankName" href={`#/pets/${pet.id}`}>{pet.displayName}</a>
+        <a className="discussionOwnerLink" href={pet.ownerId ? `#/users/${pet.ownerHandle || pet.ownerId}` : `#/pets/${pet.id}`}>
+          by {pet.ownerName}
+        </a>
+      </div>
+      <DiscussionMetrics pet={pet} />
+    </article>
+  );
+}
+
+function DiscussionMetrics({ pet }: { pet: Pet }) {
+  return (
+    <div className="discussionMetrics" aria-label={`${pet.displayName} discussion stats`}>
+      <span className="creatorMetric active" aria-label={`Messages: ${formatMetric(pet.commentCount)}`}>
+        <Icon name="comment" size={13} />
+        <span>Messages</span>
+        <strong>{formatMetric(pet.commentCount)}</strong>
+      </span>
+      <span className="creatorMetric" aria-label={`Likes: ${formatMetric(pet.likeCount)}`}>
+        <Icon name="heart" size={13} />
+        <span>Likes</span>
+        <strong>{formatMetric(pet.likeCount)}</strong>
+      </span>
+      <span className="creatorMetric" aria-label={`Views: ${formatMetric(pet.viewCount)}`}>
+        <Icon name="eye" size={13} />
+        <span>Views</span>
+        <strong>{formatMetric(pet.viewCount)}</strong>
+      </span>
+    </div>
+  );
+}
+
 function Gallery({
   pets,
+  recentComments,
   meta,
   loading,
   query,
@@ -177,6 +370,7 @@ function Gallery({
   onSignIn
 }: {
   pets: Pet[];
+  recentComments: GalleryRecentComment[];
   meta: GalleryMeta;
   loading: boolean;
   query: string;
@@ -285,12 +479,17 @@ function Gallery({
           </div>
         )}
       </div>
-      {activeSort !== "random" ? (
+      {activeSort !== "random" && activeSort !== "discussed" && meta.totalPages > 1 ? (
         <div className="galleryTopPagination">
           <PaginationControls meta={meta} loading={loading} onPage={onPage} />
         </div>
       ) : null}
-      {loading ? (
+      {activeSort === "discussed" ? (
+        <>
+          <DiscussionContextRail comments={recentComments} loading={loading} />
+          <DiscussionLeaderboard pets={pets} meta={meta} loading={loading} onPage={onPage} />
+        </>
+      ) : loading ? (
         <GallerySkeleton view={activeView} />
       ) : pets.length ? (
         <div className="galleryResultsShell">
@@ -343,7 +542,7 @@ function Gallery({
             Randomize
           </button>
         </div>
-      ) : activeSort === "random" ? null : (
+      ) : activeSort === "random" || activeSort === "discussed" ? null : (
         <PaginationControls meta={meta} loading={loading} onPage={onPage} />
       )}
       {previewPet && cursorPoint && (

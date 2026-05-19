@@ -56,6 +56,18 @@ export type CommentNotification = {
   createdAt: string;
 };
 
+export type GalleryRecentComment = {
+  id: string;
+  petId: string;
+  petDisplayName: string;
+  petCommentCount: number;
+  authorId: string | null;
+  authorHandle: string | null;
+  authorName: string;
+  body: string;
+  createdAt: string;
+};
+
 export type PetComment = {
   id: string;
   petId: string;
@@ -94,7 +106,7 @@ export type Route =
   | { name: "room"; id: string }
   | { name: "collectionRoom"; slug: string };
 
-export type GallerySort = "new" | "popular" | "views" | "random";
+export type GallerySort = "new" | "popular" | "views" | "discussed" | "random";
 export type GalleryView = "standard" | "compact";
 export type PetKind = "all" | "object" | "animal" | "person" | "creature";
 export type EditablePetKind = Exclude<PetKind, "all">;
@@ -125,6 +137,7 @@ export type GalleryMeta = {
 
 export type GalleryResponse = GalleryMeta & {
   pets: Pet[];
+  recentComments?: GalleryRecentComment[];
 };
 
 export type CreatorStats = {

@@ -13,6 +13,7 @@ import type {
   AuthSession,
   ContentMode,
   GalleryMeta,
+  GalleryRecentComment,
   GalleryResponse,
   GallerySort,
   GalleryUrlState,
@@ -38,6 +39,7 @@ export function useGalleryBrowser({
 }) {
   const initialGalleryState = useMemo(() => galleryUrlStateFromHash(), []);
   const [pets, setPets] = useState<Pet[]>([]);
+  const [recentComments, setRecentComments] = useState<GalleryRecentComment[]>([]);
   const [galleryMeta, setGalleryMeta] = useState<GalleryMeta>({
     page: initialGalleryState.page,
     pageSize: galleryPageSize(initialGalleryState.view, initialGalleryState.sort),
@@ -129,6 +131,7 @@ export function useGalleryBrowser({
     const nextPets = body.pets.map(normalizePet);
     resetFreshNotice();
     setPets(nextPets);
+    setRecentComments(sort === "discussed" ? body.recentComments || [] : []);
     setGalleryMeta({
       page: body.page,
       pageSize,
@@ -173,6 +176,7 @@ export function useGalleryBrowser({
 
     resetFreshNotice();
     setPets(randomPets);
+    setRecentComments([]);
     setGalleryMeta({
       page: 1,
       pageSize,
@@ -400,6 +404,7 @@ export function useGalleryBrowser({
   return {
     pets,
     setPets,
+    recentComments,
     galleryMeta,
     setGalleryMeta,
     loading,

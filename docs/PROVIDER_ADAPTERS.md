@@ -58,7 +58,10 @@ The frontend expects an API under `VITE_APP_API_BASE_URL` with these groups:
 
 Responses should match the TypeScript types in `src/domain/types.ts`. Collection
 detail responses include the same pagination metadata shape as gallery
-responses.
+responses. Gallery sort values are `new`, `popular`, `views`, `discussed`,
+and `random`; `discussed` ranks pets by visible comment count and can include
+`recentComments` for the current filtered view so the frontend can render a
+recent-comment strip above the most-discussed pets leaderboard.
 
 ## Auth Contract
 

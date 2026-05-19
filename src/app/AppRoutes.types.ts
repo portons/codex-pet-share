@@ -11,6 +11,7 @@ import type {
   EditablePetKind,
   EntityShareTarget,
   GalleryMeta,
+  GalleryRecentComment,
   GallerySort,
   GalleryView,
   Pet,
@@ -28,6 +29,7 @@ export type AppRoutesProps = {
   user: User | null;
   session: AuthSession | null;
   pets: Pet[];
+  recentComments: GalleryRecentComment[];
   galleryMeta: GalleryMeta;
   loading: boolean;
   query: string;

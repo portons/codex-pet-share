@@ -9,6 +9,19 @@ import { deleteAsset, getAssetBytes, petAssetUrl, putAsset, serveAsset } from ".
 import type { AppContext, AuthUser, ContentMode, Pagination, PetKind, PetRow, PetSort, UploadFile, ValidationReport, Viewer } from "../core/types";
 
 const sqlVariableChunkSize = 80;
+const recentDiscussionLimit = 5;
+
+type RecentDiscussionRow = {
+  id: string;
+  pet_id: string;
+  pet_display_name: string;
+  pet_comment_count: number;
+  author_id: string | null;
+  author_handle: string | null;
+  author_display_name: string | null;
+  body: string;
+  created_at: string;
+};
 
 export async function handlePets(ctx: AppContext, parts: string[]) {
   const user = await currentUser(ctx);
@@ -58,13 +71,15 @@ export async function listPets(ctx: AppContext, query = "", ownerId?: string, fi
     && canSeePet(row, viewer)
     && (content === "all" || !tags(row).includes("nsfw"))
   );
-  const sortedRows = sortRows(rows, sort);
+  const discussionRows = sort === "discussed" ? rows.filter((row) => (row.comment_count || 0) > 0) : rows;
+  const sortedRows = sortRows(discussionRows, sort);
   const page = pagination || { page: 1, pageSize: sortedRows.length || 1 };
   const start = (page.page - 1) * page.pageSize;
   const pageRows = sortedRows.slice(start, start + page.pageSize);
   const likeContext = await likeContextFor(ctx, pageRows.map((row) => row.id), viewer);
   return {
     pets: pageRows.map((row) => serializePet(ctx, row, undefined, likeContext, viewer)),
+    ...(sort === "discussed" ? { recentComments: await recentDiscussionComments(ctx, sortedRows) } : {}),
     page: page.page,
     pageSize: page.pageSize,
     total: sortedRows.length,
@@ -278,7 +293,13 @@ function petBaseQuery(ctx: AppContext, suffix = "") {
         from pet_comments pc
         left join users cu on cu.id = pc.author_id
         where pc.pet_id = p.id and cu.shadowbanned_at is null
-      ) as comment_count
+      ) as comment_count,
+      (
+        select max(pc.created_at)
+        from pet_comments pc
+        left join users cu on cu.id = pc.author_id
+        where pc.pet_id = p.id and cu.shadowbanned_at is null
+      ) as latest_comment_at
     from pets p left join users u on u.id = p.owner_id ${suffix}
   `);
 }
@@ -295,13 +316,67 @@ function sortRows(rows: PetRow[], sort: PetSort) {
     ? (b.like_count - a.like_count) || Date.parse(b.created_at) - Date.parse(a.created_at)
     : sort === "views"
       ? (b.view_count - a.view_count) || (b.like_count - a.like_count) || Date.parse(b.created_at) - Date.parse(a.created_at)
+      : sort === "discussed"
+        ? ((b.comment_count || 0) - (a.comment_count || 0))
+          || (Date.parse(b.latest_comment_at || b.created_at) - Date.parse(a.latest_comment_at || a.created_at))
+          || (b.like_count - a.like_count)
+          || Date.parse(b.created_at) - Date.parse(a.created_at)
       : Date.parse(b.created_at) - Date.parse(a.created_at) || a.display_name.localeCompare(b.display_name));
 }
 
 function parsePetSort(value: string | null): PetSort {
   if (!value || value === "new") return "new";
-  if (value === "popular" || value === "views" || value === "random") return value;
+  if (value === "popular" || value === "views" || value === "discussed" || value === "random") return value;
   throw new HttpError("invalid sort", 400);
+}
+
+async function recentDiscussionComments(ctx: AppContext, rows: PetRow[]) {
+  const petIds = rows.filter((row) => (row.comment_count || 0) > 0).map((row) => row.id);
+  if (!petIds.length) return [];
+
+  const comments: RecentDiscussionRow[] = [];
+  for (let index = 0; index < petIds.length; index += sqlVariableChunkSize) {
+    const chunk = petIds.slice(index, index + sqlVariableChunkSize);
+    const placeholders = chunk.map(() => "?").join(",");
+    comments.push(...await all<RecentDiscussionRow>(ctx.env.DB.prepare(`
+      select
+        c.id,
+        c.pet_id,
+        p.display_name as pet_display_name,
+        (
+          select count(*)
+          from pet_comments pc
+          left join users cu on cu.id = pc.author_id
+          where pc.pet_id = p.id and cu.shadowbanned_at is null
+        ) as pet_comment_count,
+        u.id as author_id,
+        u.handle as author_handle,
+        u.display_name as author_display_name,
+        c.body,
+        c.created_at
+      from pet_comments c
+      join pets p on p.id = c.pet_id
+      left join users u on u.id = c.author_id
+      where c.pet_id in (${placeholders}) and u.shadowbanned_at is null
+      order by c.created_at desc
+      limit ${recentDiscussionLimit}
+    `).bind(...chunk)));
+  }
+
+  return comments
+    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
+    .slice(0, recentDiscussionLimit)
+    .map((row) => ({
+      id: row.id,
+      petId: row.pet_id,
+      petDisplayName: row.pet_display_name,
+      petCommentCount: row.pet_comment_count,
+      authorId: row.author_id,
+      authorHandle: row.author_handle,
+      authorName: row.author_id ? row.author_display_name || "Anonymous" : "Anonymous",
+      body: row.body,
+      createdAt: row.created_at
+    }));
 }
 
 export function parseContentMode(value: string | null): ContentMode {

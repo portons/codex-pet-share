@@ -176,7 +176,9 @@ presence and collection routing. Verify both cases because they differ.
 
 Gallery API responses are typed in `src/domain/types.ts`. Browse surfaces
 support query, tags, kind, content mode, sort, page size, favorites, user pages,
-collections, creator leaderboard, likes, views, downloads, and share modals.
+collections, creator leaderboard, likes, views, comments, downloads, and share
+modals. The `discussed` gallery sort ranks pets by visible comment count and
+surfaces recent comments above a most-discussed pets leaderboard.
 
 Pet detail pages also support a flat guestbook-style comments surface. The
 provider API owns persistence and authorization under `/api/pets/:id/comments`:

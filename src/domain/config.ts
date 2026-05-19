@@ -94,8 +94,9 @@ export const galleryFilterTags = allowedTags
   .sort((a, b) => a.localeCompare(b)) as Array<TagName>;
 export const gallerySorts: { id: GallerySort; label: string }[] = [
   { id: "new", label: "Newest" },
-  { id: "popular", label: "Most Liked" },
-  { id: "views", label: "Most Viewed" },
+  { id: "popular", label: "Liked" },
+  { id: "views", label: "Viewed" },
+  { id: "discussed", label: "Discussed" },
   { id: "random", label: "Random" }
 ];
 
@@ -135,7 +136,7 @@ export function isTagName(value: string): value is TagName {
 }
 
 export function isGallerySort(value: string | null): value is GallerySort {
-  return value === "new" || value === "popular" || value === "views" || value === "random";
+  return value === "new" || value === "popular" || value === "views" || value === "discussed" || value === "random";
 }
 
 export function isGalleryView(value: string | null): value is GalleryView {

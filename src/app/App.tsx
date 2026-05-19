@@ -35,6 +35,7 @@ function App() {
   const {
     pets,
     setPets,
+    recentComments,
     galleryMeta,
     loading,
     setLoading,
@@ -563,7 +564,7 @@ function App() {
       }
     },
     routes: {
-      route, user, session, pets, galleryMeta, loading, query, activeTags, activeSort, activeView, activeKind,
+      route, user, session, pets, recentComments, galleryMeta, loading, query, activeTags, activeSort, activeView, activeKind,
       contentMode, deletingPetId, shadowbanBusyOwnerId, nsfwBusyId, collections, userCollections,
       userCollectionsLoading, setQuery, selectTag,
       clearTags, selectSort, selectView, selectKind, selectPage, randomizeGallery,

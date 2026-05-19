@@ -31,6 +31,7 @@ export function AppRoutes({
   user,
   session,
   pets,
+  recentComments,
   galleryMeta,
   loading,
   query,
@@ -136,6 +137,7 @@ export function AppRoutes({
       {route.name === "gallery" && (
         <GalleryWithPresence
           pets={pets}
+          recentComments={recentComments}
           meta={galleryMeta}
           loading={loading}
           query={query}
