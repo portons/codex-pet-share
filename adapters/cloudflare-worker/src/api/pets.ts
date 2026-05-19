@@ -375,7 +375,7 @@ async function recentDiscussionComments(ctx: AppContext, rows: PetRow[]) {
         id: row.id,
         petId: row.pet_id,
         petDisplayName: row.pet_display_name,
-        petPreviewUrl: petAssetUrl(ctx, `${row.pet_id}/preview.webp`, version),
+        petPosterUrl: petAssetUrl(ctx, `${row.pet_id}/poster.webp`, version),
         petCommentCount: row.pet_comment_count,
         authorId: row.author_id,
         authorHandle: row.author_handle,

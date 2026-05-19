@@ -178,7 +178,7 @@ function RecentCommentList({ comments }: { comments: GalleryRecentComment[] }) {
           >
             <div className="recentCommentMain">
               <a className="recentCommentPreview" href={petHref} aria-label={`Open ${comment.petDisplayName}`}>
-                <img src={comment.petPreviewUrl} alt="" loading="lazy" decoding="async" />
+                <img src={comment.petPosterUrl} alt="" loading="lazy" decoding="async" />
               </a>
               <div className="recentCommentBody">
                 <span className="recentCommentPetContext">
