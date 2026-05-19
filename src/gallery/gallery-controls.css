@@ -189,7 +189,7 @@
 
 .recentCommentItem {
   display: grid;
-  grid-template-rows: minmax(74px, auto) auto;
+  grid-template-rows: minmax(64px, auto) auto;
   gap: 10px;
   min-width: 0;
   padding: 12px;
@@ -198,6 +198,32 @@
   background: color-mix(in srgb, var(--surface) 62%, transparent);
   animation: discussion-row-in 280ms var(--ease-out) both;
   animation-delay: calc(var(--discussion-index) * 44ms);
+}
+
+.recentCommentMain {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.recentCommentPreview {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--floating-control-bg) 78%, transparent);
+}
+
+.recentCommentPreview img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 .recentCommentBody {

@@ -176,12 +176,17 @@ function RecentCommentList({ comments }: { comments: GalleryRecentComment[] }) {
             className="recentCommentItem"
             style={{ "--discussion-index": index } as CSSProperties}
           >
-            <div className="recentCommentBody">
-              <span className="recentCommentPetContext">
-                <span>Pet discussed</span>
-                <a className="recentCommentPet" href={petHref}>{comment.petDisplayName}</a>
-              </span>
-              <a className="recentCommentText" href={commentHref}>{comment.body}</a>
+            <div className="recentCommentMain">
+              <a className="recentCommentPreview" href={petHref} aria-label={`Open ${comment.petDisplayName}`}>
+                <img src={comment.petPreviewUrl} alt="" loading="lazy" decoding="async" />
+              </a>
+              <div className="recentCommentBody">
+                <span className="recentCommentPetContext">
+                  <span>Pet discussed</span>
+                  <a className="recentCommentPet" href={petHref}>{comment.petDisplayName}</a>
+                </span>
+                <a className="recentCommentText" href={commentHref}>{comment.body}</a>
+              </div>
             </div>
             <span className="recentCommentMeta">
               {authorHref ? (

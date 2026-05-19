@@ -60,6 +60,7 @@ export type GalleryRecentComment = {
   id: string;
   petId: string;
   petDisplayName: string;
+  petPreviewUrl: string;
   petCommentCount: number;
   authorId: string | null;
   authorHandle: string | null;

@@ -333,6 +333,7 @@ function parsePetSort(value: string | null): PetSort {
 async function recentDiscussionComments(ctx: AppContext, rows: PetRow[]) {
   const petIds = rows.filter((row) => (row.comment_count || 0) > 0).map((row) => row.id);
   if (!petIds.length) return [];
+  const petRows = new Map(rows.map((row) => [row.id, row]));
 
   const comments: RecentDiscussionRow[] = [];
   for (let index = 0; index < petIds.length; index += sqlVariableChunkSize) {
@@ -366,17 +367,23 @@ async function recentDiscussionComments(ctx: AppContext, rows: PetRow[]) {
   return comments
     .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
     .slice(0, recentDiscussionLimit)
-    .map((row) => ({
-      id: row.id,
-      petId: row.pet_id,
-      petDisplayName: row.pet_display_name,
-      petCommentCount: row.pet_comment_count,
-      authorId: row.author_id,
-      authorHandle: row.author_handle,
-      authorName: row.author_id ? row.author_display_name || "Anonymous" : "Anonymous",
-      body: row.body,
-      createdAt: row.created_at
-    }));
+    .map((row) => {
+      const pet = petRows.get(row.pet_id);
+      if (!pet) throw new HttpError("pet not found", 404);
+      const version = String(Date.parse(pet.updated_at || pet.created_at));
+      return {
+        id: row.id,
+        petId: row.pet_id,
+        petDisplayName: row.pet_display_name,
+        petPreviewUrl: petAssetUrl(ctx, `${row.pet_id}/preview.webp`, version),
+        petCommentCount: row.pet_comment_count,
+        authorId: row.author_id,
+        authorHandle: row.author_handle,
+        authorName: row.author_id ? row.author_display_name || "Anonymous" : "Anonymous",
+        body: row.body,
+        createdAt: row.created_at
+      };
+    });
 }
 
 export function parseContentMode(value: string | null): ContentMode {
