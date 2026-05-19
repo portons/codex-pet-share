@@ -7,7 +7,7 @@ import {
   type TagName
 } from "../domain/config";
 import { readJson } from "../domain/http";
-import { normalizePet } from "../domain/pets";
+import { normalizePet, normalizeRecentComment } from "../domain/pets";
 import { galleryHash, galleryUrlStateFromHash, pushHash } from "../domain/routing";
 import type {
   AuthSession,
@@ -131,7 +131,7 @@ export function useGalleryBrowser({
     const nextPets = body.pets.map(normalizePet);
     resetFreshNotice();
     setPets(nextPets);
-    setRecentComments(sort === "discussed" ? body.recentComments || [] : []);
+    setRecentComments(sort === "discussed" ? (body.recentComments || []).map(normalizeRecentComment) : []);
     setGalleryMeta({
       page: body.page,
       pageSize,

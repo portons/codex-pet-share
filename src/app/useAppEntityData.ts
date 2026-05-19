@@ -4,6 +4,7 @@ import { trackEvent } from "../domain/analytics";
 import { defaultPageSize } from "../domain/config";
 import { readJson } from "../domain/http";
 import { normalizePet } from "../domain/pets";
+import { normalizeAvatarUrl } from "../domain/users";
 import type {
   AuthSession,
   CollectionDetailResponse,
@@ -171,7 +172,7 @@ export function useAppEntityData({
         params.set("content", "all");
       }
       const body = await readJson<CreatorPetsResponse>(await apiFetch(`/api/users/${id}/pets?${params}`, {}, authSession));
-      setCreator(body.user);
+      setCreator(normalizeCreator(body.user));
       setCreatorPets(body.pets.map(normalizePet));
       setCreatorMeta({
         page: body.page,
@@ -207,6 +208,7 @@ export function useAppEntityData({
       const body = await readJson<CreatorsLeaderboardResponse>(await apiFetch(`/api/creators/leaderboard?${params}`, {}, authSession));
       setCreators(body.creators.map((creator) => ({
         ...creator,
+        avatarUrl: normalizeAvatarUrl(creator.avatarUrl),
         topPets: creator.topPets.map(normalizePet)
       })));
       setCreatorsMeta({
@@ -384,5 +386,12 @@ export function useAppEntityData({
     loadAdminCollections,
     refreshPrimaryPetLists,
     refreshRoutePetLists
+  };
+}
+
+function normalizeCreator(creator: Creator): Creator {
+  return {
+    ...creator,
+    avatarUrl: normalizeAvatarUrl(creator.avatarUrl)
   };
 }

@@ -4,7 +4,7 @@ import { parseContentMode, parsePagination, listPets, serializePet, getPet, getV
 import { slugPattern } from "./constants";
 import { all, first, nowIso, tags } from "../core/db";
 import { HttpError, json, readJsonBody } from "../core/http";
-import { deleteAsset } from "../storage/assets";
+import { deleteAsset, userAvatarPath, userAvatarUrl } from "../storage/assets";
 import type { AppContext, AuthUser, CollectionRow, PetRow } from "../core/types";
 
 const sqlVariableChunkSize = 80;
@@ -81,10 +81,10 @@ export async function handleCreators(ctx: AppContext, parts: string[]) {
     const sort = parseCreatorSort(ctx.url.searchParams.get("sort"));
     const query = (ctx.url.searchParams.get("q") || "").trim().toLowerCase();
     const shadowbannedCreators = await shadowbannedUserIds(ctx);
-    const byCreator = new Map<string, { id: string; handle: string | null; displayName: string; petCount: number; viewCount: number; likeCount: number; topPets: typeof pets }>();
+    const byCreator = new Map<string, { id: string; handle: string | null; displayName: string; avatarUrl: string | null; petCount: number; viewCount: number; likeCount: number; topPets: typeof pets }>();
     for (const pet of pets) {
       if (!pet.ownerId || shadowbannedCreators.has(pet.ownerId)) continue;
-      const item = byCreator.get(pet.ownerId) || { id: pet.ownerId, handle: pet.ownerHandle, displayName: pet.ownerName, petCount: 0, viewCount: 0, likeCount: 0, topPets: [] };
+      const item = byCreator.get(pet.ownerId) || { id: pet.ownerId, handle: pet.ownerHandle, displayName: pet.ownerName, avatarUrl: pet.ownerAvatarUrl, petCount: 0, viewCount: 0, likeCount: 0, topPets: [] };
       item.petCount += 1; item.viewCount += pet.viewCount; item.likeCount += pet.likeCount; item.topPets.push(pet);
       byCreator.set(pet.ownerId, item);
     }
@@ -185,6 +185,7 @@ export async function handleAdmin(ctx: AppContext, parts: string[]) {
     if (!target) return json({ error: "user not found" }, 404);
     const deletedPets = await deleteUserUploads(ctx, target.id, user);
     await ctx.env.DB.prepare("delete from pet_likes where user_id = ?").bind(target.id).run();
+    await deleteAsset(ctx, userAvatarPath(target.id));
     await ctx.env.DB.prepare("delete from users where id = ?").bind(target.id).run();
     await auditAdminAction(ctx, user, "user.delete", {
       targetUserId: target.id,
@@ -249,7 +250,9 @@ async function collectionPetRows(ctx: AppContext, slugs: string[]) {
         p.*,
         u.handle as owner_handle,
         u.display_name as owner_display_name,
-        u.shadowbanned_at as owner_shadowbanned_at
+        u.shadowbanned_at as owner_shadowbanned_at,
+        u.avatar_path as owner_avatar_path,
+        u.avatar_updated_at as owner_avatar_updated_at
       from collection_pets cp
       join pets p on p.id = cp.pet_id
       left join users u on u.id = p.owner_id
@@ -459,14 +462,15 @@ async function shadowbannedUserIds(ctx: AppContext) {
 async function setProfileShadowban(ctx: AppContext, userId: string, shadowbanned: boolean) {
   await ctx.env.DB.prepare("update users set shadowbanned_at = ?, updated_at = ? where id = ?")
     .bind(shadowbanned ? nowIso() : null, nowIso(), userId).run();
-  const row = await first<{ id: string; handle: string; display_name: string; shadowbanned_at: string | null }>(
-    ctx.env.DB.prepare("select id, handle, display_name, shadowbanned_at from users where id = ?").bind(userId)
+  const row = await first<{ id: string; handle: string; display_name: string; avatar_path: string | null; avatar_updated_at: string | null; shadowbanned_at: string | null }>(
+    ctx.env.DB.prepare("select id, handle, display_name, avatar_path, avatar_updated_at, shadowbanned_at from users where id = ?").bind(userId)
   );
   if (!row) throw new HttpError("user not found", 404);
   return {
     id: row.id,
     handle: row.handle,
     displayName: row.display_name,
+    avatarUrl: userAvatarUrl(ctx, row),
     shadowbanned: Boolean(row.shadowbanned_at)
   };
 }

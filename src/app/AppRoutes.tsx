@@ -67,6 +67,7 @@ export function AppRoutes({
   openSpriteFixer,
   openCollectionEditor,
   openPetCollector,
+  openQuickComment,
   openCollectionCreator,
   openUserCollectionEditor,
   openCollectionPetAdder,
@@ -173,6 +174,7 @@ export function AppRoutes({
           onEditTags={openTagEditor}
           onManageCollections={openCollectionEditor}
           onCollect={openPetCollector}
+          onQuickComment={openQuickComment}
           onToggleNsfw={togglePetNsfw}
           onShadowbanOwner={toggleOwnerShadowban}
           onDelete={deleteUpload}

@@ -1,0 +1,40 @@
+.userAvatar {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 35% 20%, var(--inset-highlight), transparent 40%),
+    color-mix(in srgb, var(--accent-soft) 58%, var(--surface));
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.userAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: auto;
+}
+
+.userAvatar-sm {
+  width: 30px;
+  height: 30px;
+  font-size: 10px;
+}
+
+.userAvatar-md {
+  width: 36px;
+  height: 36px;
+  font-size: 11px;
+}
+
+.userAvatar-lg {
+  width: 48px;
+  height: 48px;
+  font-size: 13px;
+}

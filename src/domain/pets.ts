@@ -2,7 +2,7 @@ import { APP_HANDLE } from "../branding/brand";
 import type { DownloadCommandMode } from "../downloads/DownloadCommandRow";
 import { galleryRequestTags, isEditablePetKind } from "./config";
 import { petAssetUrl } from "./http";
-import type { CollectionSummary, GalleryUrlState, Pet } from "./types";
+import type { CollectionSummary, GalleryRecentComment, GalleryUrlState, Pet } from "./types";
 
 export function petImportCommand(pet: Pet, mode: DownloadCommandMode) {
   if (mode === "cli") {
@@ -42,12 +42,21 @@ export function normalizePet(pet: Pet): Pet {
     commentCount: pet.commentCount || 0,
     likedByMe: Boolean(pet.likedByMe),
     ownerShadowbanned: Boolean(pet.ownerShadowbanned),
+    ownerAvatarUrl: pet.ownerAvatarUrl ? petAssetUrl(pet.ownerAvatarUrl) : null,
     spritesheetUrl: petAssetUrl(pet.spritesheetUrl),
     posterUrl: petAssetUrl(pet.posterUrl),
     previewUrl: petAssetUrl(pet.previewUrl),
     shareImageUrl: petAssetUrl(pet.shareImageUrl),
     downloadUrl: petAssetUrl(pet.downloadUrl),
     kind: isEditablePetKind(pet.kind) ? pet.kind : "object"
+  };
+}
+
+export function normalizeRecentComment(comment: GalleryRecentComment): GalleryRecentComment {
+  return {
+    ...comment,
+    petPosterUrl: petAssetUrl(comment.petPosterUrl),
+    authorAvatarUrl: comment.authorAvatarUrl ? petAssetUrl(comment.authorAvatarUrl) : null
   };
 }
 

@@ -4,6 +4,7 @@ import { AuthModal, AccountSettingsModal } from "../auth/AuthModals";
 import type { AuthMode, AuthProvider } from "../auth/useAuthForms";
 import { CollectionPetAdderModal, PetCollectorModal, UserCollectionEditorModal } from "../collections/UserCollectionModals";
 import type { CollectionPetAdderState } from "../collections/useUserCollections";
+import { QuickCommentModal } from "../comments/QuickCommentModal";
 import { DownloadModal } from "../downloads/DownloadModal";
 import { PetCollectionsModal, PetDeleteConfirmModal, TagEditorModal } from "../pets/PetManagementModals";
 import { SpriteFixerModal } from "../pets/SpriteFixerModal";
@@ -42,11 +43,22 @@ export function AppDialogs({
   setSettingsNewPassword,
   settingsStatus,
   settingsBusy,
+  settingsAvatarStatus,
+  settingsAvatarBusy,
+  settingsAvatarPets,
+  settingsAvatarPetsLoading,
+  loadSettingsAvatarPets,
   submitSettings,
+  submitAvatar,
   deleteAccount,
   closeSettings,
   sharingPet,
   setSharingPet,
+  quickCommentPet,
+  quickCommentStatus,
+  quickCommentBusy,
+  submitQuickComment,
+  closeQuickComment,
   sharingEntity,
   setSharingEntity,
   downloadPet,
@@ -132,11 +144,22 @@ export function AppDialogs({
   setSettingsNewPassword: Dispatch<SetStateAction<string>>;
   settingsStatus: string;
   settingsBusy: boolean;
+  settingsAvatarStatus: string;
+  settingsAvatarBusy: boolean;
+  settingsAvatarPets: Pet[];
+  settingsAvatarPetsLoading: boolean;
+  loadSettingsAvatarPets: () => void | Promise<void>;
   submitSettings: (event: FormEvent) => void | Promise<void>;
+  submitAvatar: (avatar: Blob) => void | Promise<void>;
   deleteAccount: (deletePets: boolean) => void | Promise<void>;
   closeSettings: () => void;
   sharingPet: Pet | null;
   setSharingPet: Dispatch<SetStateAction<Pet | null>>;
+  quickCommentPet: Pet | null;
+  quickCommentStatus: string;
+  quickCommentBusy: boolean;
+  submitQuickComment: (body: string) => void | Promise<void>;
+  closeQuickComment: () => void;
   sharingEntity: EntityShareTarget | null;
   setSharingEntity: Dispatch<SetStateAction<EntityShareTarget | null>>;
   downloadPet: Pet | null;
@@ -229,13 +252,28 @@ export function AppDialogs({
           setNewPassword={setSettingsNewPassword}
           status={settingsStatus}
           busy={settingsBusy}
+          avatarStatus={settingsAvatarStatus}
+          avatarBusy={settingsAvatarBusy}
+          avatarPets={settingsAvatarPets}
+          avatarPetsLoading={settingsAvatarPetsLoading}
           onSubmit={submitSettings}
+          onAvatarSubmit={submitAvatar}
+          onReloadAvatarPets={loadSettingsAvatarPets}
           onDeleteAccount={deleteAccount}
           onClose={closeSettings}
         />
       )}
 
       {sharingPet && <ShareModal pet={sharingPet} onClose={() => setSharingPet(null)} />}
+      {quickCommentPet && (
+        <QuickCommentModal
+          pet={quickCommentPet}
+          status={quickCommentStatus}
+          busy={quickCommentBusy}
+          onSubmit={submitQuickComment}
+          onClose={closeQuickComment}
+        />
+      )}
       {sharingEntity && <EntityShareModal target={sharingEntity} onClose={() => setSharingEntity(null)} />}
       {downloadPet && <DownloadModal pet={downloadPet} onClose={() => setDownloadPet(null)} />}
 

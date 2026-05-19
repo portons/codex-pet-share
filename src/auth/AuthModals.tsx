@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { Icon } from "../ui/Icon";
 import { Spinner } from "../ui/Spinner";
-import type { ContentMode, User } from "../domain/types";
+import type { ContentMode, Pet, User } from "../domain/types";
+import { AvatarEditor } from "./AvatarEditor";
 import type { AuthMode, AuthProvider } from "./useAuthForms";
 
 export function AuthModal({
@@ -262,7 +263,13 @@ export function AccountSettingsModal({
   setNewPassword,
   status,
   busy,
+  avatarStatus,
+  avatarBusy,
+  avatarPets,
+  avatarPetsLoading,
   onSubmit,
+  onAvatarSubmit,
+  onReloadAvatarPets,
   onDeleteAccount,
   onClose
 }: {
@@ -277,11 +284,18 @@ export function AccountSettingsModal({
   setNewPassword: (value: string) => void;
   status: string;
   busy: boolean;
+  avatarStatus: string;
+  avatarBusy: boolean;
+  avatarPets: Pet[];
+  avatarPetsLoading: boolean;
   onSubmit: (event: FormEvent) => void;
+  onAvatarSubmit: (avatar: Blob) => void | Promise<void>;
+  onReloadAvatarPets: () => void | Promise<void>;
   onDeleteAccount: (deletePets: boolean) => void | Promise<void>;
   onClose: () => void;
 }) {
   const nsfwEnabled = contentMode === "all";
+  const modalBusy = busy || avatarBusy;
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   return (
     <>
@@ -289,18 +303,18 @@ export function AccountSettingsModal({
         className="modalBackdrop"
         role="presentation"
         onClick={(event) => {
-          if (event.target === event.currentTarget && !busy) {
+          if (event.target === event.currentTarget && !modalBusy) {
             onClose();
           }
         }}
       >
-        <section className="authModal" role="dialog" aria-modal="true" aria-label="Settings">
+        <section className="authModal settingsModal" role="dialog" aria-modal="true" aria-label="Settings">
           <div className="modalHeader">
             <div className="modalTitle compact">
               <p className="metaText">App</p>
               <h2>Settings</h2>
             </div>
-            <button className="btn btnSm btnGhost modalCloseButton" type="button" onClick={onClose} disabled={busy}>
+            <button className="btn btnSm btnGhost modalCloseButton" type="button" onClick={onClose} disabled={modalBusy}>
               <Icon name="close" size={12} />
               Close
             </button>
@@ -372,6 +386,15 @@ export function AccountSettingsModal({
                   {busy ? "Saving" : "Save"}
                 </button>
               </form>
+              <AvatarEditor
+                user={user}
+                pets={avatarPets}
+                petsLoading={avatarPetsLoading}
+                status={avatarStatus}
+                busy={avatarBusy}
+                onReloadPets={onReloadAvatarPets}
+                onSubmit={onAvatarSubmit}
+              />
               <div className="settingsDangerZone">
                 <span className="fieldLabel">Delete account</span>
                 <button className="btn btnDanger btnLg settingsDeleteButton" type="button" disabled={busy} onClick={() => setDeleteModalOpen(true)}>

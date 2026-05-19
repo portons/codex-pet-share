@@ -10,6 +10,15 @@ export function petAssetUrl(ctx: AppContext, path: string, version?: string) {
   return `${base}${version ? `/v/${encodeURIComponent(version)}` : ""}/${path}`;
 }
 
+export function userAvatarPath(userId: string) {
+  return `users/${userId}/avatar.webp`;
+}
+
+export function userAvatarUrl(ctx: AppContext, row: { avatar_path?: string | null; avatar_updated_at?: string | null }) {
+  if (!row.avatar_path || !row.avatar_updated_at) return null;
+  return petAssetUrl(ctx, row.avatar_path, String(Date.parse(row.avatar_updated_at)));
+}
+
 export async function putAsset(ctx: AppContext, path: string, bytes: Uint8Array, contentType: string) {
   await ctx.env.PET_ASSETS.put(petAssetKey(ctx, path), bytes, {
     httpMetadata: {

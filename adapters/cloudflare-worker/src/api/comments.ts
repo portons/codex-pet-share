@@ -3,6 +3,7 @@ import { getPet, getVisiblePet, parsePagination } from "./pets";
 import { all, first, nowIso } from "../core/db";
 import { uuid } from "../core/crypto";
 import { HttpError, json, readJsonBody } from "../core/http";
+import { userAvatarUrl } from "../storage/assets";
 import type { AppContext, AuthUser, PetRow, Viewer } from "../core/types";
 
 const allowedCommentReactions = new Set(["heart", "sparkle", "laugh", "party", "eyes"]);
@@ -18,6 +19,8 @@ type PetCommentRow = {
   author_handle?: string | null;
   author_display_name?: string | null;
   author_shadowbanned_at?: string | null;
+  author_avatar_path?: string | null;
+  author_avatar_updated_at?: string | null;
 };
 
 type CommentReactionRow = {
@@ -58,7 +61,8 @@ async function listPetComments(ctx: AppContext, petId: string) {
   const total = Number(totalRow?.total || 0);
   const rows = await all<PetCommentRow>(
     ctx.env.DB.prepare(`
-      select c.*, u.handle as author_handle, u.display_name as author_display_name, u.shadowbanned_at as author_shadowbanned_at
+      select c.*, u.handle as author_handle, u.display_name as author_display_name, u.shadowbanned_at as author_shadowbanned_at,
+        u.avatar_path as author_avatar_path, u.avatar_updated_at as author_avatar_updated_at
       from pet_comments c
       left join users u on u.id = c.author_id
       where c.pet_id = ? and ${filter.sql}
@@ -68,7 +72,7 @@ async function listPetComments(ctx: AppContext, petId: string) {
   );
   const reactions = await commentReactionContext(ctx, rows.map((row) => row.id), viewer);
   return json({
-    comments: rows.map((row) => serializePetComment(row, reactions.get(row.id) || [], viewer, pet)),
+    comments: rows.map((row) => serializePetComment(ctx, row, reactions.get(row.id) || [], viewer, pet)),
     page: pagination.page,
     pageSize: pagination.pageSize,
     total,
@@ -91,7 +95,7 @@ async function createPetComment(ctx: AppContext, petId: string) {
   const row = await commentRow(ctx, petId, id);
   if (!row) throw new HttpError("comment not found", 500);
   return json({
-    comment: serializePetComment(row, [], user, pet),
+    comment: serializePetComment(ctx, row, [], user, pet),
     total: await publicCommentCount(ctx, petId)
   }, 201);
 }
@@ -124,7 +128,7 @@ async function setPetCommentReaction(ctx: AppContext, petId: string, commentId: 
       .run();
   }
   const reactions = await commentReactionContext(ctx, [commentId], user);
-  return json({ comment: serializePetComment(comment, reactions.get(commentId) || [], user, pet) });
+  return json({ comment: serializePetComment(ctx, comment, reactions.get(commentId) || [], user, pet) });
 }
 
 async function requireCommentUser(ctx: AppContext) {
@@ -149,7 +153,8 @@ function validateReaction(value: unknown) {
 async function commentRow(ctx: AppContext, petId: string, commentId: string) {
   return first<PetCommentRow>(
     ctx.env.DB.prepare(`
-      select c.*, u.handle as author_handle, u.display_name as author_display_name, u.shadowbanned_at as author_shadowbanned_at
+      select c.*, u.handle as author_handle, u.display_name as author_display_name, u.shadowbanned_at as author_shadowbanned_at,
+        u.avatar_path as author_avatar_path, u.avatar_updated_at as author_avatar_updated_at
       from pet_comments c
       left join users u on u.id = c.author_id
       where c.pet_id = ? and c.id = ?
@@ -157,13 +162,14 @@ async function commentRow(ctx: AppContext, petId: string, commentId: string) {
   );
 }
 
-function serializePetComment(row: PetCommentRow, reactions: CommentReactionRow[], viewer: Viewer, pet: PetRow) {
+function serializePetComment(ctx: AppContext, row: PetCommentRow, reactions: CommentReactionRow[], viewer: Viewer, pet: PetRow) {
   return {
     id: row.id,
     petId: row.pet_id,
     authorId: row.author_id,
     authorHandle: row.author_handle || null,
     authorName: row.author_display_name || "Anonymous",
+    authorAvatarUrl: userAvatarUrl(ctx, { avatar_path: row.author_avatar_path, avatar_updated_at: row.author_avatar_updated_at }),
     body: row.body,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

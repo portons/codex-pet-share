@@ -160,6 +160,7 @@ export function PetCard({
   onManageCollections,
   onCollect,
   onRemoveFromCollection,
+  onQuickComment,
   onPreview,
   previewActive = false,
   onToggleNsfw,
@@ -186,6 +187,7 @@ export function PetCard({
   onManageCollections: (pet: Pet) => void;
   onCollect?: (pet: Pet) => void;
   onRemoveFromCollection?: (pet: Pet) => void;
+  onQuickComment?: (pet: Pet) => void;
   onPreview?: (pet: Pet) => void;
   previewActive?: boolean;
   onToggleNsfw: (pet: Pet) => void;
@@ -243,7 +245,7 @@ export function PetCard({
     }
   };
 
-  const hasQuickAction = Boolean(onPreview || onPlayground);
+  const hasQuickAction = Boolean(onPreview || onPlayground || onQuickComment);
   const animateCardPreview = cardPointerInside || cardFocusInside;
 
   return (
@@ -295,6 +297,21 @@ export function PetCard({
               }}
             >
               <Icon name="cube" size={14} />
+            </button>
+          )}
+          {onQuickComment && (
+            <button
+              className="petCardQuickAction"
+              type="button"
+              aria-label="Quick comment"
+              title="Quick comment"
+              data-tooltip="Quick comment"
+              onClick={() => {
+                trackCardAction("card_quick_comment_click");
+                onQuickComment(pet);
+              }}
+            >
+              <Icon name="comment" size={14} />
             </button>
           )}
         </div>

@@ -18,7 +18,9 @@ export function petSelect(db: D1Database) {
       p.*,
       u.handle as owner_handle,
       u.display_name as owner_display_name,
-      u.shadowbanned_at as owner_shadowbanned_at
+      u.shadowbanned_at as owner_shadowbanned_at,
+      u.avatar_path as owner_avatar_path,
+      u.avatar_updated_at as owner_avatar_updated_at
     from pets p
     left join users u on u.id = p.owner_id
   `);
@@ -43,15 +45,18 @@ export function serializeUser(row: {
   email: string;
   display_name: string;
   handle: string;
+  avatar_path?: string | null;
+  avatar_updated_at?: string | null;
   is_admin: number;
   shadowbanned_at: string | null;
   email_verified_at?: string | null;
-}): AuthUser {
+}, avatarUrl: string | null = null): AuthUser {
   return {
     id: row.id,
     email: row.email,
     displayName: row.display_name,
     handle: row.handle,
+    avatarUrl,
     isAdmin: Boolean(row.is_admin),
     isShadowbanned: Boolean(row.shadowbanned_at),
     emailVerified: Boolean(row.email_verified_at)

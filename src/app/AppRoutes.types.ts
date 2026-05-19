@@ -65,6 +65,7 @@ export type AppRoutesProps = {
   openSpriteFixer: (pet: Pet) => void;
   openCollectionEditor: (pet: Pet) => void | Promise<void>;
   openPetCollector: (pet: Pet) => void | Promise<void>;
+  openQuickComment: (pet: Pet) => void;
   openCollectionCreator: () => void | Promise<void>;
   openUserCollectionEditor: (collection: CollectionSummary) => void | Promise<void>;
   openCollectionPetAdder: (collection: Omit<CollectionSummary, "topPets">) => void | Promise<void>;

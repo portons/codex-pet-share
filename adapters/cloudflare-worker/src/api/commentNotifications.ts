@@ -1,6 +1,7 @@
 import { requireUser } from "./auth";
 import { all, first, nowIso } from "../core/db";
 import { HttpError, json, readJsonBody } from "../core/http";
+import { userAvatarUrl } from "../storage/assets";
 import type { AppContext, AuthUser } from "../core/types";
 
 const notificationPageSize = 6;
@@ -14,6 +15,8 @@ type CommentNotificationRow = {
   author_id: string | null;
   author_handle: string | null;
   author_display_name: string | null;
+  author_avatar_path: string | null;
+  author_avatar_updated_at: string | null;
 };
 
 export async function handleCommentNotifications(ctx: AppContext, parts: string[]) {
@@ -44,7 +47,8 @@ async function commentNotifications(ctx: AppContext, user: AuthUser) {
   const rows = await all<CommentNotificationRow>(
     ctx.env.DB.prepare(`
       select c.id, c.pet_id, p.display_name as pet_display_name, c.body, c.created_at,
-        c.author_id, u.handle as author_handle, u.display_name as author_display_name
+        c.author_id, u.handle as author_handle, u.display_name as author_display_name,
+        u.avatar_path as author_avatar_path, u.avatar_updated_at as author_avatar_updated_at
       from pet_comments c
       join pets p on p.id = c.pet_id
       left join users u on u.id = c.author_id
@@ -56,7 +60,7 @@ async function commentNotifications(ctx: AppContext, user: AuthUser) {
   );
   return {
     unreadCount: Number(totalRow?.total || 0),
-    notifications: rows.map(serializeCommentNotification)
+    notifications: rows.map((row) => serializeCommentNotification(ctx, row))
   };
 }
 
@@ -95,7 +99,7 @@ function ownedUnreadCommentFilter() {
   return "p.owner_id = ? and coalesce(c.author_id, '') <> ? and u.shadowbanned_at is null and r.comment_id is null";
 }
 
-function serializeCommentNotification(row: CommentNotificationRow) {
+function serializeCommentNotification(ctx: AppContext, row: CommentNotificationRow) {
   return {
     id: row.id,
     commentId: row.id,
@@ -104,6 +108,7 @@ function serializeCommentNotification(row: CommentNotificationRow) {
     authorId: row.author_id,
     authorHandle: row.author_handle || null,
     authorName: row.author_display_name || "Anonymous",
+    authorAvatarUrl: userAvatarUrl(ctx, { avatar_path: row.author_avatar_path, avatar_updated_at: row.author_avatar_updated_at }),
     body: row.body,
     createdAt: row.created_at
   };

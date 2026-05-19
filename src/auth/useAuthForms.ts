@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { readJson } from "../domain/http";
-import type { AuthSession, User } from "../domain/types";
+import { normalizePet } from "../domain/pets";
+import { normalizeUser } from "../domain/users";
+import type { AuthSession, Pet, User } from "../domain/types";
 
 export type AuthProvider = {
   id: "google" | "x";
@@ -53,6 +55,10 @@ export function useAuthForms({
   const [settingsNewPassword, setSettingsNewPassword] = useState("");
   const [settingsStatus, setSettingsStatus] = useState("");
   const [settingsBusy, setSettingsBusy] = useState(false);
+  const [settingsAvatarStatus, setSettingsAvatarStatus] = useState("");
+  const [settingsAvatarBusy, setSettingsAvatarBusy] = useState(false);
+  const [settingsAvatarPets, setSettingsAvatarPets] = useState<Pet[]>([]);
+  const [settingsAvatarPetsLoading, setSettingsAvatarPetsLoading] = useState(false);
 
   function selectAuthMode(next: AuthMode) {
     setAuthMode(next);
@@ -86,13 +92,29 @@ export function useAuthForms({
     setSettingsCurrentPassword("");
     setSettingsNewPassword("");
     setSettingsStatus("");
+    setSettingsAvatarStatus("");
     setSettingsOpen(true);
+    void loadSettingsAvatarPets();
   }
 
   function closeSettings() {
-    if (settingsBusy) return;
+    if (settingsBusy || settingsAvatarBusy) return;
     setSettingsOpen(false);
     setSettingsStatus("");
+    setSettingsAvatarStatus("");
+  }
+
+  async function loadSettingsAvatarPets() {
+    if (!user || settingsAvatarPetsLoading) return;
+    setSettingsAvatarPetsLoading(true);
+    try {
+      const body = await readJson<{ pets: Pet[] }>(await apiFetch("/api/pets/mine"));
+      setSettingsAvatarPets(body.pets.map(normalizePet));
+    } catch (error) {
+      setSettingsAvatarStatus(error instanceof Error ? error.message : "Could not load your pets.");
+    } finally {
+      setSettingsAvatarPetsLoading(false);
+    }
   }
 
   async function submitAuth(event: FormEvent) {
@@ -178,15 +200,16 @@ export function useAuthForms({
         );
         return;
       }
+      const nextUser = normalizeUser(body.user);
       applySession(body.session);
-      setUser(body.user);
+      setUser(nextUser);
       setDisplayName("");
       setEmail("");
       setPassword("");
       setResetToken("");
       setAuthStatus("");
       setAuthOpen(false);
-      await onAuthenticated(body.user, body.session);
+      await onAuthenticated(nextUser, body.session);
     } catch (error) {
       setAuthStatus(error instanceof Error ? error.message : "Authentication failed.");
     } finally {
@@ -284,8 +307,9 @@ export function useAuthForms({
           body: JSON.stringify({ displayName: nextDisplayName.value })
         })
       );
-      setUser(body.user);
-      setSettingsDisplayName(body.user.displayName);
+      const nextUser = normalizeUser(body.user);
+      setUser(nextUser);
+      setSettingsDisplayName(nextUser.displayName);
       if (settingsCurrentPassword || settingsNewPassword) {
         await readJson<{ ok: true }>(
           await apiFetch("/api/auth/password", {
@@ -298,11 +322,35 @@ export function useAuthForms({
       setSettingsCurrentPassword("");
       setSettingsNewPassword("");
       setSettingsOpen(false);
-      await onSettingsSaved(body.user);
+      await onSettingsSaved(nextUser);
     } catch (error) {
       setSettingsStatus(error instanceof Error ? error.message : "Could not save account settings.");
     } finally {
       setSettingsBusy(false);
+    }
+  }
+
+  async function submitAvatar(avatar: Blob) {
+    if (!user || settingsAvatarBusy) return;
+    setSettingsAvatarStatus("");
+    setSettingsAvatarBusy(true);
+    try {
+      const form = new FormData();
+      form.append("avatar", avatar, "avatar.webp");
+      const body = await readJson<{ user: User }>(
+        await apiFetch("/api/auth/me/avatar", {
+          method: "POST",
+          body: form
+        })
+      );
+      const nextUser = normalizeUser(body.user);
+      setUser(nextUser);
+      setSettingsAvatarStatus("Avatar saved.");
+      await onSettingsSaved(nextUser);
+    } catch (error) {
+      setSettingsAvatarStatus(error instanceof Error ? error.message : "Could not save avatar.");
+    } finally {
+      setSettingsAvatarBusy(false);
     }
   }
 
@@ -363,7 +411,13 @@ export function useAuthForms({
     setSettingsNewPassword,
     settingsStatus,
     settingsBusy,
+    settingsAvatarStatus,
+    settingsAvatarBusy,
+    settingsAvatarPets,
+    settingsAvatarPetsLoading,
+    loadSettingsAvatarPets,
     submitSettings,
+    submitAvatar,
     deleteAccount,
     openSettings,
     closeSettings,

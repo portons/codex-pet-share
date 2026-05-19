@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { apiUrl, readJson } from "../domain/http";
 import { loadStoredSession, sessionNeedsRefresh, storeSession } from "../domain/session";
+import { normalizeNullableUser, normalizeUser } from "../domain/users";
 import type { AuthSession, User } from "../domain/types";
 
 type CachedResponse = {
@@ -101,7 +102,7 @@ export function useSessionApi() {
       throw new Error("session expired");
     }
     applySession(body.session);
-    setUser(body.user);
+    setUser(normalizeUser(body.user));
     return body.session;
   }
 
@@ -129,8 +130,9 @@ export function useSessionApi() {
 
   async function loadMe(authSession = session) {
     const body = await readJson<{ user: User | null }>(await apiFetch("/api/auth/me", {}, authSession));
-    setUser(body.user);
-    return body.user;
+    const nextUser = normalizeNullableUser(body.user);
+    setUser(nextUser);
+    return nextUser;
   }
 
   return {

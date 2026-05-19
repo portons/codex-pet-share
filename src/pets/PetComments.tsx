@@ -3,6 +3,7 @@ import { formatDate, formatMetric } from "../domain/format";
 import type { Pet, PetComment, User } from "../domain/types";
 import { Icon, type IconName } from "../ui/Icon";
 import { Spinner } from "../ui/Spinner";
+import { UserAvatar } from "../ui/UserAvatar";
 
 const maxCommentLength = 280;
 
@@ -199,7 +200,7 @@ function CommentItem({
       style={{ "--comment-index": index } as CSSProperties}
     >
       <header className="petCommentMeta">
-        <span className="petCommentAvatar" aria-hidden="true">{initials(comment.authorName)}</span>
+        <UserAvatar className="petCommentAvatar" name={comment.authorName} avatarUrl={comment.authorAvatarUrl} />
         <div className="petCommentByline">
           <div>
             {authorHref ? (
@@ -277,12 +278,6 @@ function CommentSkeleton() {
       ))}
     </div>
   );
-}
-
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  const text = `${parts[0]?.[0] || "A"}${parts[1]?.[0] || ""}`.toUpperCase();
-  return text.slice(0, 2);
 }
 
 function commentDomId(id: string) {

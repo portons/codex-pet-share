@@ -17,6 +17,7 @@ import { Icon } from "../ui/Icon";
 import { ResultBar } from "../ui/ResultBar";
 import { GallerySkeleton, UploadsSkeleton } from "../ui/Skeletons";
 import { SignInGate } from "../ui/SignInGate";
+import { UserAvatar } from "../ui/UserAvatar";
 import { PaginationControls } from "./PaginationControls";
 
 export function CreatorPage({
@@ -77,14 +78,17 @@ export function CreatorPage({
       <header className="sectionHeader">
         <div>
           <p className="metaText">Creator</p>
-          <h1>
-            {creator?.displayName || "Creator"}
-            {creator?.shadowbanned && (
-              <span className="shadowbanIcon" title="Shadowbanned">
-                <Icon name="ban" size={18} />
-              </span>
-            )}
-          </h1>
+          <div className="creatorDetailTitle">
+            {creator ? <UserAvatar name={creator.displayName} avatarUrl={creator.avatarUrl} size="lg" /> : null}
+            <h1>
+              {creator?.displayName || "Creator"}
+              {creator?.shadowbanned && (
+                <span className="shadowbanIcon" title="Shadowbanned">
+                  <Icon name="ban" size={18} />
+                </span>
+              )}
+            </h1>
+          </div>
         </div>
         {creator && (
           <button className="btn btnSm" type="button" onClick={onShareCreator} aria-label={`Share ${creator.displayName}`}>
@@ -394,13 +398,16 @@ function CreatorFeatureCard({
     <article className="creatorFeatureCard">
       <div className="creatorFeatureCopy">
         <p className="creatorSpotlightKicker">Rank {rank}</p>
-        <button
-          className="ownerLink creatorFeatureName"
-          type="button"
-          onClick={() => navigate(`/users/${creator.handle || creator.id}`)}
-        >
-          {creator.displayName}
-        </button>
+        <div className="creatorFeatureIdentity">
+          <UserAvatar name={creator.displayName} avatarUrl={creator.avatarUrl} size="lg" />
+          <button
+            className="ownerLink creatorFeatureName"
+            type="button"
+            onClick={() => navigate(`/users/${creator.handle || creator.id}`)}
+          >
+            {creator.displayName}
+          </button>
+        </div>
       </div>
       <CreatorPetMosaic creator={creator} variant="feature" />
       <div className="creatorFeatureMetrics" aria-label={`${creator.displayName} stats`}>
@@ -428,9 +435,12 @@ function CreatorRankRow({
     >
       <span className={`leaderRank ${rank <= 3 ? `rank${rank}` : ""}`}>{rank}</span>
       <div className="creatorRankIdentity">
-        <button className="ownerLink creatorRankName" type="button" onClick={() => navigate(`/users/${creator.handle || creator.id}`)}>
-          {creator.displayName}
-        </button>
+        <div className="creatorRankNameWrap">
+          <UserAvatar name={creator.displayName} avatarUrl={creator.avatarUrl} size="md" />
+          <button className="ownerLink creatorRankName" type="button" onClick={() => navigate(`/users/${creator.handle || creator.id}`)}>
+            {creator.displayName}
+          </button>
+        </div>
         <CreatorPetMosaic creator={creator} variant="row" />
       </div>
       <div className="creatorRankMetrics" aria-label={`${creator.displayName} stats`}>

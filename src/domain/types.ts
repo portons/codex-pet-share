@@ -2,6 +2,7 @@ export type User = {
   id: string;
   email: string;
   displayName: string;
+  avatarUrl: string | null;
   isAdmin: boolean;
   isShadowbanned: boolean;
   emailVerified?: boolean;
@@ -21,6 +22,7 @@ export type Pet = {
   ownerId: string | null;
   ownerHandle: string | null;
   ownerName: string;
+  ownerAvatarUrl: string | null;
   uploadedAt: string;
   viewCount: number;
   downloadCount: number;
@@ -52,6 +54,7 @@ export type CommentNotification = {
   authorId: string | null;
   authorHandle: string | null;
   authorName: string;
+  authorAvatarUrl: string | null;
   body: string;
   createdAt: string;
 };
@@ -65,6 +68,7 @@ export type GalleryRecentComment = {
   authorId: string | null;
   authorHandle: string | null;
   authorName: string;
+  authorAvatarUrl: string | null;
   body: string;
   createdAt: string;
 };
@@ -75,6 +79,7 @@ export type PetComment = {
   authorId: string | null;
   authorHandle: string | null;
   authorName: string;
+  authorAvatarUrl: string | null;
   body: string;
   createdAt: string;
   updatedAt: string;
@@ -152,6 +157,7 @@ export type Creator = {
   id: string;
   handle: string;
   displayName: string;
+  avatarUrl: string | null;
   shadowbanned?: boolean;
 };
 
@@ -165,6 +171,7 @@ export type CreatorLeaderboardItem = {
   id: string;
   handle: string | null;
   displayName: string;
+  avatarUrl: string | null;
   petCount: number;
   viewCount: number;
   likeCount: number;

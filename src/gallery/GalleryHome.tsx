@@ -11,6 +11,7 @@ import { Icon } from "../ui/Icon";
 import { ResultBar } from "../ui/ResultBar";
 import { GallerySkeleton } from "../ui/Skeletons";
 import { Spinner } from "../ui/Spinner";
+import { UserAvatar } from "../ui/UserAvatar";
 import { GallerySearch } from "./GalleryControls";
 import { PaginationControls } from "./PaginationControls";
 
@@ -189,11 +190,14 @@ function RecentCommentList({ comments }: { comments: GalleryRecentComment[] }) {
               </div>
             </div>
             <span className="recentCommentMeta">
-              {authorHref ? (
-                <a href={authorHref}>{comment.authorName}</a>
-              ) : (
-                <span>{comment.authorName}</span>
-              )}
+              <span className="recentCommentAuthor">
+                <UserAvatar name={comment.authorName} avatarUrl={comment.authorAvatarUrl} size="sm" />
+                {authorHref ? (
+                  <a href={authorHref}>{comment.authorName}</a>
+                ) : (
+                  <span>{comment.authorName}</span>
+                )}
+              </span>
               <span>{formatDate(comment.createdAt)}</span>
             </span>
           </li>
@@ -372,6 +376,7 @@ function Gallery({
   onEditTags,
   onManageCollections,
   onCollect,
+  onQuickComment,
   onToggleNsfw,
   onShadowbanOwner,
   onDelete,
@@ -414,6 +419,7 @@ function Gallery({
   onEditTags: (pet: Pet) => void;
   onManageCollections: (pet: Pet) => void;
   onCollect?: (pet: Pet) => void;
+  onQuickComment: (pet: Pet) => void;
   onToggleNsfw: (pet: Pet) => void;
   onShadowbanOwner: (pet: Pet) => void;
   onDelete: (pet: Pet) => void;
@@ -527,6 +533,7 @@ function Gallery({
                   onEditTags={onEditTags}
                   onManageCollections={onManageCollections}
                   onCollect={onCollect}
+                  onQuickComment={onQuickComment}
                   onPreview={canCursorPreview ? (previewTarget) =>
                     setPreviewPet((current) => (current?.id === previewTarget.id ? null : previewTarget))
                   : undefined}

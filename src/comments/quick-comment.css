@@ -1,0 +1,103 @@
+.quickCommentBackdrop {
+  align-items: start;
+  justify-items: center;
+  padding-top: min(12vh, 88px);
+}
+
+.quickCommentModal {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  width: min(430px, 100%);
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-modal);
+  animation: modal-in 260ms var(--ease-spring);
+}
+
+.quickCommentModal .modalHeader {
+  margin-bottom: 0;
+}
+
+.quickCommentPet {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+}
+
+.quickCommentPet img {
+  width: 64px;
+  height: 70px;
+  object-fit: contain;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  image-rendering: pixelated;
+}
+
+.quickCommentPet div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.quickCommentPet a {
+  overflow: hidden;
+  color: var(--ink);
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quickCommentPet small {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quickCommentForm {
+  display: grid;
+  gap: 12px;
+}
+
+.quickCommentForm label {
+  display: grid;
+  gap: 7px;
+}
+
+.quickCommentInput {
+  min-height: 116px;
+  resize: vertical;
+}
+
+.quickCommentFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+@media (max-width: 560px) {
+  .quickCommentBackdrop {
+    padding-top: 24px;
+  }
+
+  .quickCommentFooter {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .quickCommentFooter .btn {
+    justify-content: center;
+  }
+}

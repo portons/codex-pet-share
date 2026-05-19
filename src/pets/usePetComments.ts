@@ -1,5 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { readJson } from "../domain/http";
+import { normalizeAvatarUrl } from "../domain/users";
 import type { AuthSession, Pet, PetComment, PetCommentsResponse, User } from "../domain/types";
 
 type ApiFetch = (path: string, init?: RequestInit, authSession?: AuthSession | null) => Promise<Response>;
@@ -55,8 +56,9 @@ export function usePetComments({
       const body = await readJson<PetCommentsResponse>(
         await apiFetch(`/api/pets/${petId}/comments?${params}`, {}, session)
       );
+      const nextComments = body.comments.map(normalizeComment);
       setComments((current) =>
-        page === 1 ? body.comments : mergeComments(current, body.comments)
+        page === 1 ? nextComments : mergeComments(current, nextComments)
       );
       setCommentsMeta({
         page: body.page,
@@ -91,7 +93,8 @@ export function usePetComments({
           body: JSON.stringify({ body: cleanBody })
         })
       );
-      setComments((current) => [responseBody.comment, ...current.filter((comment) => comment.id !== responseBody.comment.id)]);
+      const nextComment = normalizeComment(responseBody.comment);
+      setComments((current) => [nextComment, ...current.filter((comment) => comment.id !== nextComment.id)]);
       setCommentsMeta((current) => ({
         ...current,
         total: responseBody.total,
@@ -148,7 +151,7 @@ export function usePetComments({
           body: JSON.stringify({ reaction })
         })
       );
-      setComments((current) => current.map((item) => item.id === comment.id ? body.comment : item));
+      setComments((current) => current.map((item) => item.id === comment.id ? normalizeComment(body.comment) : item));
     } catch (error) {
       setCommentsStatus(error instanceof Error ? error.message : "Reaction failed.");
     } finally {
@@ -173,4 +176,11 @@ export function usePetComments({
 function mergeComments(current: PetComment[], next: PetComment[]) {
   const seen = new Set(current.map((comment) => comment.id));
   return [...current, ...next.filter((comment) => !seen.has(comment.id))];
+}
+
+function normalizeComment(comment: PetComment): PetComment {
+  return {
+    ...comment,
+    authorAvatarUrl: normalizeAvatarUrl(comment.authorAvatarUrl)
+  };
 }

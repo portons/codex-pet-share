@@ -5,7 +5,7 @@ import { parseJson, parsePetKind, validateManifest, validatePosterImage, validat
 import { all, first, nowIso, tags, validationReport } from "../core/db";
 import { HttpError, json } from "../core/http";
 import { createZip } from "../core/zip";
-import { deleteAsset, getAssetBytes, petAssetUrl, putAsset, serveAsset } from "../storage/assets";
+import { deleteAsset, getAssetBytes, petAssetUrl, putAsset, serveAsset, userAvatarUrl } from "../storage/assets";
 import type { AppContext, AuthUser, ContentMode, Pagination, PetKind, PetRow, PetSort, UploadFile, ValidationReport, Viewer } from "../core/types";
 
 const sqlVariableChunkSize = 80;
@@ -19,6 +19,8 @@ type RecentDiscussionRow = {
   author_id: string | null;
   author_handle: string | null;
   author_display_name: string | null;
+  author_avatar_path: string | null;
+  author_avatar_updated_at: string | null;
   body: string;
   created_at: string;
 };
@@ -98,6 +100,7 @@ export function serializePet(ctx: AppContext, row: PetRow, report?: ValidationRe
     ownerId: row.owner_id,
     ownerHandle: row.owner_handle || null,
     ownerName: row.owner_display_name || (row.source === "seed" ? "Local package" : "Anonymous"),
+    ownerAvatarUrl: userAvatarUrl(ctx, { avatar_path: row.owner_avatar_path, avatar_updated_at: row.owner_avatar_updated_at }),
     uploadedAt: row.created_at,
     viewCount: row.view_count || 0,
     downloadCount: viewer?.isAdmin ? row.download_count || 0 : 0,
@@ -288,6 +291,7 @@ async function recordPetStat(ctx: AppContext, petId: string, eventType: "view" |
 function petBaseQuery(ctx: AppContext, suffix = "") {
   return ctx.env.DB.prepare(`
     select p.*, u.handle as owner_handle, u.display_name as owner_display_name, u.shadowbanned_at as owner_shadowbanned_at,
+      u.avatar_path as owner_avatar_path, u.avatar_updated_at as owner_avatar_updated_at,
       (
         select count(*)
         from pet_comments pc
@@ -353,6 +357,8 @@ async function recentDiscussionComments(ctx: AppContext, rows: PetRow[]) {
         u.id as author_id,
         u.handle as author_handle,
         u.display_name as author_display_name,
+        u.avatar_path as author_avatar_path,
+        u.avatar_updated_at as author_avatar_updated_at,
         c.body,
         c.created_at
       from pet_comments c
@@ -380,6 +386,7 @@ async function recentDiscussionComments(ctx: AppContext, rows: PetRow[]) {
         authorId: row.author_id,
         authorHandle: row.author_handle,
         authorName: row.author_id ? row.author_display_name || "Anonymous" : "Anonymous",
+        authorAvatarUrl: userAvatarUrl(ctx, { avatar_path: row.author_avatar_path, avatar_updated_at: row.author_avatar_updated_at }),
         body: row.body,
         createdAt: row.created_at
       };

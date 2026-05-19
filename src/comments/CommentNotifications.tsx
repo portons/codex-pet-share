@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { formatDate, formatMetric } from "../domain/format";
 import type { CommentNotification } from "../domain/types";
 import { Icon } from "../ui/Icon";
+import { UserAvatar } from "../ui/UserAvatar";
 
 export function CommentNotifications({
   notifications,
@@ -90,7 +91,7 @@ export function CommentNotifications({
                     onClick={() => openNotification(notification)}
                     style={{ "--notice-index": index } as CSSProperties}
                   >
-                    <span className="commentNoticeAvatar" aria-hidden="true">{initials(notification.authorName)}</span>
+                    <UserAvatar className="commentNoticeAvatar" name={notification.authorName} avatarUrl={notification.authorAvatarUrl} size="sm" />
                     <span className="commentNoticeCopy">
                       <span>
                         <strong>{notification.petDisplayName}</strong>
@@ -113,10 +114,4 @@ export function CommentNotifications({
       )}
     </div>
   );
-}
-
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  const text = `${parts[0]?.[0] || "A"}${parts[1]?.[0] || ""}`.toUpperCase();
-  return text.slice(0, 2);
 }

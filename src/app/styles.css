@@ -1,6 +1,8 @@
 @import "./base.css";
+@import "../auth/avatar-editor.css";
 @import "../collections/user-collections.css";
 @import "../comments/comment-notifications.css";
+@import "../comments/quick-comment.css";
 @import "../gallery/gallery.css";
 @import "../pets/pet-surfaces.css";
 @import "../pets/sprite-fixer.css";
@@ -12,4 +14,5 @@
 @import "../playground/playground.css";
 @import "../share/share.css";
 @import "../ui/feedback.css";
+@import "../ui/user-avatar.css";
 @import "./responsive.css";

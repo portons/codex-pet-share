@@ -8,6 +8,7 @@ import { useSessionApi } from "./useSessionApi";
 import { useAuthForms } from "../auth/useAuthForms";
 import { navigate, routeFromHash } from "../domain/routing";
 import { readJson } from "../domain/http";
+import { normalizeUser } from "../domain/users";
 import { useUploadWorkflow } from "../uploads/useUploadWorkflow";
 import { usePetEditors } from "../pets/usePetEditors";
 import { usePetMutations } from "../pets/usePetMutations";
@@ -22,6 +23,7 @@ import type {
   CollectionSummary,
   EntityShareTarget,
   Pet,
+  PetComment,
   Route,
   User
 } from "../domain/types";
@@ -132,6 +134,9 @@ function App() {
     loadGallery
   });
   const [sharingPet, setSharingPet] = useState<Pet | null>(null);
+  const [quickCommentPet, setQuickCommentPet] = useState<Pet | null>(null);
+  const [quickCommentStatus, setQuickCommentStatus] = useState("");
+  const [quickCommentBusy, setQuickCommentBusy] = useState(false);
   const [sharingEntity, setSharingEntity] = useState<EntityShareTarget | null>(null);
   const [downloadPet, setDownloadPet] = useState<Pet | null>(null);
   const [playgroundPet, setPlaygroundPet] = useState<Pet | null>(null);
@@ -177,7 +182,13 @@ function App() {
     setSettingsNewPassword,
     settingsStatus,
     settingsBusy,
+    settingsAvatarStatus,
+    settingsAvatarBusy,
+    settingsAvatarPets,
+    settingsAvatarPetsLoading,
+    loadSettingsAvatarPets,
     submitSettings,
+    submitAvatar,
     deleteAccount,
     openSettings,
     openPasswordReset,
@@ -381,8 +392,53 @@ function App() {
   async function refreshAfterSettings(nextUser: User) {
     await refreshPrimaryPetLists(session, nextUser);
     setDetailPet((current) =>
-      current?.ownerId === nextUser.id ? { ...current, ownerName: nextUser.displayName } : current
+      current?.ownerId === nextUser.id ? { ...current, ownerName: nextUser.displayName, ownerAvatarUrl: nextUser.avatarUrl } : current
     );
+  }
+
+  function openQuickComment(pet: Pet) {
+    if (!user) {
+      openAuth();
+      return;
+    }
+    setQuickCommentPet(pet);
+    setQuickCommentStatus("");
+  }
+
+  function closeQuickComment() {
+    if (quickCommentBusy) return;
+    setQuickCommentPet(null);
+    setQuickCommentStatus("");
+  }
+
+  async function submitQuickComment(body: string) {
+    if (!quickCommentPet) return;
+    setQuickCommentStatus("");
+    setQuickCommentBusy(true);
+    try {
+      const result = await readJson<{ comment: PetComment; total: number }>(
+        await apiFetch(`/api/pets/${quickCommentPet.id}/comments`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ body })
+        })
+      );
+      const withCommentCount = (pet: Pet) => pet.id === quickCommentPet.id ? { ...pet, commentCount: result.total } : pet;
+      setPets((current) => current.map(withCommentCount));
+      setMinePets((current) => current.map(withCommentCount));
+      setFavoritePets((current) => current.map(withCommentCount));
+      setCreatorPets((current) => current.map(withCommentCount));
+      setCollectionPets((current) => current.map(withCommentCount));
+      setDetailPet((current) => current && current.id === quickCommentPet.id ? withCommentCount(current) : current);
+      setQuickCommentPet(null);
+      if (route.name === "gallery") {
+        await loadGallery(query, activeTags, activeSort, galleryMeta.page, session, contentMode, activeView, activeKind, true);
+      }
+    } catch (error) {
+      setQuickCommentStatus(error instanceof Error ? error.message : "Could not post comment.");
+    } finally {
+      setQuickCommentBusy(false);
+    }
   }
 
   async function refresh(authSession = session) {
@@ -437,9 +493,10 @@ function App() {
         );
         if (cancelled) return;
         if (!body.session) throw new Error("Authentication session was not created.");
+        const nextUser = normalizeUser(body.user);
         applySession(body.session);
-        setUser(body.user);
-        await refreshAfterAuth(body.user, body.session);
+        setUser(nextUser);
+        await refreshAfterAuth(nextUser, body.session);
       } catch (error) {
         if (cancelled) return;
         openAuth();
@@ -575,6 +632,7 @@ function App() {
       openCollectionCreator: userCollectionActions.openCollectionCreator,
       openUserCollectionEditor: userCollectionActions.openCollectionEditor,
       openCollectionPetAdder: userCollectionActions.openCollectionPetAdder,
+      openQuickComment,
       deleteUserCollection: userCollectionActions.deleteUserCollection,
       removePetFromUserCollection: userCollectionActions.removePetFromCollection,
       startUserCollectionRoom: userCollectionActions.startCollectionRoom,
@@ -595,8 +653,10 @@ function App() {
       setPassword, authStatus, authBusy, resendBusy, authProviders, startOAuth, resendVerification, submitAuth,
       closeAuth, settingsOpen, settingsDisplayName,
       setSettingsDisplayName, settingsCurrentPassword, setSettingsCurrentPassword, settingsNewPassword,
-      setSettingsNewPassword, settingsStatus, settingsBusy, submitSettings, deleteAccount, closeSettings, sharingPet,
-      setSharingPet, sharingEntity, setSharingEntity, downloadPet, setDownloadPet, tagEditorPet,
+      setSettingsNewPassword, settingsStatus, settingsBusy, settingsAvatarStatus, settingsAvatarBusy,
+      settingsAvatarPets, settingsAvatarPetsLoading, loadSettingsAvatarPets, submitSettings, submitAvatar,
+      deleteAccount, closeSettings, sharingPet, setSharingPet, quickCommentPet, quickCommentStatus,
+      quickCommentBusy, submitQuickComment, closeQuickComment, sharingEntity, setSharingEntity, downloadPet, setDownloadPet, tagEditorPet,
       tagEditorTags, tagEditorKind, tagEditorStatus, tagEditorBusy, setTagEditorKind, toggleTagEditorTag,
       submitTagEditor, closeTagEditor, spriteFixerPet, spriteFixerStatus, spriteFixerBusy,
       submitSpriteFixer, closeSpriteFixer, collectionEditorPet, adminCollections, collectionEditorSlugs,

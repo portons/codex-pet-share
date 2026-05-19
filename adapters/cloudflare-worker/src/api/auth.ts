@@ -3,7 +3,7 @@ import { bearerToken, escapeHtml, HttpError, json, readJsonBody } from "../core/
 import { decodePayload, encodePayload, hmac, randomId, sha256Hex, timingSafeEqual, uuid } from "../core/crypto";
 import { all, first, nowIso, serializeUser } from "../core/db";
 import { hashPassword, verifyPassword } from "../core/password";
-import { deleteAsset } from "../storage/assets";
+import { deleteAsset, putAsset, userAvatarPath, userAvatarUrl } from "../storage/assets";
 import type { AppContext, AuthSession, AuthUser, PetRow } from "../core/types";
 
 const accessTtlSeconds = 60 * 15;
@@ -65,6 +65,11 @@ export async function handleAuth(ctx: AppContext, partsOrAction: string[] | stri
     return json({ user: await currentUser(ctx) });
   }
 
+  if (ctx.request.method === "POST" && action === "me" && parts[1] === "avatar") {
+    const user = await requireUser(ctx);
+    return json({ user: await updateUserAvatar(ctx, user) });
+  }
+
   if (ctx.request.method === "PATCH" && action === "me") {
     const user = await requireUser(ctx);
     const { displayName } = await readJsonBody<{ displayName?: unknown }>(ctx.request);
@@ -85,6 +90,7 @@ export async function handleAuth(ctx: AppContext, partsOrAction: string[] | stri
         .bind(nowIso(), user.id)
         .run();
     }
+    await deleteAsset(ctx, userAvatarPath(user.id));
     await ctx.env.DB.prepare("delete from users where id = ?").bind(user.id).run();
     return json({ ok: true, deletedPets: removedPetIds.length });
   }
@@ -188,12 +194,12 @@ export async function requireAdmin(ctx: AppContext) {
 
 export async function userById(ctx: AppContext, id: string) {
   const row = await first<UserRow>(ctx.env.DB.prepare("select * from users where id = ?").bind(id));
-  return row ? serializeUser(row) : null;
+  return row ? serializeUser(row, userAvatarUrl(ctx, row)) : null;
 }
 
 export async function userByEmail(ctx: AppContext, email: string) {
   const row = await first<UserRow>(ctx.env.DB.prepare("select * from users where email = ?").bind(email));
-  return row ? serializeUser(row) : null;
+  return row ? serializeUser(row, userAvatarUrl(ctx, row)) : null;
 }
 
 async function deleteOwnUploads(ctx: AppContext, userId: string) {
@@ -207,6 +213,22 @@ async function deleteOwnUploads(ctx: AppContext, userId: string) {
   return removedPetIds;
 }
 
+async function updateUserAvatar(ctx: AppContext, user: AuthUser) {
+  const form = await ctx.request.formData();
+  const avatar = form.get("avatar");
+  if (!(avatar instanceof File)) throw new HttpError("avatar image is required", 400);
+  if (avatar.type !== "image/webp") throw new HttpError("avatar must be a WebP image", 400);
+  if (avatar.size > 512 * 1024) throw new HttpError("avatar must be smaller than 512 KB", 400);
+
+  const path = userAvatarPath(user.id);
+  const updatedAt = nowIso();
+  await putAsset(ctx, path, new Uint8Array(await avatar.arrayBuffer()), "image/webp");
+  await ctx.env.DB.prepare("update users set avatar_path = ?, avatar_updated_at = ?, updated_at = ? where id = ?")
+    .bind(path, updatedAt, updatedAt, user.id)
+    .run();
+  return await userById(ctx, user.id);
+}
+
 export async function publicUser(ctx: AppContext, idOrHandle: string, viewer: AuthUser | null) {
   const row = await first<UserRow>(
     idOrHandle.includes("-") && idOrHandle.length > 30
@@ -218,6 +240,7 @@ export async function publicUser(ctx: AppContext, idOrHandle: string, viewer: Au
     id: row.id,
     handle: row.handle,
     displayName: row.display_name,
+    avatarUrl: userAvatarUrl(ctx, row),
     shadowbanned: Boolean(viewer?.isAdmin && row.shadowbanned_at)
   };
 }
@@ -531,7 +554,7 @@ async function resendVerificationEmail(ctx: AppContext, email: string) {
   const row = await first<UserRow>(ctx.env.DB.prepare("select * from users where email = ?").bind(email));
   if (!row) throw new HttpError("account not found", 404);
   if (row.email_verified_at) throw new HttpError("email is already confirmed", 409);
-  await sendVerificationEmail(ctx, serializeUser(row));
+  await sendVerificationEmail(ctx, serializeUser(row, userAvatarUrl(ctx, row)));
 }
 
 async function createEmailVerificationToken(ctx: AppContext, userId: string) {
@@ -707,6 +730,8 @@ type UserRow = {
   email: string;
   display_name: string;
   handle: string;
+  avatar_path: string | null;
+  avatar_updated_at: string | null;
   is_admin: number;
   shadowbanned_at: string | null;
   email_verified_at: string | null;

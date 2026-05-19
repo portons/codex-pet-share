@@ -40,6 +40,7 @@ export type AuthUser = {
   email: string;
   displayName: string;
   handle: string;
+  avatarUrl: string | null;
   isAdmin: boolean;
   isShadowbanned: boolean;
   emailVerified: boolean;
@@ -49,6 +50,7 @@ export type PublicUser = {
   id: string;
   handle: string;
   displayName: string;
+  avatarUrl: string | null;
   shadowbanned?: boolean;
 };
 
@@ -85,6 +87,8 @@ export type PetRow = {
   owner_handle?: string | null;
   owner_display_name?: string | null;
   owner_shadowbanned_at?: string | null;
+  owner_avatar_path?: string | null;
+  owner_avatar_updated_at?: string | null;
 };
 
 export type CollectionRow = {

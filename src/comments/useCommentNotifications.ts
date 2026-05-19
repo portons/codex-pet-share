@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { readJson } from "../domain/http";
 import { navigate } from "../domain/routing";
+import { normalizeAvatarUrl } from "../domain/users";
 import type { AuthSession, CommentNotification, CommentNotificationsResponse, User } from "../domain/types";
 
 type ApiFetch = (path: string, init?: RequestInit, authSession?: AuthSession | null) => Promise<Response>;
@@ -85,7 +86,10 @@ export function useCommentNotifications({
   }, [user?.id, session?.accessToken]);
 
   function applyResponse(body: CommentNotificationsResponse) {
-    setNotifications(body.notifications);
+    setNotifications(body.notifications.map((notification) => ({
+      ...notification,
+      authorAvatarUrl: normalizeAvatarUrl(notification.authorAvatarUrl)
+    })));
     setUnreadCount(body.unreadCount);
   }
 
