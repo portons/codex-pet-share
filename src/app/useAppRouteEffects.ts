@@ -13,6 +13,7 @@ import type {
   AuthSession,
   Creator,
   CreatorLeaderboardSort,
+  GalleryFormat,
   GalleryMeta,
   GallerySort,
   GalleryView,
@@ -30,7 +31,8 @@ type LoadGallery = (
   authSession: AuthSession | null,
   content: "safe" | "all",
   view: GalleryView,
-  kind: PetKind
+  kind: PetKind,
+  format: GalleryFormat
 ) => Promise<void>;
 
 export function useAppRouteEffects({
@@ -121,7 +123,7 @@ export function useAppRouteEffects({
       const nextState = galleryUrlStateFromHash();
       applyGalleryState(nextState);
       setLoading(true);
-      loadGallery(nextState.query, nextState.tags, nextState.sort, nextState.page, session, nextState.content, nextState.view, nextState.kind)
+      loadGallery(nextState.query, nextState.tags, nextState.sort, nextState.page, session, nextState.content, nextState.view, nextState.kind, nextState.format)
         .catch((error) => setAuthStatus(error instanceof Error ? error.message : "failed to load gallery"))
         .finally(() => setLoading(false));
     }

@@ -29,6 +29,8 @@ export function usePetEditors({
   reconcilePetCollections: (pet: Pet, selectedSlugs: Array<string>) => void;
 }) {
   const [tagEditorPet, setTagEditorPet] = useState<Pet | null>(null);
+  const [tagEditorDisplayName, setTagEditorDisplayName] = useState("");
+  const [tagEditorDescription, setTagEditorDescription] = useState("");
   const [tagEditorKind, setTagEditorKind] = useState<EditablePetKind>("object");
   const [tagEditorTags, setTagEditorTags] = useState<string[]>([]);
   const [tagEditorStatus, setTagEditorStatus] = useState("");
@@ -43,6 +45,8 @@ export function usePetEditors({
 
   function openTagEditor(pet: Pet) {
     setTagEditorPet(pet);
+    setTagEditorDisplayName(pet.displayName);
+    setTagEditorDescription(pet.description);
     setTagEditorKind(pet.kind);
     setTagEditorTags(pet.tags);
     setTagEditorStatus("");
@@ -56,6 +60,7 @@ export function usePetEditors({
   }
 
   function toggleTagEditorTag(tag: TagName) {
+    if (!user?.isAdmin && tag === "nsfw" && tagEditorPet?.tags.includes("nsfw")) return;
     setTagEditorTags((current) =>
       current.includes(tag) ? current.filter((value) => value !== tag) : [...current, tag]
     );
@@ -64,10 +69,23 @@ export function usePetEditors({
   async function submitTagEditor(event: FormEvent) {
     event.preventDefault();
     if (!tagEditorPet || tagEditorBusy) return;
+    const displayName = tagEditorDisplayName.trim();
+    const description = tagEditorDescription.trim();
+    if (!displayName) {
+      setTagEditorStatus("Display name is required.");
+      return;
+    }
+    if (!description) {
+      setTagEditorStatus("Description is required.");
+      return;
+    }
     if (!isEditablePetKind(tagEditorKind)) {
       setTagEditorStatus("Choose a kind.");
       return;
     }
+    const tags = !user?.isAdmin && tagEditorPet.tags.includes("nsfw") && !tagEditorTags.includes("nsfw")
+      ? [...tagEditorTags, "nsfw"]
+      : tagEditorTags;
     setTagEditorStatus("");
     setTagEditorBusy(true);
     try {
@@ -75,10 +93,10 @@ export function usePetEditors({
         await apiFetch(`/api/pets/${tagEditorPet.id}/tags`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tags: tagEditorTags, kind: tagEditorKind })
+          body: JSON.stringify({ displayName, description, tags, kind: tagEditorKind })
         })
       );
-      reconcileTaggedPet(body.pet);
+      reconcileTaggedPet(normalizePet(body.pet));
       setTagEditorBusy(false);
       setTagEditorPet(null);
     } catch (error) {
@@ -201,10 +219,14 @@ export function usePetEditors({
 
   return {
     tagEditorPet,
+    tagEditorDisplayName,
+    tagEditorDescription,
     tagEditorTags,
     tagEditorKind,
     tagEditorStatus,
     tagEditorBusy,
+    setTagEditorDisplayName,
+    setTagEditorDescription,
     setTagEditorKind,
     openTagEditor,
     closeTagEditor,

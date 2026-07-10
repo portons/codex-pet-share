@@ -403,6 +403,99 @@
   min-width: 0;
 }
 
+.settingsApiKeys {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.settingsSectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settingsSectionHeader small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.apiKeyCreateRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.apiKeyCreateRow label {
+  display: grid;
+  gap: 7px;
+}
+
+.apiKeySecretBox {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.apiKeySecretBox code {
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.apiKeyList {
+  display: grid;
+  gap: 8px;
+}
+
+.apiKeyRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  padding: 10px;
+}
+
+.apiKeyRow span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.apiKeyRow strong,
+.apiKeyRow small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.apiKeyRow strong {
+  color: var(--ink);
+  font-size: 13.5px;
+}
+
+.apiKeyRow small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
 .settingsToggleRow {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

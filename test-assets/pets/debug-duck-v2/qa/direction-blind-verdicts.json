@@ -1,0 +1,204 @@
+{
+  "pairs": [
+    {
+      "pair": "horizontal-1",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "screen-left": 3
+        },
+        "B": {
+          "screen-right": 3
+        }
+      }
+    },
+    {
+      "pair": "horizontal-2",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "screen-left": 3
+        },
+        "B": {
+          "screen-right": 3
+        }
+      }
+    },
+    {
+      "pair": "horizontal-3",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "screen-right": 3
+        },
+        "B": {
+          "screen-left": 3
+        }
+      }
+    },
+    {
+      "pair": "horizontal-4",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "screen-left": 3
+        },
+        "B": {
+          "screen-right": 3
+        }
+      }
+    },
+    {
+      "pair": "horizontal-5",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "screen-left": 3
+        },
+        "B": {
+          "screen-right": 3
+        }
+      }
+    },
+    {
+      "pair": "horizontal-6",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "screen-right": 3
+        },
+        "B": {
+          "screen-left": 3
+        }
+      }
+    },
+    {
+      "pair": "horizontal-7",
+      "A": "screen-right",
+      "B": "ambiguous",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "screen-right": 3
+        },
+        "B": {
+          "ambiguous": 2,
+          "screen-left": 1
+        }
+      }
+    },
+    {
+      "pair": "vertical-1",
+      "A": "up",
+      "B": "down",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "up": 3
+        },
+        "B": {
+          "down": 3
+        }
+      }
+    },
+    {
+      "pair": "vertical-2",
+      "A": "down",
+      "B": "up",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "down": 3
+        },
+        "B": {
+          "up": 3
+        }
+      }
+    },
+    {
+      "pair": "vertical-3",
+      "A": "up",
+      "B": "down",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "up": 2,
+          "ambiguous": 1
+        },
+        "B": {
+          "down": 3
+        }
+      }
+    },
+    {
+      "pair": "vertical-4",
+      "A": "ambiguous",
+      "B": "ambiguous",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "ambiguous": 3
+        },
+        "B": {
+          "ambiguous": 2,
+          "down": 1
+        }
+      }
+    },
+    {
+      "pair": "vertical-5",
+      "A": "up",
+      "B": "down",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "up": 3
+        },
+        "B": {
+          "down": 3
+        }
+      }
+    },
+    {
+      "pair": "vertical-6",
+      "A": "up",
+      "B": "down",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "up": 3
+        },
+        "B": {
+          "down": 3
+        }
+      }
+    },
+    {
+      "pair": "vertical-7",
+      "A": "ambiguous",
+      "B": "ambiguous",
+      "reason": "strict majority of independent blind reviews",
+      "votes": {
+        "A": {
+          "ambiguous": 3
+        },
+        "B": {
+          "down": 1,
+          "ambiguous": 2
+        }
+      }
+    }
+  ]
+}

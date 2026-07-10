@@ -341,6 +341,7 @@ export function useAppEntityData({
     detailPet,
     setDetailPet,
     morePets,
+    setMorePets,
     creator,
     setCreator,
     creatorPets,

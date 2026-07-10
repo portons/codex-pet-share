@@ -69,18 +69,23 @@
 .petFormatPill {
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
   width: fit-content;
-  padding: 2px 6px;
+  min-height: 22px;
+  max-width: 100%;
+  padding: 4px 9px;
   border: 1px solid color-mix(in srgb, var(--accent-deep) 32%, var(--border));
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent-deep);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.02em;
-  line-height: 1.2;
+  letter-spacing: 0.035em;
+  line-height: 1;
   text-transform: uppercase;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 .petFormatPill.v2 {
@@ -100,7 +105,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 14px 16px;
+  padding: 16px 18px;
   border: 1px solid color-mix(in srgb, var(--accent-deep) 24%, var(--border));
   border-radius: var(--radius-md);
   background:
@@ -110,7 +115,7 @@
 
 .petFormatGuideCopy {
   display: grid;
-  gap: 3px;
+  gap: 5px;
   min-width: 0;
 }
 
@@ -142,21 +147,145 @@
   flex: 0 0 auto;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 8px;
+  margin-inline-start: auto;
+  padding-block: 2px;
 }
 
 .galleryFormatGuide {
-  margin-bottom: 16px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin: 4px 0 12px;
+  padding: 18px 20px;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--accent-deep) 34%, var(--border));
+  background:
+    linear-gradient(105deg, color-mix(in srgb, var(--accent-soft) 70%, var(--surface)) 0%, transparent 56%),
+    radial-gradient(circle at 90% 18%, var(--accent-glow), transparent 34%),
+    var(--surface-warm);
+  box-shadow:
+    inset 3px 0 0 var(--accent),
+    0 12px 30px color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+.petFormatGuideIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--accent-deep) 30%, var(--border));
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+}
+
+.galleryFormatGuide .petFormatGuideCopy {
+  gap: 6px;
+}
+
+.galleryFormatGuide .petFormatGuideCopy strong {
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.galleryFormatGuide .petFormatGuideCopy > span:last-child {
+  max-width: 66ch;
+  font-size: 12.5px;
+}
+
+.petFormatGuideAside {
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+  min-width: 226px;
+}
+
+.petFormatGuideAction {
+  min-height: 32px;
+  padding-inline: 12px;
+  white-space: nowrap;
+}
+
+.galleryFormatGuide + .galleryTools {
+  padding-top: 10px;
+}
+
+.petCardOwner .petFormatPill {
+  margin-block: 4px 1px;
+  margin-inline-start: 8px;
+}
+
+.detailSpecimen > .petFormatPill {
+  margin-inline-start: 4px;
+}
+
+.uploadFormatGuide .petFormatGuideBadges {
+  margin-block: 4px;
 }
 
 @media (max-width: 720px) {
   .petFormatGuide {
     align-items: flex-start;
     flex-direction: column;
+    gap: 14px;
+    padding: 15px 16px;
   }
 
   .petFormatGuideBadges {
     justify-content: flex-start;
+    width: 100%;
+    margin-inline-start: 0;
+    padding: 0;
+  }
+
+  .galleryFormatGuide {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 12px;
+    margin-top: 0;
+    margin-bottom: 8px;
+    padding: 16px;
+  }
+
+  .petFormatGuideIcon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .galleryFormatGuide .petFormatGuideCopy strong {
+    font-size: 17px;
+  }
+
+  .petFormatGuideAside {
+    grid-column: 1 / -1;
+    justify-items: stretch;
+    width: 100%;
+    min-width: 0;
+    margin-top: 2px;
+  }
+
+  .petFormatGuideAction {
+    justify-content: center;
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .galleryFormatGuide + .galleryTools {
+    padding-top: 8px;
+  }
+
+  .petCardOwner .petFormatPill {
+    margin-block-start: 6px;
+  }
+
+  .detailSpecimen > .petFormatPill {
+    margin-inline-start: 0;
   }
 }
 

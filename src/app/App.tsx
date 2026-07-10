@@ -47,6 +47,7 @@ function App() {
     activeSort,
     activeView,
     activeKind,
+    activeFormat,
     contentMode,
     setContentMode,
     applyGalleryState,
@@ -59,6 +60,7 @@ function App() {
     selectSort,
     selectView,
     selectKind,
+    selectFormat,
     selectPage,
     randomizeGallery,
     freshPetCount,
@@ -74,6 +76,7 @@ function App() {
     detailPet,
     setDetailPet,
     morePets,
+    setMorePets,
     creator,
     setCreator,
     creatorPets,
@@ -186,7 +189,16 @@ function App() {
     settingsAvatarBusy,
     settingsAvatarPets,
     settingsAvatarPetsLoading,
+    apiKeys,
+    apiKeysLoading,
+    apiKeyBusy,
+    newApiKeyName,
+    setNewApiKeyName,
+    newApiKeySecret,
+    apiKeyStatus,
     loadSettingsAvatarPets,
+    createApiKey,
+    revokeApiKey,
     submitSettings,
     submitAvatar,
     deleteAccount,
@@ -225,6 +237,7 @@ function App() {
     activeSort,
     activeView,
     activeKind,
+    activeFormat,
     galleryMeta,
     creatorMeta,
     setCreatorMeta,
@@ -238,6 +251,7 @@ function App() {
     setFavoritePets,
     setCreatorPets,
     setDetailPet,
+    setMorePets,
     setCollectionPets,
     setSharingPet,
     setCreator,
@@ -318,10 +332,14 @@ function App() {
   } = useUploadWorkflow({ apiFetch, refresh });
   const {
     tagEditorPet,
+    tagEditorDisplayName,
+    tagEditorDescription,
     tagEditorTags,
     tagEditorKind,
     tagEditorStatus,
     tagEditorBusy,
+    setTagEditorDisplayName,
+    setTagEditorDescription,
     setTagEditorKind,
     openTagEditor,
     closeTagEditor,
@@ -432,7 +450,7 @@ function App() {
       setDetailPet((current) => current && current.id === quickCommentPet.id ? withCommentCount(current) : current);
       setQuickCommentPet(null);
       if (route.name === "gallery") {
-        await loadGallery(query, activeTags, activeSort, galleryMeta.page, session, contentMode, activeView, activeKind, true);
+        await loadGallery(query, activeTags, activeSort, galleryMeta.page, session, contentMode, activeView, activeKind, activeFormat, true);
       }
     } catch (error) {
       setQuickCommentStatus(error instanceof Error ? error.message : "Could not post comment.");
@@ -571,6 +589,7 @@ function App() {
     activeSort,
     activeView,
     activeKind,
+    activeFormat,
     galleryMeta,
     creatorMeta,
     creatorsMeta,
@@ -621,10 +640,10 @@ function App() {
       }
     },
     routes: {
-      route, user, session, pets, recentComments, galleryMeta, loading, query, activeTags, activeSort, activeView, activeKind,
+      route, user, session, pets, recentComments, galleryMeta, loading, query, activeTags, activeSort, activeView, activeKind, activeFormat,
       contentMode, deletingPetId, shadowbanBusyOwnerId, nsfwBusyId, collections, userCollections,
       userCollectionsLoading, setQuery, selectTag,
-      clearTags, selectSort, selectView, selectKind, selectPage, randomizeGallery,
+      clearTags, selectSort, selectView, selectKind, selectFormat, selectPage, randomizeGallery,
       freshPetCount, showFreshPets,
       submitSearch, likeBusyId, toggleLike, setSharingPet, setPlaygroundPet, setDownloadPet,
       selectVisibleTag, openTagEditor, openSpriteFixer, openCollectionEditor, togglePetNsfw, toggleOwnerShadowban,
@@ -654,10 +673,13 @@ function App() {
       closeAuth, settingsOpen, settingsDisplayName,
       setSettingsDisplayName, settingsCurrentPassword, setSettingsCurrentPassword, settingsNewPassword,
       setSettingsNewPassword, settingsStatus, settingsBusy, settingsAvatarStatus, settingsAvatarBusy,
-      settingsAvatarPets, settingsAvatarPetsLoading, loadSettingsAvatarPets, submitSettings, submitAvatar,
+      settingsAvatarPets, settingsAvatarPetsLoading, apiKeys, apiKeysLoading, apiKeyBusy,
+      newApiKeyName, setNewApiKeyName, newApiKeySecret, apiKeyStatus,
+      loadSettingsAvatarPets, createApiKey, revokeApiKey, submitSettings, submitAvatar,
       deleteAccount, closeSettings, sharingPet, setSharingPet, quickCommentPet, quickCommentStatus,
       quickCommentBusy, submitQuickComment, closeQuickComment, sharingEntity, setSharingEntity, downloadPet, setDownloadPet, tagEditorPet,
-      tagEditorTags, tagEditorKind, tagEditorStatus, tagEditorBusy, setTagEditorKind, toggleTagEditorTag,
+      tagEditorDisplayName, tagEditorDescription, tagEditorTags, tagEditorKind, tagEditorStatus, tagEditorBusy,
+      setTagEditorDisplayName, setTagEditorDescription, setTagEditorKind, toggleTagEditorTag,
       submitTagEditor, closeTagEditor, spriteFixerPet, spriteFixerStatus, spriteFixerBusy,
       submitSpriteFixer, closeSpriteFixer, collectionEditorPet, adminCollections, collectionEditorSlugs,
       collectionEditorStatus, collectionEditorBusy, toggleCollectionEditorSlug, submitCollectionEditor,

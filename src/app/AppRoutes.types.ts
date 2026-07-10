@@ -11,6 +11,7 @@ import type {
   EditablePetKind,
   EntityShareTarget,
   GalleryMeta,
+  GalleryFormat,
   GalleryRecentComment,
   GallerySort,
   GalleryView,
@@ -37,6 +38,7 @@ export type AppRoutesProps = {
   activeSort: GallerySort;
   activeView: GalleryView;
   activeKind: PetKind;
+  activeFormat: GalleryFormat;
   contentMode: ContentMode;
   deletingPetId: string;
   shadowbanBusyOwnerId: string;
@@ -50,6 +52,7 @@ export type AppRoutesProps = {
   selectSort: (sort: GallerySort) => void | Promise<void>;
   selectView: (view: GalleryView) => void | Promise<void>;
   selectKind: (kind: PetKind) => void | Promise<void>;
+  selectFormat: (format: GalleryFormat) => void | Promise<void>;
   selectPage: (page: number) => void | Promise<void>;
   randomizeGallery: () => void | Promise<void>;
   freshPetCount: number;

@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "reviewed_at": "2026-07-09T18:27:54Z",
+  "coordinate_system": "viewer/screen coordinates",
+  "cardinals": [
+    {
+      "direction": "000",
+      "expected": "up",
+      "verdict": "pass",
+      "evidence": "Bill is centered above the head and pitched clearly toward the top edge; eyes are naturally occluded by the upward head pitch."
+    },
+    {
+      "direction": "090",
+      "expected": "screen-right",
+      "verdict": "pass",
+      "evidence": "Bill tip lies wholly to the screen-right of the head center with the black eye behind it."
+    },
+    {
+      "direction": "180",
+      "expected": "down",
+      "verdict": "pass",
+      "evidence": "Head bows over the debugging panel and the bill points clearly toward the bottom edge."
+    },
+    {
+      "direction": "270",
+      "expected": "screen-left",
+      "verdict": "pass",
+      "evidence": "Bill tip lies wholly to the screen-left of the head center with the black eye behind it."
+    }
+  ],
+  "identity_note": "All anchors preserve the yellow pixel-art duck, orange bill and feet, rounded silhouette, black eye construction, and attached dark debugging panel."
+}

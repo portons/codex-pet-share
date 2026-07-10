@@ -135,8 +135,8 @@ state rows.
 | `waiting` | 6 | 6 | 4 | yes |
 | `running` | 7 | 6 | 12 | yes |
 | `review` | 8 | 6 | 6 | yes |
-| `look-000-157` (v2) | 9 | 8 | n/a | preview/export |
-| `look-180-337` (v2) | 10 | 8 | n/a | preview/export |
+| `look-right-side` (v2) | 9 | 8 | n/a | preview/export |
+| `look-left-side` (v2) | 10 | 8 | n/a | preview/export |
 
 The sprite editor and avatar frame picker derive their rows and atlas height
 from `spriteVersionNumber`; v2 exposes labeled look cells while v1 remains

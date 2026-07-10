@@ -43,6 +43,10 @@ export async function handleAuth(ctx: AppContext, partsOrAction: string[] | stri
     return json({ user, session: await createSession(ctx, user) });
   }
 
+  if (action === "api-keys") {
+    return handleApiKeys(ctx, parts.slice(1));
+  }
+
   if (ctx.request.method === "POST" && action === "resend-verification") {
     const { email } = await readJsonBody<{ email?: unknown }>(ctx.request);
     await resendVerificationEmail(ctx, String(email || "").trim().toLowerCase());
@@ -178,6 +182,19 @@ export async function currentUser(ctx: AppContext): Promise<AuthUser | null> {
   );
   if (!session || session.expires_at <= nowSeconds()) return null;
   return userById(ctx, payload.uid);
+}
+
+export async function apiKeyUser(ctx: AppContext): Promise<AuthUser | null> {
+  const token = bearerToken(ctx.request);
+  if (!token.startsWith("cps_")) return null;
+  const row = await first<{ id: string; user_id: string }>(
+    ctx.env.DB.prepare("select id, user_id from api_keys where token_hash = ? and revoked_at is null").bind(await sha256Hex(token))
+  );
+  if (!row) return null;
+  await ctx.env.DB.prepare("update api_keys set last_used_at = ? where id = ?")
+    .bind(nowIso(), row.id)
+    .run();
+  return userById(ctx, row.user_id);
 }
 
 export async function requireUser(ctx: AppContext) {
@@ -619,6 +636,61 @@ async function setUserPassword(ctx: AppContext, userId: string, password: string
     .run();
 }
 
+async function handleApiKeys(ctx: AppContext, parts: string[]) {
+  const user = await requireUser(ctx);
+  if (ctx.request.method === "GET" && parts.length === 0) {
+    const rows = await all<ApiKeyRow>(
+      ctx.env.DB.prepare(`
+        select id, name, created_at, last_used_at, revoked_at
+        from api_keys
+        where user_id = ? and revoked_at is null
+        order by created_at desc
+      `).bind(user.id)
+    );
+    return json({ apiKeys: rows.map(serializeApiKey) });
+  }
+  if (ctx.request.method === "POST" && parts.length === 0) {
+    const { name } = await readJsonBody<{ name?: unknown }>(ctx.request);
+    const apiKey = await createApiKey(ctx, user, name);
+    return json({ apiKey }, 201);
+  }
+  if (ctx.request.method === "DELETE" && parts[0] && parts.length === 1) {
+    await ctx.env.DB.prepare("update api_keys set revoked_at = coalesce(revoked_at, ?) where id = ? and user_id = ?")
+      .bind(nowIso(), parts[0], user.id)
+      .run();
+    return json({ ok: true });
+  }
+  return json({ error: "not found" }, 404);
+}
+
+async function createApiKey(ctx: AppContext, user: AuthUser, rawName: unknown) {
+  const name = validateApiKeyName(rawName);
+  const id = randomId(18);
+  const token = `cps_${randomId(32)}`;
+  const createdAt = nowIso();
+  await ctx.env.DB.prepare(`
+    insert into api_keys (id, user_id, name, token_hash, created_at)
+    values (?, ?, ?, ?, ?)
+  `).bind(id, user.id, name, await sha256Hex(token), createdAt).run();
+  return { id, name, key: token, createdAt, lastUsedAt: null, revokedAt: null };
+}
+
+function serializeApiKey(row: ApiKeyRow) {
+  return {
+    id: row.id,
+    name: row.name,
+    createdAt: row.created_at,
+    lastUsedAt: row.last_used_at,
+    revokedAt: row.revoked_at
+  };
+}
+
+function validateApiKeyName(value: unknown) {
+  const name = String(value || "Agent key").trim().replace(/\s+/g, " ");
+  if (!name || name.length > 80) throw new HttpError("api key name is required", 400);
+  return name;
+}
+
 async function createAuthLoginCode(ctx: AppContext, userId: string) {
   const code = randomId(32);
   await ctx.env.DB.prepare(`
@@ -735,4 +807,12 @@ type UserRow = {
   is_admin: number;
   shadowbanned_at: string | null;
   email_verified_at: string | null;
+};
+
+type ApiKeyRow = {
+  id: string;
+  name: string;
+  created_at: string;
+  last_used_at: string | null;
+  revoked_at: string | null;
 };

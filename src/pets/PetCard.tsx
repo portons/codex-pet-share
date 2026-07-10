@@ -107,7 +107,7 @@ export function AdminPetMenu({
           style={floatingStyles}
         >
           <button type="button" role="menuitem" onClick={() => run(() => onEditTags(pet))}>
-            Edit tags
+            Edit details
           </button>
           <button type="button" role="menuitem" onClick={() => run(() => onManageCollections(pet))}>
             Manage collections
@@ -200,6 +200,7 @@ export function PetCard({
   const [cardFocusInside, setCardFocusInside] = useState(false);
   const likeLabel = pet.likedByMe ? "Liked" : "Like";
   const canDeleteOwnPet = Boolean(!user?.isAdmin && user?.id && user.id === pet.ownerId);
+  const canEditOwnPet = canDeleteOwnPet;
   const openPetPage = () => {
     trackEvent("card_detail_open", { route: "gallery_card", petId: pet.id, user });
     navigate(`/pets/${pet.id}`);
@@ -351,7 +352,7 @@ export function PetCard({
             >
               by <OwnerLabel pet={pet} />
               <span className={`petFormatPill ${pet.spriteVersionNumber === 2 ? "v2" : "v1"}`}>
-                {pet.spriteVersionNumber === 2 ? "v2 · new · looks" : "v1 · legacy"}
+                {pet.spriteVersionNumber === 2 ? "V2 · 16 directions" : "V1 · supported"}
               </span>
             </div>
           </div>
@@ -437,6 +438,18 @@ export function PetCard({
             onShadowbanOwner={onShadowbanOwner}
             onDelete={onDelete}
           />
+        )}
+        {canEditOwnPet && (
+          <button
+            className="btn btnSm"
+            type="button"
+            aria-label="Edit details"
+            title="Edit details"
+            onClick={() => onEditTags(pet)}
+          >
+            <Icon name="tag" size={13} />
+            {!compact && "Edit details"}
+          </button>
         )}
         {canDeleteOwnPet && (
           <button

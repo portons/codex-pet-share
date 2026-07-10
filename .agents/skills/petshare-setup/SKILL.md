@@ -68,8 +68,8 @@ Before editing, read:
 - `src/app/*`: SPA composition, route effects, API/session hooks, shell chrome,
   modal composition, and cross-feature refresh/navigation.
 - `src/uploads/*`: file inputs, manifest parsing, slug normalization, upload
-  validation preview, generated `share.png`, generated `preview.webp`, and
-  `POST /api/pets` form assembly.
+  validation preview, generated `share.png`, generated `preview.webp`,
+  generated `poster.webp`, and `POST /api/pets` form assembly.
 - `src/pets/*`: gallery/detail pet surfaces, sprite previews, cursor preview,
   metadata editing, tag/kind management, delete, share, and GIF export wiring.
 - `src/downloads/*`: package modal, install command UI, spritesheet fetch, GIF
@@ -174,7 +174,8 @@ playground load.
 
 1. Keep `pet.json` and `spritesheet.webp` as the package contract unless the
    user explicitly changes it.
-2. Preserve generated `share.png` and `preview.webp` as app assets.
+2. Preserve generated `share.png`, `preview.webp`, and `poster.webp` as app
+   assets.
 3. Update frontend generation, backend validation, storage writes, serializer
    URLs, and download endpoint together.
 4. Verify upload error messages, validation card, detail route, share image,

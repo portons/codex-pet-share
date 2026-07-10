@@ -8,20 +8,30 @@ import { Spinner } from "../ui/Spinner";
 
 export function TagEditorModal({
   pet,
+  displayName,
+  description,
   tags,
   kind,
   status,
   busy,
+  lockedTags = [],
+  onDisplayName,
+  onDescription,
   onKind,
   onToggle,
   onSubmit,
   onClose
 }: {
   pet: Pet;
+  displayName: string;
+  description: string;
   tags: string[];
   kind: EditablePetKind;
   status: string;
   busy: boolean;
+  lockedTags?: string[];
+  onDisplayName: (displayName: string) => void;
+  onDescription: (description: string) => void;
   onKind: (kind: EditablePetKind) => void;
   onToggle: (tag: TagName) => void;
   onSubmit: (event: FormEvent) => void;
@@ -37,10 +47,10 @@ export function TagEditorModal({
         }
       }}
     >
-      <section className="authModal" role="dialog" aria-modal="true" aria-label={`Edit tags for ${pet.displayName}`}>
+      <section className="authModal" role="dialog" aria-modal="true" aria-label={`Edit details for ${pet.displayName}`}>
         <div className="modalHeader">
           <div className="modalTitle compact">
-            <p className="metaText">Tags</p>
+            <p className="metaText">Pet details</p>
             <h2>{pet.displayName}</h2>
           </div>
           <button className="btn btnSm btnGhost modalCloseButton" type="button" onClick={onClose} disabled={busy}>
@@ -49,17 +59,38 @@ export function TagEditorModal({
           </button>
         </div>
         <form className="stackForm" onSubmit={onSubmit}>
+          <label>
+            <span className="fieldLabel">Display name</span>
+            <input
+              className="input"
+              type="text"
+              value={displayName}
+              maxLength={80}
+              disabled={busy}
+              onChange={(event) => onDisplayName(event.target.value)}
+            />
+          </label>
+          <label>
+            <span className="fieldLabel">Description</span>
+            <textarea
+              className="input textareaInput"
+              value={description}
+              maxLength={280}
+              disabled={busy}
+              onChange={(event) => onDescription(event.target.value)}
+            />
+          </label>
           <div className="stackField">
             <span className="fieldLabel">Kind</span>
             <EditableKindControls value={kind} onChange={onKind} />
           </div>
           <div className="stackField">
             <span className="fieldLabel">Tags</span>
-            <TagFilters activeTag={tags} onTag={onToggle} />
+            <TagFilters activeTag={tags} lockedTags={lockedTags} onTag={onToggle} />
           </div>
           <button className="btn btnPrimary btnLg" type="submit" disabled={busy}>
             {busy ? <Spinner size={14} /> : <Icon name="tag" size={14} />}
-            {busy ? "Saving" : "Save tags"}
+            {busy ? "Saving" : "Save details"}
           </button>
         </form>
         {status && (

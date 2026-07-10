@@ -310,13 +310,15 @@
 
   .sortControls,
   .viewControls,
-  .kindControls {
+  .kindControls,
+  .formatControls {
     width: 100%;
   }
 
   .sortControls button,
   .viewControls button,
-  .kindControls button {
+  .kindControls button,
+  .formatControls button {
     justify-content: center;
     flex: 1;
   }

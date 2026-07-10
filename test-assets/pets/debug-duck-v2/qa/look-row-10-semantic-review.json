@@ -1,0 +1,71 @@
+{
+  "ok": true,
+  "reviewed_at": "2026-07-09T18:35:44Z",
+  "row": "look-row-10",
+  "directions": [
+    {
+      "direction": "180",
+      "expected": "down",
+      "verdict": "pass",
+      "horizontal": "none required",
+      "vertical": "Head bows centrally and bill points toward the panel."
+    },
+    {
+      "direction": "202.5",
+      "expected": "down-left",
+      "verdict": "pass",
+      "horizontal": "Bill begins moving screen-left of center.",
+      "vertical": "Head remains strongly bowed."
+    },
+    {
+      "direction": "225",
+      "expected": "down-left",
+      "verdict": "pass",
+      "horizontal": "Bill and eye read on the left half.",
+      "vertical": "Bill stays below the level 270 pose."
+    },
+    {
+      "direction": "247.5",
+      "expected": "down-left",
+      "verdict": "pass",
+      "horizontal": "Clear screen-left bill profile.",
+      "vertical": "Head remains slightly lowered approaching 270."
+    },
+    {
+      "direction": "270",
+      "expected": "left",
+      "verdict": "pass",
+      "horizontal": "Bill tip lies fully screen-left with eye behind it.",
+      "vertical": "none required"
+    },
+    {
+      "direction": "292.5",
+      "expected": "up-left",
+      "verdict": "pass",
+      "horizontal": "Left-facing bill remains unmistakable.",
+      "vertical": "Bill and head begin pitching upward."
+    },
+    {
+      "direction": "315",
+      "expected": "up-left",
+      "verdict": "pass",
+      "horizontal": "Bill remains screen-left.",
+      "vertical": "Bill axis and eye rise clearly."
+    },
+    {
+      "direction": "337.5",
+      "expected": "up-left",
+      "verdict": "pass",
+      "horizontal": "Subtle left cue remains in the raised bill.",
+      "vertical": "Head is nearly fully up and flows into 000."
+    }
+  ],
+  "continuity": {
+    "verdict": "pass",
+    "evidence": "Feet, body, panel, scale, and baseline stay stable; the loop advances smoothly through down-left, left, and up-left. 180 follows row 9 157.5 without a snap, and 337.5 is one plausible step before 000."
+  },
+  "edge_registration": {
+    "verdict": "pass",
+    "evidence": "Final deterministic assembly accepted row 10 against the persisted row-9 scale and completed without clipping or edge failure."
+  }
+}

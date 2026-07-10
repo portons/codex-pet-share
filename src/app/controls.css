@@ -130,3 +130,10 @@
   height: 46px;
   font-size: 15px;
 }
+
+.textareaInput {
+  min-height: 92px;
+  padding-block: 11px;
+  line-height: 1.45;
+  resize: vertical;
+}

@@ -1,0 +1,132 @@
+{
+  "ok": true,
+  "reviewed_at": "2026-07-09T18:49:03Z",
+  "reviewed_by": "independent root-level static visual QA, with detailed evidence from completed row-9 and row-10 semantic reviews",
+  "directions": [
+    {
+      "direction": "000",
+      "expected": "up",
+      "verdict": "pass",
+      "observed": "horizontal: none required; vertical: Bill centered above head; eyes occluded by upward pitch.",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    },
+    {
+      "direction": "022.5",
+      "expected": "up-right",
+      "verdict": "pass",
+      "observed": "horizontal: Bill and eye begin moving screen-right of head center.; vertical: Bill remains high and head remains pitched up.",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    },
+    {
+      "direction": "045",
+      "expected": "up-right",
+      "verdict": "pass",
+      "observed": "horizontal: Clear right-facing bill and eye placement.; vertical: Bill axis stays above level with upward neck extension.",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    },
+    {
+      "direction": "067.5",
+      "expected": "up-right",
+      "verdict": "warning",
+      "observed": "horizontal: Bill tip is unmistakably screen-right.; vertical: Head remains slightly lifted relative to the 090 anchor.",
+      "reason": "Labeled normal-size review confirms the intended quadrant and coherent clockwise progression; isolated blind review found one subtle intermediate axis ambiguous."
+    },
+    {
+      "direction": "090",
+      "expected": "right",
+      "verdict": "pass",
+      "observed": "horizontal: Bill tip lies fully screen-right with eye behind it.; vertical: none required",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    },
+    {
+      "direction": "112.5",
+      "expected": "down-right",
+      "verdict": "warning",
+      "observed": "horizontal: Bill remains fully screen-right.; vertical: Head and bill begin a smooth downward pitch.",
+      "reason": "Labeled normal-size review confirms the intended quadrant and coherent clockwise progression; isolated blind review found one subtle intermediate axis ambiguous."
+    },
+    {
+      "direction": "135",
+      "expected": "down-right",
+      "verdict": "pass",
+      "observed": "horizontal: Right profile remains clear.; vertical: Eye and bill move lower toward the panel.",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    },
+    {
+      "direction": "157.5",
+      "expected": "down-right",
+      "verdict": "pass",
+      "observed": "horizontal: Subtle right cue remains in the bill.; vertical: Head is strongly bowed and flows toward the approved 180 anchor.",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    },
+    {
+      "direction": "180",
+      "expected": "down",
+      "verdict": "pass",
+      "observed": "horizontal: none required; vertical: Head bows centrally and bill points toward the panel.",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    },
+    {
+      "direction": "202.5",
+      "expected": "down-left",
+      "verdict": "warning",
+      "observed": "horizontal: Bill begins moving screen-left of center.; vertical: Head remains strongly bowed.",
+      "reason": "Labeled normal-size review confirms the intended quadrant and coherent clockwise progression; isolated blind review found one subtle intermediate axis ambiguous."
+    },
+    {
+      "direction": "225",
+      "expected": "down-left",
+      "verdict": "pass",
+      "observed": "horizontal: Bill and eye read on the left half.; vertical: Bill stays below the level 270 pose.",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    },
+    {
+      "direction": "247.5",
+      "expected": "down-left",
+      "verdict": "warning",
+      "observed": "horizontal: Clear screen-left bill profile.; vertical: Head remains slightly lowered approaching 270.",
+      "reason": "Labeled normal-size review confirms the intended quadrant and coherent clockwise progression; isolated blind review found one subtle intermediate axis ambiguous."
+    },
+    {
+      "direction": "270",
+      "expected": "left",
+      "verdict": "pass",
+      "observed": "horizontal: Bill tip lies fully screen-left with eye behind it.; vertical: none required",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    },
+    {
+      "direction": "292.5",
+      "expected": "up-left",
+      "verdict": "warning",
+      "observed": "horizontal: Left-facing bill remains unmistakable.; vertical: Bill and head begin pitching upward.",
+      "reason": "Labeled normal-size review confirms the intended quadrant and coherent clockwise progression; isolated blind review found one subtle intermediate axis ambiguous."
+    },
+    {
+      "direction": "315",
+      "expected": "up-left",
+      "verdict": "pass",
+      "observed": "horizontal: Bill remains screen-left.; vertical: Bill axis and eye rise clearly.",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    },
+    {
+      "direction": "337.5",
+      "expected": "up-left",
+      "verdict": "pass",
+      "observed": "horizontal: Subtle left cue remains in the raised bill.; vertical: Head is nearly fully up and flows into 000.",
+      "reason": "Labeled normal-size review confirms the intended axes and coherent clockwise progression."
+    }
+  ],
+  "accepted_warnings": [
+    "Blind review found the horizontal cue subtle at 202.5.",
+    "Blind review found the vertical cue subtle at 067.5 and 112.5.",
+    "Blind review found the vertical cue subtle at 247.5 and 292.5.",
+    "Labeled normal-size review confirms all five intended quadrants and no loop reversal."
+  ],
+  "hard_failures": [],
+  "independent_final_qa": {
+    "visual_qa": "pass",
+    "qa_note": "All rows preserve Debug Duck identity and semantics, the labeled clockwise look loop is coherent with unmistakable cardinals, and no clipping, opaque backgrounds, scale pop, broken props, or visible interior holes appear",
+    "repair_rows": "none",
+    "repair_notes": "none"
+  }
+}

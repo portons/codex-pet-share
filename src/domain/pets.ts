@@ -95,6 +95,7 @@ export function petMatchesGalleryFilters(pet: Pet, state: GalleryUrlState) {
     petMatchesQuery(pet, state.query) &&
     petMatchesTagFilter(pet, state.tags) &&
     (state.kind === "all" || pet.kind === state.kind) &&
+    (state.format === "all" || pet.spriteVersionNumber === (state.format === "v2" ? 2 : 1)) &&
     (state.content === "all" || !isNsfwPet(pet))
   );
 }

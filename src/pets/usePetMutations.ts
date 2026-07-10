@@ -7,6 +7,7 @@ import type {
   AuthSession,
   CollectionSummary,
   ContentMode,
+  GalleryFormat,
   Creator,
   CreatorLeaderboardSort,
   GalleryMeta,
@@ -31,6 +32,7 @@ export function usePetMutations({
   activeSort,
   activeView,
   activeKind,
+  activeFormat,
   galleryMeta,
   creatorMeta,
   setCreatorMeta,
@@ -44,6 +46,7 @@ export function usePetMutations({
   setFavoritePets,
   setCreatorPets,
   setDetailPet,
+  setMorePets,
   setCollectionPets,
   setSharingPet,
   setCreator,
@@ -66,6 +69,7 @@ export function usePetMutations({
   activeSort: GallerySort;
   activeView: GalleryView;
   activeKind: PetKind;
+  activeFormat: GalleryFormat;
   galleryMeta: GalleryMeta;
   creatorMeta: GalleryMeta;
   setCreatorMeta: Dispatch<SetStateAction<GalleryMeta>>;
@@ -79,6 +83,7 @@ export function usePetMutations({
   setFavoritePets: Dispatch<SetStateAction<Pet[]>>;
   setCreatorPets: Dispatch<SetStateAction<Pet[]>>;
   setDetailPet: Dispatch<SetStateAction<Pet | null>>;
+  setMorePets: Dispatch<SetStateAction<Pet[]>>;
   setCollectionPets: Dispatch<SetStateAction<Pet[]>>;
   setSharingPet: Dispatch<SetStateAction<Pet | null>>;
   setCreator: Dispatch<SetStateAction<Creator | null>>;
@@ -119,6 +124,7 @@ export function usePetMutations({
       setMinePets((current) => current.filter((item) => item.id !== pet.id));
       setFavoritePets((current) => current.filter((item) => item.id !== pet.id));
       setCreatorPets((current) => current.filter((item) => item.id !== pet.id));
+      setMorePets((current) => current.filter((item) => item.id !== pet.id));
       setDetailPet((current) => (current?.id === pet.id ? null : current));
       setCollectionPets((current) => current.filter((item) => item.id !== pet.id));
       await loadCollections(session, contentMode);
@@ -148,10 +154,17 @@ export function usePetMutations({
     setMinePets(replace);
     setCreatorPets(replace);
     setCollectionPets(replace);
+    setMorePets(replace);
     setFavoritePets((current) => {
       const without = current.filter((item) => item.id !== normalized.id);
       return normalized.likedByMe ? replace(current.some((item) => item.id === normalized.id) ? current : [normalized, ...without]) : without;
     });
+    setCollections((current) =>
+      current.map((collection) => ({
+        ...collection,
+        topPets: replace(collection.topPets)
+      }))
+    );
     setDetailPet((current) => (current?.id === normalized.id ? normalized : current));
     setSharingPet((current) => (current?.id === normalized.id ? normalized : current));
   }
@@ -234,6 +247,7 @@ export function usePetMutations({
         page: galleryMeta.page,
         view: activeView,
         kind: activeKind,
+        format: activeFormat,
         content: contentMode
       };
       if (!petMatchesGalleryFilters(normalized, state)) {
@@ -242,6 +256,13 @@ export function usePetMutations({
     }
     if (route.name === "user" && contentMode !== "all" && isNsfwPet(normalized)) {
       removePetFromCreator(normalized.id);
+    }
+    if (route.name === "collection" && contentMode !== "all" && isNsfwPet(normalized)) {
+      const hadPet = collectionPets.some((pet) => pet.id === normalized.id);
+      setCollectionPets((current) => current.filter((pet) => pet.id !== normalized.id));
+      if (hadPet) {
+        setCollectionDetail((current) => current ? { ...current, petCount: Math.max(0, current.petCount - 1) } : current);
+      }
     }
   }
 

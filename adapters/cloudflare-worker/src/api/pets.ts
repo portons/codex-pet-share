@@ -1,4 +1,4 @@
-import { currentUser, requireUser } from "./auth";
+import { apiKeyUser, currentUser, requireUser } from "./auth";
 import { auditAdminAction } from "./adminAudit";
 import { allowedTags, slugPattern } from "./constants";
 import { parseJson, parsePetKind, spriteVersionFromReport, validateManifest, validatePosterImage, validatePreviewImage, validateShareImage, validateSpritesheet, validationFromBytes, type Manifest } from "./validation";
@@ -6,7 +6,7 @@ import { all, first, nowIso, tags, validationReport } from "../core/db";
 import { HttpError, json } from "../core/http";
 import { createZip } from "../core/zip";
 import { deleteAsset, getAssetBytes, petAssetUrl, putAsset, serveAsset, userAvatarUrl } from "../storage/assets";
-import type { AppContext, AuthUser, ContentMode, Pagination, PetKind, PetRow, PetSort, UploadFile, ValidationReport, Viewer } from "../core/types";
+import type { AppContext, AuthUser, ContentMode, Pagination, PetKind, PetRow, PetSort, PetSpriteVersion, UploadFile, ValidationReport, Viewer } from "../core/types";
 
 const sqlVariableChunkSize = 80;
 const recentDiscussionLimit = 5;
@@ -31,12 +31,13 @@ export async function handlePets(ctx: AppContext, parts: string[]) {
     const sort = parsePetSort(ctx.url.searchParams.get("sort"));
     const content = parseContentMode(ctx.url.searchParams.get("content"));
     const kind = parsePetKindFilter(ctx.url.searchParams.get("kind"));
+    const version = parsePetVersionFilter(ctx.url.searchParams.get("version"));
     const uploadedAfter = parseUploadedAfter(ctx.url.searchParams.get("uploadedAfter"));
-    return json(await listPets(ctx, ctx.url.searchParams.get("q") || "", undefined, ctx.url.searchParams.getAll("tag"), user, sort, parsePagination(ctx.url), content, kind, uploadedAfter));
+    return json(await listPets(ctx, ctx.url.searchParams.get("q") || "", undefined, ctx.url.searchParams.getAll("tag"), user, sort, parsePagination(ctx.url), content, kind, uploadedAfter, version));
   }
   if (ctx.request.method === "GET" && parts[0] === "favorites") return json({ pets: await favoritePets(ctx, await requireUser(ctx)) });
   if (ctx.request.method === "GET" && parts[0] === "mine") return json({ pets: (await listPets(ctx, ctx.url.searchParams.get("q") || "", (await requireUser(ctx)).id, ctx.url.searchParams.getAll("tag"), user, "new", undefined, "all")).pets });
-  if (ctx.request.method === "POST" && parts.length === 0) return uploadPet(ctx, await requireUser(ctx));
+  if (ctx.request.method === "POST" && parts.length === 0) return uploadPet(ctx, await requireUploadUser(ctx));
 
   const petId = parts[0];
   if (!petId || !slugPattern.test(petId)) return json({ error: "pet not found" }, 404);
@@ -44,8 +45,8 @@ export async function handlePets(ctx: AppContext, parts: string[]) {
   if (ctx.request.method === "GET" && parts.length === 1) return petResponse(ctx, petId, user, true);
   if (ctx.request.method === "DELETE" && parts.length === 1) return deletePet(ctx, petId, await requireUser(ctx));
   if ((ctx.request.method === "POST" || ctx.request.method === "DELETE") && parts[1] === "like") return setPetLike(ctx, petId, await requireUser(ctx), ctx.request.method === "POST");
-  if (ctx.request.method === "PATCH" && parts[1] === "tags" && parts.length === 2) return updatePetMetadata(ctx, petId, await requireUser(ctx));
-  if (ctx.request.method === "PATCH" && parts[1] === "spritesheet" && parts.length === 2) return updatePetSpritesheet(ctx, petId, await requireUser(ctx));
+  if (ctx.request.method === "PATCH" && parts[1] === "tags" && parts.length === 2) return updatePetMetadata(ctx, petId, await requireUploadUser(ctx));
+  if (ctx.request.method === "PATCH" && parts[1] === "spritesheet" && parts.length === 2) return updatePetSpritesheet(ctx, petId, await requireUploadUser(ctx));
   if (ctx.request.method === "GET" && parts[1] === "spritesheet") return visibleAsset(ctx, petId, user, `${petId}/spritesheet.webp`);
   if (ctx.request.method === "GET" && parts[1] === "share-image") return visibleAsset(ctx, petId, user, `${petId}/share.png`);
   if (ctx.request.method === "GET" && parts[1] === "preview") return visibleAsset(ctx, petId, user, `${petId}/preview.webp`);
@@ -63,11 +64,12 @@ export async function getVisiblePet(ctx: AppContext, petId: string, viewer: View
   return pet && canSeePet(pet, viewer) ? pet : null;
 }
 
-export async function listPets(ctx: AppContext, query = "", ownerId?: string, filterTags: string[] = [], viewer?: Viewer, sort: PetSort = "new", pagination?: Pagination, content: ContentMode = "safe", kind?: PetKind, uploadedAfter?: number) {
+export async function listPets(ctx: AppContext, query = "", ownerId?: string, filterTags: string[] = [], viewer?: Viewer, sort: PetSort = "new", pagination?: Pagination, content: ContentMode = "safe", kind?: PetKind, uploadedAfter?: number, version?: PetSpriteVersion) {
   const rows = (await all<PetRow>(petBaseQuery(ctx))).filter((row) =>
     matchesQuery(row, query)
     && (!ownerId || row.owner_id === ownerId)
     && (!kind || row.kind === kind)
+    && (!version || spriteVersionFromReport(validationReport(row)) === version)
     && (!uploadedAfter || Date.parse(row.created_at) > uploadedAfter)
     && filterTags.every((tag) => tags(row).includes(validateTag(tag)))
     && canSeePet(row, viewer)
@@ -155,6 +157,12 @@ async function uploadPet(ctx: AppContext, user: AuthUser) {
   return json({ pet: serializePet(ctx, pet, report, await likeContextFor(ctx, [pet.id], user), user) }, 201);
 }
 
+async function requireUploadUser(ctx: AppContext) {
+  const user = await apiKeyUser(ctx) || await requireUser(ctx);
+  if (!user) throw new HttpError("login required", 401);
+  return user;
+}
+
 export async function upsertPetRow(ctx: AppContext, input: {
   id: string; displayName: string; description: string; spritesheetPath: string; kind: PetKind; ownerId: string | null; source: "upload" | "seed"; tags: string[]; validationReport?: unknown; createdAt?: string; updatedAt?: string; viewCount?: number; downloadCount?: number; likeCount?: number;
 }) {
@@ -184,13 +192,41 @@ async function updatePetMetadata(ctx: AppContext, petId: string, user: AuthUser)
   const pet = await getPet(ctx, petId);
   if (!pet) return json({ error: "pet not found" }, 404);
   if (!user.isAdmin && (pet.owner_id !== user.id || pet.source !== "upload")) return json({ error: "owner required" }, 403);
-  const body = await ctx.request.json() as { tags?: unknown; kind?: unknown };
-  const nextTags = parseTags(JSON.stringify(body.tags || []));
+  const body = await ctx.request.json() as { displayName?: unknown; description?: unknown; tags?: unknown; kind?: unknown };
+  const nextDisplayName = body.displayName === undefined ? pet.display_name : validatePetDisplayName(body.displayName);
+  const nextDescription = body.description === undefined ? pet.description : validatePetDescription(body.description);
+  const nextTags = body.tags === undefined ? tags(pet) : parseTags(JSON.stringify(body.tags || []));
+  const nextKind = body.kind === undefined ? pet.kind : parsePetKind(body.kind);
   if (!user.isAdmin && tags(pet).includes("nsfw") && !nextTags.includes("nsfw")) throw new HttpError("admin required to remove nsfw", 403);
-  await ctx.env.DB.prepare("update pets set tags_json = ?, kind = ?, updated_at = ? where id = ?")
-    .bind(JSON.stringify(nextTags), parsePetKind(body.kind), nowIso(), petId).run();
+  const currentReport = await resolveValidationReport(ctx, pet);
+  await writePetManifest(ctx, pet.id, nextDisplayName, nextDescription, nextKind, spriteVersionFromReport(currentReport));
+  await ctx.env.DB.prepare("update pets set display_name = ?, description = ?, tags_json = ?, kind = ?, updated_at = ? where id = ?")
+    .bind(nextDisplayName, nextDescription, JSON.stringify(nextTags), nextKind, nowIso(), petId).run();
   const next = await getPet(ctx, petId) as PetRow;
   return json({ pet: serializePet(ctx, next, undefined, await likeContextFor(ctx, [petId], user), user) });
+}
+
+async function writePetManifest(ctx: AppContext, id: string, displayName: string, description: string, kind: PetKind, spriteVersionNumber: 1 | 2) {
+  await putAsset(ctx, `${id}/pet.json`, new TextEncoder().encode(JSON.stringify({
+    id,
+    displayName,
+    description,
+    spritesheetPath: "spritesheet.webp",
+    ...(spriteVersionNumber === 2 ? { spriteVersionNumber: 2 } : {}),
+    kind
+  }, null, 2) + "\n"), "application/json");
+}
+
+function validatePetDisplayName(value: unknown) {
+  const displayName = String(value || "").trim();
+  if (!displayName || displayName.length > 80) throw new HttpError("displayName is required", 400);
+  return displayName;
+}
+
+function validatePetDescription(value: unknown) {
+  const description = String(value || "").trim();
+  if (!description || description.length > 280) throw new HttpError("description is required", 400);
+  return description;
 }
 
 async function updatePetSpritesheet(ctx: AppContext, petId: string, user: AuthUser) {
@@ -411,6 +447,12 @@ export function parseContentMode(value: string | null): ContentMode {
 function parsePetKindFilter(value: string | null) {
   if (!value || value === "all") return undefined;
   return parsePetKind(value);
+}
+
+function parsePetVersionFilter(value: string | null): PetSpriteVersion | undefined {
+  if (!value) return undefined;
+  if (value === "1" || value === "2") return Number(value) as PetSpriteVersion;
+  throw new HttpError("invalid pet version", 400);
 }
 
 function parseUploadedAfter(value: string | null) {

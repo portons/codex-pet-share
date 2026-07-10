@@ -1,0 +1,253 @@
+{
+  "ok": true,
+  "errors": [],
+  "warnings": [
+    "horizontal-7 B horizontal axis is ambiguous",
+    "vertical-4 A vertical axis is ambiguous",
+    "vertical-4 B vertical axis is ambiguous",
+    "vertical-7 A vertical axis is ambiguous",
+    "vertical-7 B vertical axis is ambiguous"
+  ],
+  "unconfirmed": [],
+  "reviewRequired": true,
+  "pairs": [
+    {
+      "pair": "horizontal-1",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "observed": "screen-left",
+        "expected": "screen-left",
+        "source_direction": "337.5",
+        "pass": true
+      },
+      "B": {
+        "observed": "screen-right",
+        "expected": "screen-right",
+        "source_direction": "022.5",
+        "pass": true
+      }
+    },
+    {
+      "pair": "horizontal-2",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "observed": "screen-left",
+        "expected": "screen-left",
+        "source_direction": "315",
+        "pass": true
+      },
+      "B": {
+        "observed": "screen-right",
+        "expected": "screen-right",
+        "source_direction": "045",
+        "pass": true
+      }
+    },
+    {
+      "pair": "horizontal-3",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "observed": "screen-right",
+        "expected": "screen-right",
+        "source_direction": "067.5",
+        "pass": true
+      },
+      "B": {
+        "observed": "screen-left",
+        "expected": "screen-left",
+        "source_direction": "292.5",
+        "pass": true
+      }
+    },
+    {
+      "pair": "horizontal-4",
+      "axis": "horizontal",
+      "gate": "hard",
+      "A": {
+        "observed": "screen-left",
+        "expected": "screen-left",
+        "source_direction": "270",
+        "pass": true
+      },
+      "B": {
+        "observed": "screen-right",
+        "expected": "screen-right",
+        "source_direction": "090",
+        "pass": true
+      }
+    },
+    {
+      "pair": "horizontal-5",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "observed": "screen-left",
+        "expected": "screen-left",
+        "source_direction": "247.5",
+        "pass": true
+      },
+      "B": {
+        "observed": "screen-right",
+        "expected": "screen-right",
+        "source_direction": "112.5",
+        "pass": true
+      }
+    },
+    {
+      "pair": "horizontal-6",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "observed": "screen-right",
+        "expected": "screen-right",
+        "source_direction": "135",
+        "pass": true
+      },
+      "B": {
+        "observed": "screen-left",
+        "expected": "screen-left",
+        "source_direction": "225",
+        "pass": true
+      }
+    },
+    {
+      "pair": "horizontal-7",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "observed": "screen-right",
+        "expected": "screen-right",
+        "source_direction": "157.5",
+        "pass": true
+      },
+      "B": {
+        "observed": "ambiguous",
+        "expected": "screen-left",
+        "source_direction": "202.5",
+        "pass": false
+      }
+    },
+    {
+      "pair": "vertical-1",
+      "axis": "vertical",
+      "gate": "hard",
+      "A": {
+        "observed": "up",
+        "expected": "up",
+        "source_direction": "000",
+        "pass": true
+      },
+      "B": {
+        "observed": "down",
+        "expected": "down",
+        "source_direction": "180",
+        "pass": true
+      }
+    },
+    {
+      "pair": "vertical-2",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "observed": "down",
+        "expected": "down",
+        "source_direction": "157.5",
+        "pass": true
+      },
+      "B": {
+        "observed": "up",
+        "expected": "up",
+        "source_direction": "022.5",
+        "pass": true
+      }
+    },
+    {
+      "pair": "vertical-3",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "observed": "up",
+        "expected": "up",
+        "source_direction": "045",
+        "pass": true
+      },
+      "B": {
+        "observed": "down",
+        "expected": "down",
+        "source_direction": "135",
+        "pass": true
+      }
+    },
+    {
+      "pair": "vertical-4",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "observed": "ambiguous",
+        "expected": "up",
+        "source_direction": "067.5",
+        "pass": false
+      },
+      "B": {
+        "observed": "ambiguous",
+        "expected": "down",
+        "source_direction": "112.5",
+        "pass": false
+      }
+    },
+    {
+      "pair": "vertical-5",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "observed": "up",
+        "expected": "up",
+        "source_direction": "337.5",
+        "pass": true
+      },
+      "B": {
+        "observed": "down",
+        "expected": "down",
+        "source_direction": "202.5",
+        "pass": true
+      }
+    },
+    {
+      "pair": "vertical-6",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "observed": "up",
+        "expected": "up",
+        "source_direction": "315",
+        "pass": true
+      },
+      "B": {
+        "observed": "down",
+        "expected": "down",
+        "source_direction": "225",
+        "pass": true
+      }
+    },
+    {
+      "pair": "vertical-7",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "observed": "ambiguous",
+        "expected": "up",
+        "source_direction": "292.5",
+        "pass": false
+      },
+      "B": {
+        "observed": "ambiguous",
+        "expected": "down",
+        "source_direction": "247.5",
+        "pass": false
+      }
+    }
+  ]
+}

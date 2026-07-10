@@ -1,0 +1,189 @@
+{
+  "schema_version": 3,
+  "atlas_sha256": "d1368e19bab0e0283ec705f5e02747dd4455c242641439216a5eb260448b2e37",
+  "instructions": "Do not provide this answer key to the blind visual QA reviewer.",
+  "pairs": [
+    {
+      "pair": "horizontal-1",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "expected_direction": "screen-left",
+        "source_direction": "337.5"
+      },
+      "B": {
+        "expected_direction": "screen-right",
+        "source_direction": "022.5"
+      }
+    },
+    {
+      "pair": "horizontal-2",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "expected_direction": "screen-left",
+        "source_direction": "315"
+      },
+      "B": {
+        "expected_direction": "screen-right",
+        "source_direction": "045"
+      }
+    },
+    {
+      "pair": "horizontal-3",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "expected_direction": "screen-right",
+        "source_direction": "067.5"
+      },
+      "B": {
+        "expected_direction": "screen-left",
+        "source_direction": "292.5"
+      }
+    },
+    {
+      "pair": "horizontal-4",
+      "axis": "horizontal",
+      "gate": "hard",
+      "A": {
+        "expected_direction": "screen-left",
+        "source_direction": "270"
+      },
+      "B": {
+        "expected_direction": "screen-right",
+        "source_direction": "090"
+      }
+    },
+    {
+      "pair": "horizontal-5",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "expected_direction": "screen-left",
+        "source_direction": "247.5"
+      },
+      "B": {
+        "expected_direction": "screen-right",
+        "source_direction": "112.5"
+      }
+    },
+    {
+      "pair": "horizontal-6",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "expected_direction": "screen-right",
+        "source_direction": "135"
+      },
+      "B": {
+        "expected_direction": "screen-left",
+        "source_direction": "225"
+      }
+    },
+    {
+      "pair": "horizontal-7",
+      "axis": "horizontal",
+      "gate": "review",
+      "A": {
+        "expected_direction": "screen-right",
+        "source_direction": "157.5"
+      },
+      "B": {
+        "expected_direction": "screen-left",
+        "source_direction": "202.5"
+      }
+    },
+    {
+      "pair": "vertical-1",
+      "axis": "vertical",
+      "gate": "hard",
+      "A": {
+        "expected_direction": "up",
+        "source_direction": "000"
+      },
+      "B": {
+        "expected_direction": "down",
+        "source_direction": "180"
+      }
+    },
+    {
+      "pair": "vertical-2",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "expected_direction": "down",
+        "source_direction": "157.5"
+      },
+      "B": {
+        "expected_direction": "up",
+        "source_direction": "022.5"
+      }
+    },
+    {
+      "pair": "vertical-3",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "expected_direction": "up",
+        "source_direction": "045"
+      },
+      "B": {
+        "expected_direction": "down",
+        "source_direction": "135"
+      }
+    },
+    {
+      "pair": "vertical-4",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "expected_direction": "up",
+        "source_direction": "067.5"
+      },
+      "B": {
+        "expected_direction": "down",
+        "source_direction": "112.5"
+      }
+    },
+    {
+      "pair": "vertical-5",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "expected_direction": "up",
+        "source_direction": "337.5"
+      },
+      "B": {
+        "expected_direction": "down",
+        "source_direction": "202.5"
+      }
+    },
+    {
+      "pair": "vertical-6",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "expected_direction": "up",
+        "source_direction": "315"
+      },
+      "B": {
+        "expected_direction": "down",
+        "source_direction": "225"
+      }
+    },
+    {
+      "pair": "vertical-7",
+      "axis": "vertical",
+      "gate": "review",
+      "A": {
+        "expected_direction": "up",
+        "source_direction": "292.5"
+      },
+      "B": {
+        "expected_direction": "down",
+        "source_direction": "247.5"
+      }
+    }
+  ]
+}

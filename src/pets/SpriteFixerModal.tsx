@@ -351,7 +351,7 @@ export function SpriteFixerModal({
             <h2>{pet.displayName}</h2>
             <p className="spriteEditorVersionNote">
               <span className={`petFormatPill ${pet.spriteVersionNumber === 2 ? "v2" : "v1"}`}>
-                {pet.spriteVersionNumber === 2 ? "v2 · new" : "v1 · legacy"}
+                {pet.spriteVersionNumber === 2 ? "V2 · 16 directions" : "V1 · supported"}
               </span>
               {pet.spriteVersionNumber === 2
                 ? "Editing all 11 rows, including the neutral look cell and 16 labeled directions."

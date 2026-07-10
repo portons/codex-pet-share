@@ -12,6 +12,7 @@ import { galleryHash, galleryUrlStateFromHash, pushHash } from "../domain/routin
 import type {
   AuthSession,
   ContentMode,
+  GalleryFormat,
   GalleryMeta,
   GalleryRecentComment,
   GalleryResponse,
@@ -51,6 +52,7 @@ export function useGalleryBrowser({
   const [activeSort, setActiveSort] = useState<GallerySort>(initialGalleryState.sort);
   const [activeView, setActiveView] = useState<GalleryView>(initialGalleryState.view);
   const [activeKind, setActiveKind] = useState<PetKind>(initialGalleryState.kind);
+  const [activeFormat, setActiveFormat] = useState<GalleryFormat>(initialGalleryState.format);
   const [contentMode, setContentMode] = useState<ContentMode>(initialGalleryState.content);
   const [loading, setLoading] = useState(true);
   const [freshPetCount, setFreshPetCount] = useState(0);
@@ -70,6 +72,7 @@ export function useGalleryBrowser({
     setActiveSort(nextState.sort);
     setActiveView(nextState.view);
     setActiveKind(nextState.kind);
+    setActiveFormat(nextState.format);
     setContentMode(nextState.content);
     setGalleryMeta((current) => ({
       ...current,
@@ -99,10 +102,11 @@ export function useGalleryBrowser({
     content = contentMode,
     view = activeView,
     kind = activeKind,
+    format = activeFormat,
     forceFresh = false
   ) {
     if (sort === "random") {
-      await loadRandomGallery(search, tags, authSession, content, view, kind, forceFresh);
+      await loadRandomGallery(search, tags, authSession, content, view, kind, format, forceFresh);
       return;
     }
 
@@ -118,6 +122,9 @@ export function useGalleryBrowser({
     }
     if (kind !== "all") {
       params.set("kind", kind);
+    }
+    if (format !== "all") {
+      params.set("version", format === "v2" ? "2" : "1");
     }
     if (content === "all") {
       params.set("content", "all");
@@ -147,6 +154,7 @@ export function useGalleryBrowser({
     content = contentMode,
     view = activeView,
     kind = activeKind,
+    format = activeFormat,
     forceFresh = false
   ) {
     const pageSize = galleryPageSize(view, "random");
@@ -157,6 +165,9 @@ export function useGalleryBrowser({
     params.set("random", randomRequestToken());
     if (kind !== "all") {
       params.set("kind", kind);
+    }
+    if (format !== "all") {
+      params.set("version", format === "v2" ? "2" : "1");
     }
     if (search) {
       params.set("q", search);
@@ -187,7 +198,7 @@ export function useGalleryBrowser({
 
   async function submitSearch(event: FormEvent) {
     event.preventDefault();
-    const nextState = { query, tags: activeTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, content: contentMode };
+    const nextState = { query, tags: activeTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, format: activeFormat, content: contentMode };
     pushGalleryState(nextState);
     setLoading(true);
     try {
@@ -199,7 +210,7 @@ export function useGalleryBrowser({
 
   async function selectTag(tag: TagName) {
     const nextTags = activeTags.includes(tag) ? activeTags.filter((item) => item !== tag) : [...activeTags, tag];
-    const nextState = { query, tags: nextTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, content: contentMode };
+    const nextState = { query, tags: nextTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, format: activeFormat, content: contentMode };
     pushGalleryState(nextState);
     setLoading(true);
     try {
@@ -211,7 +222,7 @@ export function useGalleryBrowser({
 
   async function clearTags() {
     if (!activeTags.length) return;
-    const nextState = { query, tags: [], sort: activeSort, page: 1, view: activeView, kind: activeKind, content: contentMode };
+    const nextState = { query, tags: [], sort: activeSort, page: 1, view: activeView, kind: activeKind, format: activeFormat, content: contentMode };
     pushGalleryState(nextState);
     setLoading(true);
     try {
@@ -222,7 +233,7 @@ export function useGalleryBrowser({
   }
 
   async function selectSort(sort: GallerySort) {
-    const nextState = { query, tags: activeTags, sort, page: 1, view: activeView, kind: activeKind, content: contentMode };
+    const nextState = { query, tags: activeTags, sort, page: 1, view: activeView, kind: activeKind, format: activeFormat, content: contentMode };
     pushGalleryState(nextState);
     setLoading(true);
     try {
@@ -235,7 +246,7 @@ export function useGalleryBrowser({
 
   async function selectView(view: GalleryView) {
     if (view === activeView) return;
-    const nextState = { query, tags: activeTags, sort: activeSort, page: 1, view, kind: activeKind, content: contentMode };
+    const nextState = { query, tags: activeTags, sort: activeSort, page: 1, view, kind: activeKind, format: activeFormat, content: contentMode };
     pushGalleryState(nextState);
     setLoading(true);
     try {
@@ -248,7 +259,7 @@ export function useGalleryBrowser({
 
   async function selectKind(kind: PetKind) {
     if (kind === activeKind) return;
-    const nextState = { query, tags: activeTags, sort: activeSort, page: 1, view: activeView, kind, content: contentMode };
+    const nextState = { query, tags: activeTags, sort: activeSort, page: 1, view: activeView, kind, format: activeFormat, content: contentMode };
     pushGalleryState(nextState);
     setLoading(true);
     try {
@@ -259,9 +270,22 @@ export function useGalleryBrowser({
     }
   }
 
+  async function selectFormat(format: GalleryFormat) {
+    if (format === activeFormat) return;
+    const nextState = { query, tags: activeTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, format, content: contentMode };
+    pushGalleryState(nextState);
+    setLoading(true);
+    try {
+      await loadGallery(nextState.query, nextState.tags, nextState.sort, nextState.page, session, nextState.content, activeView, nextState.kind, nextState.format);
+      scrollPageTop();
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function selectPage(page: number) {
     if (page === galleryMeta.page) return;
-    const nextState = { query, tags: activeTags, sort: activeSort, page, view: activeView, kind: activeKind, content: contentMode };
+    const nextState = { query, tags: activeTags, sort: activeSort, page, view: activeView, kind: activeKind, format: activeFormat, content: contentMode };
     pushGalleryState(nextState);
     setLoading(true);
     try {
@@ -273,7 +297,7 @@ export function useGalleryBrowser({
   }
 
   async function randomizeGallery() {
-    const nextState = { query, tags: activeTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, content: contentMode };
+    const nextState = { query, tags: activeTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, format: activeFormat, content: contentMode };
     setLoading(true);
     try {
       await loadGallery(
@@ -293,11 +317,11 @@ export function useGalleryBrowser({
   }
 
   async function showFreshPets() {
-    const nextState = { query, tags: activeTags, sort: "new" as const, page: 1, view: activeView, kind: activeKind, content: contentMode };
+    const nextState = { query, tags: activeTags, sort: "new" as const, page: 1, view: activeView, kind: activeKind, format: activeFormat, content: contentMode };
     pushGalleryState(nextState);
     setLoading(true);
     try {
-      await loadGallery(nextState.query, nextState.tags, nextState.sort, nextState.page, session, nextState.content, nextState.view, nextState.kind, true);
+      await loadGallery(nextState.query, nextState.tags, nextState.sort, nextState.page, session, nextState.content, nextState.view, nextState.kind, nextState.format, true);
       scrollPageTop();
     } finally {
       setLoading(false);
@@ -306,11 +330,11 @@ export function useGalleryBrowser({
 
   useEffect(() => {
     if (route.name !== "gallery") return;
-    const key = freshGalleryKey(query, activeTags, contentMode, activeKind, freshViewer);
+    const key = freshGalleryKey(query, activeTags, contentMode, activeKind, activeFormat, freshViewer);
     let cancelled = false;
 
     async function fetchFreshSnapshot() {
-      const params = freshGalleryParams(query, activeTags, contentMode, activeKind);
+      const params = freshGalleryParams(query, activeTags, contentMode, activeKind, activeFormat);
       const body = await readJson<GalleryResponse>(
         await apiFetch(`/api/pets?${params}`, {}, session)
       );
@@ -323,7 +347,7 @@ export function useGalleryBrowser({
     }
 
     async function fetchNewerUploads(uploadedAfter: string) {
-      const params = freshGalleryParams(query, activeTags, contentMode, activeKind, uploadedAfter);
+      const params = freshGalleryParams(query, activeTags, contentMode, activeKind, activeFormat, uploadedAfter);
       const body = await readJson<GalleryResponse>(
         await apiFetch(`/api/pets?${params}`, {}, session)
       );
@@ -367,11 +391,11 @@ export function useGalleryBrowser({
       cancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [route, query, activeTags, contentMode, activeKind, freshViewer, apiFetch, session, freshBaselineVersion]);
+  }, [route, query, activeTags, contentMode, activeKind, activeFormat, freshViewer, apiFetch, session, freshBaselineVersion]);
 
   async function selectVisibleTag(tag: TagName, sourceTags: string[]) {
     const nextContent = tag === "nsfw" || sourceTags.includes("nsfw") ? "all" : contentMode;
-    const nextState = { query: "", tags: [tag], sort: activeSort, page: 1, view: activeView, kind: activeKind, content: nextContent };
+    const nextState = { query: "", tags: [tag], sort: activeSort, page: 1, view: activeView, kind: activeKind, format: activeFormat, content: nextContent };
     pushGalleryState(nextState);
     if (route.name !== "gallery") {
       return;
@@ -415,6 +439,7 @@ export function useGalleryBrowser({
     activeSort,
     activeView,
     activeKind,
+    activeFormat,
     contentMode,
     setContentMode,
     applyGalleryState,
@@ -427,6 +452,7 @@ export function useGalleryBrowser({
     selectSort,
     selectView,
     selectKind,
+    selectFormat,
     selectPage,
     randomizeGallery,
     freshPetCount,
@@ -445,17 +471,18 @@ function freshViewerKey(user: User | null, session: AuthSession | null) {
   });
 }
 
-function freshGalleryKey(search: string, tags: string[], content: ContentMode, kind: PetKind, viewer: string) {
+function freshGalleryKey(search: string, tags: string[], content: ContentMode, kind: PetKind, format: GalleryFormat, viewer: string) {
   return JSON.stringify({
     search,
     tags: galleryRequestTags(tags),
     content,
     kind,
+    format,
     viewer
   });
 }
 
-function freshGalleryParams(search: string, tags: string[], content: ContentMode, kind: PetKind, uploadedAfter?: string) {
+function freshGalleryParams(search: string, tags: string[], content: ContentMode, kind: PetKind, format: GalleryFormat, uploadedAfter?: string) {
   const params = new URLSearchParams();
   params.set("page", "1");
   params.set("pageSize", "1");
@@ -470,6 +497,9 @@ function freshGalleryParams(search: string, tags: string[], content: ContentMode
   galleryRequestTags(tags).forEach((tag) => params.append("tag", tag));
   if (kind !== "all") {
     params.set("kind", kind);
+  }
+  if (format !== "all") {
+    params.set("version", format === "v2" ? "2" : "1");
   }
   if (content === "all") {
     params.set("content", "all");

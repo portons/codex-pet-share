@@ -1,7 +1,7 @@
 import { type CSSProperties, type FormEvent, useEffect, useMemo, useState } from "react";
 import { type TagName } from "../domain/config";
 import { formatDate, formatMetric } from "../domain/format";
-import type { AuthSession, CollectionSummary, ContentMode, GalleryMeta, GalleryRecentComment, GallerySort, GalleryView, Pet, PetKind, User } from "../domain/types";
+import type { AuthSession, CollectionSummary, ContentMode, GalleryFormat, GalleryMeta, GalleryRecentComment, GallerySort, GalleryView, Pet, PetKind, User } from "../domain/types";
 import { useCollectionPresenceCounts } from "../realtime/useCollectionPresenceCounts";
 import { CursorPetPreview, useCursorPreviewAssets, useCursorPreviewMotion, useCursorPreviewSupport } from "../pets/CursorPreview";
 import { PetCard } from "../pets/PetCard";
@@ -348,6 +348,7 @@ function Gallery({
   activeSort,
   activeView,
   activeKind,
+  activeFormat,
   contentMode,
   deletingPetId,
   shadowbanBusyOwnerId,
@@ -361,6 +362,7 @@ function Gallery({
   onSort,
   onView,
   onKind,
+  onFormat,
   onPage,
   onRandomize,
   freshPetCount,
@@ -391,6 +393,7 @@ function Gallery({
   activeSort: GallerySort;
   activeView: GalleryView;
   activeKind: PetKind;
+  activeFormat: GalleryFormat;
   contentMode: ContentMode;
   deletingPetId: string;
   shadowbanBusyOwnerId: string;
@@ -404,6 +407,7 @@ function Gallery({
   onSort: (value: GallerySort) => void;
   onView: (value: GalleryView) => void;
   onKind: (value: PetKind) => void;
+  onFormat: (value: GalleryFormat) => void;
   onPage: (page: number) => void;
   onRandomize: () => void;
   freshPetCount: number;
@@ -460,23 +464,38 @@ function Gallery({
         signedIn={Boolean(user)}
         onSignIn={onSignIn}
       />
-      <div className="petFormatGuide galleryFormatGuide" role="note" aria-label="Supported Codex pet formats">
+      <aside className="petFormatGuide galleryFormatGuide" aria-labelledby="gallery-v2-title">
+        <span className="petFormatGuideIcon" aria-hidden="true">
+          <Icon name="sparkle" size={18} />
+        </span>
         <div className="petFormatGuideCopy">
-          <span className="petFormatGuideEyebrow">Codex pet formats</span>
-          <strong>V2 pets are new—and they can look around.</strong>
-          <span>V2 adds a neutral look plus 16 directional poses. Original v1 pets are legacy, but remain fully supported.</span>
+          <span className="petFormatGuideEyebrow">New in V2</span>
+          <strong id="gallery-v2-title">Pets can now look around.</strong>
+          <span>A neutral pose plus 16 directions make previews feel alive. Original V1 pets still work everywhere.</span>
         </div>
-        <div className="petFormatGuideBadges" aria-hidden="true">
-          <span className="petFormatPill v2">v2 · new · 16 looks</span>
-          <span className="petFormatPill v1">v1 · legacy · supported</span>
+        <div className="petFormatGuideAside">
+          <div className="petFormatGuideBadges" aria-hidden="true">
+            <span className="petFormatPill v2">V2 · 16 directions</span>
+            <span className="petFormatPill v1">V1 · fully supported</span>
+          </div>
+          <button
+            className="btn btnSm petFormatGuideAction"
+            type="button"
+            aria-pressed={activeFormat === "v2"}
+            onClick={() => onFormat(activeFormat === "v2" ? "all" : "v2")}
+          >
+            <Icon name={activeFormat === "v2" ? "check" : "sparkle"} size={13} />
+            {activeFormat === "v2" ? "Show all formats" : "Browse V2 pets"}
+          </button>
         </div>
-      </div>
+      </aside>
       <GallerySearch
         query={query}
         activeTags={activeTags}
         activeSort={activeSort}
         activeView={activeView}
         activeKind={activeKind}
+        activeFormat={activeFormat}
         contentMode={contentMode}
         loading={loading}
         onQuery={onQuery}
@@ -485,6 +504,7 @@ function Gallery({
         onSort={onSort}
         onView={onView}
         onKind={onKind}
+        onFormat={onFormat}
         onSubmit={onSearch}
       />
       <div className={`galleryStatusRow ${freshPetCount > 0 ? "hasFresh" : ""}`}>

@@ -2,11 +2,12 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
   editablePetKindOptions,
   galleryFilterTags,
+  galleryFormatOptions,
   gallerySorts,
   petKindOptions,
   type TagName
 } from "../domain/config";
-import type { ContentMode, EditablePetKind, GallerySort, GalleryView, PetKind } from "../domain/types";
+import type { ContentMode, EditablePetKind, GalleryFormat, GallerySort, GalleryView, PetKind } from "../domain/types";
 import { Icon } from "../ui/Icon";
 import { Spinner } from "../ui/Spinner";
 
@@ -16,6 +17,7 @@ export function GallerySearch({
   activeSort,
   activeView,
   activeKind,
+  activeFormat,
   contentMode,
   loading,
   onQuery,
@@ -24,6 +26,7 @@ export function GallerySearch({
   onSort,
   onView,
   onKind,
+  onFormat,
   onSubmit
 }: {
   query: string;
@@ -31,6 +34,7 @@ export function GallerySearch({
   activeSort: GallerySort;
   activeView: GalleryView;
   activeKind: PetKind;
+  activeFormat: GalleryFormat;
   contentMode: ContentMode;
   loading: boolean;
   onQuery: (value: string) => void;
@@ -39,6 +43,7 @@ export function GallerySearch({
   onSort: (value: GallerySort) => void;
   onView: (value: GalleryView) => void;
   onKind: (value: PetKind) => void;
+  onFormat: (value: GalleryFormat) => void;
   onSubmit: (event: FormEvent) => void;
 }) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -46,6 +51,7 @@ export function GallerySearch({
     (activeSort === "new" ? 0 : 1) +
     (activeView === "standard" ? 0 : 1) +
     (activeKind === "all" ? 0 : 1) +
+    (activeFormat === "all" ? 0 : 1) +
     activeTags.length;
   const filterSummary = activeFilterCount ? `${activeFilterCount} active` : "Default";
 
@@ -82,9 +88,27 @@ export function GallerySearch({
           <SortControls activeSort={activeSort} onSort={onSort} />
           <ViewControls activeView={activeView} onView={onView} />
           <KindControls activeKind={activeKind} onKind={onKind} />
+          <FormatControls activeFormat={activeFormat} onFormat={onFormat} />
         </div>
         <TagFilterDropdown contentMode={contentMode} activeTags={activeTags} onTagToggle={onTagToggle} onTagsClear={onTagsClear} />
       </div>
+    </div>
+  );
+}
+
+function FormatControls({ activeFormat, onFormat }: { activeFormat: GalleryFormat; onFormat: (value: GalleryFormat) => void }) {
+  return (
+    <div className="formatControls" aria-label="Pet format">
+      {galleryFormatOptions.map((format) => (
+        <button
+          className={activeFormat === format.id ? "active" : ""}
+          key={format.id}
+          type="button"
+          onClick={() => onFormat(format.id)}
+        >
+          {format.label}
+        </button>
+      ))}
     </div>
   );
 }
@@ -251,14 +275,32 @@ function TagFilterDropdown({
   );
 }
 
-export function TagFilters({ activeTag, onTag }: { activeTag: string[]; onTag: (value: TagName) => void }) {
+export function TagFilters({
+  activeTag,
+  lockedTags = [],
+  onTag
+}: {
+  activeTag: string[];
+  lockedTags?: string[];
+  onTag: (value: TagName) => void;
+}) {
   return (
     <div className="tagFilters" aria-label="Pet tags">
-      {galleryFilterTags.map((tag) => (
-        <button className={`tagPill ${activeTag.includes(tag) ? "active" : ""}`} key={tag} type="button" onClick={() => onTag(tag)}>
-          {tag}
-        </button>
-      ))}
+      {galleryFilterTags.map((tag) => {
+        const locked = lockedTags.includes(tag);
+        return (
+          <button
+            className={`tagPill ${activeTag.includes(tag) ? "active" : ""}`}
+            key={tag}
+            type="button"
+            disabled={locked}
+            title={locked ? "Admin reviewed" : undefined}
+            onClick={() => onTag(tag)}
+          >
+            {tag}
+          </button>
+        );
+      })}
     </div>
   );
 }

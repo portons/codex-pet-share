@@ -45,7 +45,7 @@ export function useUserCollections({
   setCollectionPets: Dispatch<SetStateAction<Pet[]>>;
   loadUserCollections: (currentUser?: User | null, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
   loadCollectionDetail: (slug: string, authSession?: AuthSession | null, content?: ContentMode) => Promise<void>;
-  openAuth: () => void;
+  openAuth: (status?: string) => void;
 }) {
   const [collectionEditor, setCollectionEditor] = useState<CollectionEditorState | null>(null);
   const [collectionEditorStatus, setCollectionEditorStatus] = useState("");
@@ -130,7 +130,7 @@ export function useUserCollections({
 
   function openPetCollector(pet: Pet) {
     if (!user) {
-      openAuth();
+      openAuth(`Sign in to add ${pet.displayName} to a collection.`);
       return;
     }
     setCollectPet(pet);

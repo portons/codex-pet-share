@@ -189,8 +189,8 @@ export function UploadPage({
               <span>Use a 1536×2288 sheet plus <code>spriteVersionNumber: 2</code> for a neutral look and 16 directions. Legacy 1536×1872 v1 pets still work without a version field.</span>
             </div>
             <div className="petFormatGuideBadges" aria-hidden="true">
-              <span className="petFormatPill v2">v2 · recommended</span>
-              <span className="petFormatPill v1">v1 · supported</span>
+              <span className="petFormatPill v2">V2 · recommended</span>
+              <span className="petFormatPill v1">V1 · supported</span>
             </div>
           </div>
           <FileField

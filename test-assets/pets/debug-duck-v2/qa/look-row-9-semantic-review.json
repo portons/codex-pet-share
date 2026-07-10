@@ -1,0 +1,72 @@
+{
+  "ok": true,
+  "reviewed_at": "2026-07-09T18:30:53Z",
+  "row": "look-row-9",
+  "registered_strip": "qa/look-row-9-registered.png",
+  "directions": [
+    {
+      "direction": "000",
+      "expected": "up",
+      "verdict": "pass",
+      "horizontal": "none required",
+      "vertical": "Bill centered above head; eyes occluded by upward pitch."
+    },
+    {
+      "direction": "022.5",
+      "expected": "up-right",
+      "verdict": "pass",
+      "horizontal": "Bill and eye begin moving screen-right of head center.",
+      "vertical": "Bill remains high and head remains pitched up."
+    },
+    {
+      "direction": "045",
+      "expected": "up-right",
+      "verdict": "pass",
+      "horizontal": "Clear right-facing bill and eye placement.",
+      "vertical": "Bill axis stays above level with upward neck extension."
+    },
+    {
+      "direction": "067.5",
+      "expected": "up-right",
+      "verdict": "pass",
+      "horizontal": "Bill tip is unmistakably screen-right.",
+      "vertical": "Head remains slightly lifted relative to the 090 anchor."
+    },
+    {
+      "direction": "090",
+      "expected": "right",
+      "verdict": "pass",
+      "horizontal": "Bill tip lies fully screen-right with eye behind it.",
+      "vertical": "none required"
+    },
+    {
+      "direction": "112.5",
+      "expected": "down-right",
+      "verdict": "pass",
+      "horizontal": "Bill remains fully screen-right.",
+      "vertical": "Head and bill begin a smooth downward pitch."
+    },
+    {
+      "direction": "135",
+      "expected": "down-right",
+      "verdict": "pass",
+      "horizontal": "Right profile remains clear.",
+      "vertical": "Eye and bill move lower toward the panel."
+    },
+    {
+      "direction": "157.5",
+      "expected": "down-right",
+      "verdict": "pass",
+      "horizontal": "Subtle right cue remains in the bill.",
+      "vertical": "Head is strongly bowed and flows toward the approved 180 anchor."
+    }
+  ],
+  "continuity": {
+    "verdict": "pass",
+    "evidence": "Feet, lower body, debugging panel, scale, and baseline remain stable; bill, eye, and head contour progress clockwise without reversal or a visible snap. The final 157.5 pose is one plausible step from the approved 180 cardinal."
+  },
+  "edge_registration": {
+    "verdict": "pass",
+    "evidence": "Deterministic row-9 registration completed without clipping or edge failure using the persisted shared scale."
+  }
+}

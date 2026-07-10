@@ -115,7 +115,7 @@ export function PetDetail({
   const canDelete = Boolean(!user?.isAdmin && user?.id && user.id === pet.ownerId);
   const canEditTags = Boolean(!user?.isAdmin && user?.id && user.id === pet.ownerId);
   const canFixSprites = Boolean((user?.isAdmin && pet.ownerId) || (user?.id && user.id === pet.ownerId));
-  const hasManagementActions = canFixSprites || canDelete || Boolean(user?.isAdmin);
+  const hasManagementActions = canEditTags || canFixSprites || canDelete || Boolean(user?.isAdmin);
   const downloadCommand = petImportCommand(pet, downloadCommandMode);
   const codexInstallUrl = petCodexInstallUrl(pet);
 
@@ -173,7 +173,7 @@ export function PetDetail({
             <span className="detailSpecimenSep" aria-hidden="true">·</span>
             <span className="detailSpecimenItem">by <OwnerLabel pet={pet} className="detailSpecimenOwner" /></span>
             <span className={`petFormatPill ${pet.spriteVersionNumber === 2 ? "v2" : "v1"}`}>
-              {pet.spriteVersionNumber === 2 ? "v2 · new · 16 look directions" : "v1 · legacy · supported"}
+              {pet.spriteVersionNumber === 2 ? "V2 · 16 directions" : "V1 · supported"}
             </span>
             {isNsfwPet(pet) ? <span className="detailNsfwPill">NSFW</span> : null}
           </p>
@@ -210,6 +210,12 @@ export function PetDetail({
           <div className="detailCreatorTools" role="group" aria-label="Pet tools">
             <span className="detailCreatorToolsLabel">Pet tools</span>
             <div className="detailCreatorToolsButtons">
+              {canEditTags ? (
+                <button className="btn btnSm" type="button" onClick={() => onEditTags(pet)}>
+                  <Icon name="tag" size={13} />
+                  Edit details
+                </button>
+              ) : null}
               {canFixSprites ? (
                 <button className="btn btnSm detailFixSpritesAction" type="button" onClick={() => onFixSprites(pet)}>
                   <Icon name="sheet" size={13} />
@@ -272,7 +278,7 @@ export function PetDetail({
                 Playground
               </button>
             )}
-            {user && onCollect && (
+            {onCollect && (
               <button className="btn btnSm" type="button" onClick={handleCollect}>
                 <Icon name="package" size={13} />
                 Add to collection
@@ -416,16 +422,8 @@ export function PetDetail({
         onSignIn={onSignIn}
       />
 
-      {(canEditTags || Boolean(deleteStatus)) && (
+      {Boolean(deleteStatus) && (
         <div className="detailAdminBar">
-          <div className="detailActions">
-            {canEditTags && (
-              <button className="btn btnSm" type="button" onClick={() => onEditTags(pet)}>
-                <Icon name="tag" size={13} />
-                Edit tags
-              </button>
-            )}
-          </div>
           {canDelete && deleteStatus && (
             <p className="status" role="alert">
               {deleteStatus}

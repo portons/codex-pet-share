@@ -40,6 +40,7 @@ The frontend expects an API under `VITE_APP_API_BASE_URL` with these groups:
 - `GET /api/pets`, `GET /api/pets/:id`, `POST /api/pets`
 - `GET /api/pets/mine`, `GET /api/pets/favorites`
 - `POST|DELETE /api/pets/:id/like`
+- `PATCH /api/pets/:id/tags` for owner/admin updates to `displayName`, `description`, `kind`, and tags
 - `GET /api/pets/:id/comments`,
   `POST /api/pets/:id/comments`,
   `DELETE /api/pets/:id/comments/:commentId`,
@@ -51,6 +52,7 @@ The frontend expects an API under `VITE_APP_API_BASE_URL` with these groups:
   `GET /api/pets/:id/share-image`
 - `POST /api/auth/login`, `POST /api/auth/register`,
   `POST /api/auth/refresh`, `GET|PATCH|DELETE /api/auth/me`
+- `GET|POST /api/auth/api-keys`, `DELETE /api/auth/api-keys/:id`
 - `GET /api/users/:id/pets`, `GET /api/creators/leaderboard`
 - `GET /api/collections`, `GET /api/collections/:slug?page=<n>&pageSize=<n>`
 - `POST /api/rooms`, `GET /api/rooms/:id`, `POST /api/rooms/:id/close`
@@ -71,6 +73,8 @@ responses. Gallery sort values are `new`, `popular`, `views`, `discussed`,
 and `random`; `discussed` ranks pets by visible comment count and can include
 `recentComments` for the current filtered view so the frontend can render a
 recent-comment strip above the most-discussed pets leaderboard.
+Gallery requests may also pass `version=1` or `version=2`; providers should
+apply that filter before pagination and calculate totals from the filtered set.
 
 ## Auth Contract
 
@@ -89,6 +93,12 @@ Auth responses return:
 
 The frontend stores this session in localStorage and refreshes through
 `POST /api/auth/refresh`.
+
+API keys are created from a signed-in browser session and can authenticate
+agent uploads to `POST /api/pets` plus owner-safe maintenance through
+`PATCH /api/pets/:id/tags` and `PATCH /api/pets/:id/spritesheet`. Providers
+should store API keys hashed and return the plaintext key only once on
+creation. API keys do not grant admin permissions.
 
 Account removal is `DELETE /api/auth/me` with `{ "deletePets": boolean }`.
 When `deletePets` is false, uploaded pets remain public with no owner and are

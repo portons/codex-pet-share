@@ -549,7 +549,8 @@
 /* Tag filters */
 .sortControls,
 .viewControls,
-.kindControls {
+.kindControls,
+.formatControls {
   display: inline-flex;
   align-items: center;
   overflow: hidden;
@@ -560,7 +561,8 @@
 
 .sortControls button,
 .viewControls button,
-.kindControls button {
+.kindControls button,
+.formatControls button {
   display: inline-flex;
   align-items: center;
   height: 30px;
@@ -577,19 +579,22 @@
 
 .sortControls button:last-child,
 .viewControls button:last-child,
-.kindControls button:last-child {
+.kindControls button:last-child,
+.formatControls button:last-child {
   border-right: 0;
 }
 
 .sortControls button:hover,
 .viewControls button:hover,
-.kindControls button:hover {
+.kindControls button:hover,
+.formatControls button:hover {
   color: var(--ink);
 }
 
 .sortControls button.active,
 .viewControls button.active,
-.kindControls button.active {
+.kindControls button.active,
+.formatControls button.active {
   background: var(--ink);
   color: var(--surface);
 }
@@ -919,7 +924,8 @@
 
   .sortControls,
   .viewControls,
-  .kindControls {
+  .kindControls,
+  .formatControls {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
@@ -929,7 +935,8 @@
 
   .sortControls button,
   .viewControls button,
-  .kindControls button {
+  .kindControls button,
+  .formatControls button {
     justify-content: center;
     width: 100%;
     min-width: 0;
@@ -966,6 +973,14 @@
   }
 
   .kindControls button:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .formatControls {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .formatControls button {
     border-bottom: 0;
   }
 

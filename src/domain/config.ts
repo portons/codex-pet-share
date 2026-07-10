@@ -1,5 +1,6 @@
 import type {
   EditablePetKind,
+  GalleryFormat,
   GallerySort,
   GalleryUrlState,
   GalleryView,
@@ -35,8 +36,8 @@ export const petStates = [
 
 export type PetState = (typeof petStates)[number];
 export const petLookRows = [
-  { id: "look-000-157", label: "Look 000°–157.5°", row: 9, frames: 8 },
-  { id: "look-180-337", label: "Look 180°–337.5°", row: 10, frames: 8 }
+  { id: "look-right-side", label: "Look around · Right side", row: 9, frames: 8 },
+  { id: "look-left-side", label: "Look around · Left side", row: 10, frames: 8 }
 ] as const;
 export type PetLookRow = (typeof petLookRows)[number];
 export type PetAnimationRow = {
@@ -66,11 +67,7 @@ export function petFrameLabel(row: number, frame: number, version: PetSpriteVers
   if (version === 2 && row === 0 && frame === 6) return "Neutral look";
   if (row < 9) return `Frame ${frame + 1}`;
   const directionIndex = (row - 9) * spriteAtlasColumns + frame;
-  const degrees = directionIndex * lookDirectionStepDegrees;
-  const padded = Number.isInteger(degrees)
-    ? String(degrees).padStart(3, "0")
-    : degrees.toFixed(1).padStart(5, "0");
-  return `${padded}°`;
+  return lookDirectionName(directionIndex);
 }
 export type CursorPreviewStateId = "idle" | "waiting" | "running-left" | "running-right";
 
@@ -95,6 +92,29 @@ export const spriteAtlasRows: Record<PetSpriteVersion, number> = { 1: 9, 2: 11 }
 export const spriteSheetWidth = spriteCellWidth * spriteAtlasColumns;
 export const lookDirectionCount = 16;
 export const lookDirectionStepDegrees = 360 / lookDirectionCount;
+export const lookDirectionNames = [
+  "Up",
+  "Up, slight right",
+  "Up-right",
+  "Right, slight up",
+  "Right",
+  "Right, slight down",
+  "Down-right",
+  "Down, slight right",
+  "Down",
+  "Down, slight left",
+  "Down-left",
+  "Left, slight down",
+  "Left",
+  "Left, slight up",
+  "Up-left",
+  "Up, slight left"
+] as const;
+
+export function lookDirectionName(directionIndex: number) {
+  const normalized = ((Math.round(directionIndex) % lookDirectionCount) + lookDirectionCount) % lookDirectionCount;
+  return lookDirectionNames[normalized];
+}
 
 export function spriteSheetHeight(version: PetSpriteVersion) {
   return spriteCellHeight * spriteAtlasRows[version];
@@ -166,6 +186,11 @@ export const gallerySorts: { id: GallerySort; label: string }[] = [
   { id: "discussed", label: "Discussed" },
   { id: "random", label: "Random" }
 ];
+export const galleryFormatOptions: Array<{ id: GalleryFormat; label: string }> = [
+  { id: "all", label: "All formats" },
+  { id: "v2", label: "V2" },
+  { id: "v1", label: "V1" }
+];
 
 export const defaultGalleryUrlState: GalleryUrlState = {
   query: "",
@@ -174,6 +199,7 @@ export const defaultGalleryUrlState: GalleryUrlState = {
   page: 1,
   view: "standard",
   kind: "all",
+  format: "all",
   content: "safe"
 };
 
@@ -212,6 +238,10 @@ export function isGalleryView(value: string | null): value is GalleryView {
 
 export function isPetKind(value: string | null): value is PetKind {
   return Boolean(value && petKindOptions.some((kind) => kind.id === value));
+}
+
+export function isGalleryFormat(value: string | null): value is GalleryFormat {
+  return Boolean(value && galleryFormatOptions.some((format) => format.id === value));
 }
 
 export function isEditablePetKind(value: string | null | undefined): value is EditablePetKind {

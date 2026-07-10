@@ -1,7 +1,7 @@
 import type { Dispatch, FormEvent, SetStateAction } from "react";
 import { type AdminCollection } from "../admin/AdminPage";
 import { AuthModal, AccountSettingsModal } from "../auth/AuthModals";
-import type { AuthMode, AuthProvider } from "../auth/useAuthForms";
+import type { ApiKeySummary, AuthMode, AuthProvider } from "../auth/useAuthForms";
 import { CollectionPetAdderModal, PetCollectorModal, UserCollectionEditorModal } from "../collections/UserCollectionModals";
 import type { CollectionPetAdderState } from "../collections/useUserCollections";
 import { QuickCommentModal } from "../comments/QuickCommentModal";
@@ -47,7 +47,16 @@ export function AppDialogs({
   settingsAvatarBusy,
   settingsAvatarPets,
   settingsAvatarPetsLoading,
+  apiKeys,
+  apiKeysLoading,
+  apiKeyBusy,
+  newApiKeyName,
+  setNewApiKeyName,
+  newApiKeySecret,
+  apiKeyStatus,
   loadSettingsAvatarPets,
+  createApiKey,
+  revokeApiKey,
   submitSettings,
   submitAvatar,
   deleteAccount,
@@ -64,10 +73,14 @@ export function AppDialogs({
   downloadPet,
   setDownloadPet,
   tagEditorPet,
+  tagEditorDisplayName,
+  tagEditorDescription,
   tagEditorTags,
   tagEditorKind,
   tagEditorStatus,
   tagEditorBusy,
+  setTagEditorDisplayName,
+  setTagEditorDescription,
   setTagEditorKind,
   toggleTagEditorTag,
   submitTagEditor,
@@ -148,7 +161,16 @@ export function AppDialogs({
   settingsAvatarBusy: boolean;
   settingsAvatarPets: Pet[];
   settingsAvatarPetsLoading: boolean;
+  apiKeys: ApiKeySummary[];
+  apiKeysLoading: boolean;
+  apiKeyBusy: string;
+  newApiKeyName: string;
+  setNewApiKeyName: Dispatch<SetStateAction<string>>;
+  newApiKeySecret: string;
+  apiKeyStatus: string;
   loadSettingsAvatarPets: () => void | Promise<void>;
+  createApiKey: (event: FormEvent) => void | Promise<void>;
+  revokeApiKey: (id: string) => void | Promise<void>;
   submitSettings: (event: FormEvent) => void | Promise<void>;
   submitAvatar: (avatar: Blob) => void | Promise<void>;
   deleteAccount: (deletePets: boolean) => void | Promise<void>;
@@ -165,10 +187,14 @@ export function AppDialogs({
   downloadPet: Pet | null;
   setDownloadPet: Dispatch<SetStateAction<Pet | null>>;
   tagEditorPet: Pet | null;
+  tagEditorDisplayName: string;
+  tagEditorDescription: string;
   tagEditorTags: string[];
   tagEditorKind: EditablePetKind;
   tagEditorStatus: string;
   tagEditorBusy: boolean;
+  setTagEditorDisplayName: Dispatch<SetStateAction<string>>;
+  setTagEditorDescription: Dispatch<SetStateAction<string>>;
   setTagEditorKind: Dispatch<SetStateAction<EditablePetKind>>;
   toggleTagEditorTag: (tag: TagName) => void;
   submitTagEditor: (event: FormEvent) => void | Promise<void>;
@@ -256,7 +282,16 @@ export function AppDialogs({
           avatarBusy={settingsAvatarBusy}
           avatarPets={settingsAvatarPets}
           avatarPetsLoading={settingsAvatarPetsLoading}
+          apiKeys={apiKeys}
+          apiKeysLoading={apiKeysLoading}
+          apiKeyBusy={apiKeyBusy}
+          newApiKeyName={newApiKeyName}
+          setNewApiKeyName={setNewApiKeyName}
+          newApiKeySecret={newApiKeySecret}
+          apiKeyStatus={apiKeyStatus}
           onSubmit={submitSettings}
+          onApiKeyCreate={createApiKey}
+          onApiKeyRevoke={revokeApiKey}
           onAvatarSubmit={submitAvatar}
           onReloadAvatarPets={loadSettingsAvatarPets}
           onDeleteAccount={deleteAccount}
@@ -280,10 +315,15 @@ export function AppDialogs({
       {tagEditorPet && (
         <TagEditorModal
           pet={tagEditorPet}
+          displayName={tagEditorDisplayName}
+          description={tagEditorDescription}
           tags={tagEditorTags}
           kind={tagEditorKind}
           status={tagEditorStatus}
           busy={tagEditorBusy}
+          lockedTags={!user?.isAdmin && tagEditorPet.tags.includes("nsfw") ? ["nsfw"] : []}
+          onDisplayName={setTagEditorDisplayName}
+          onDescription={setTagEditorDescription}
           onKind={setTagEditorKind}
           onToggle={toggleTagEditorTag}
           onSubmit={submitTagEditor}

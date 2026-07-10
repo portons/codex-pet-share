@@ -39,6 +39,7 @@ export function AppRoutes({
   activeSort,
   activeView,
   activeKind,
+  activeFormat,
   contentMode,
   deletingPetId,
   shadowbanBusyOwnerId,
@@ -52,6 +53,7 @@ export function AppRoutes({
   selectSort,
   selectView,
   selectKind,
+  selectFormat,
   selectPage,
   randomizeGallery,
   freshPetCount,
@@ -146,6 +148,7 @@ export function AppRoutes({
           activeSort={activeSort}
           activeView={activeView}
           activeKind={activeKind}
+          activeFormat={activeFormat}
           contentMode={contentMode}
           deletingPetId={deletingPetId}
           shadowbanBusyOwnerId={shadowbanBusyOwnerId}
@@ -159,6 +162,7 @@ export function AppRoutes({
           onSort={selectSort}
           onView={selectView}
           onKind={selectKind}
+          onFormat={selectFormat}
           onPage={selectPage}
           onRandomize={randomizeGallery}
           freshPetCount={freshPetCount}

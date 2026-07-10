@@ -4,6 +4,7 @@ import { collectionHash, creatorHash, creatorsHash, navigate, pushHash } from ".
 import type {
   AuthSession,
   ContentMode,
+  GalleryFormat,
   CreatorLeaderboardSort,
   GalleryMeta,
   GallerySort,
@@ -37,6 +38,7 @@ export function useAppNavigationActions({
   activeSort,
   activeView,
   activeKind,
+  activeFormat,
   galleryMeta,
   creatorMeta,
   creatorsMeta,
@@ -73,6 +75,7 @@ export function useAppNavigationActions({
   activeSort: GallerySort;
   activeView: GalleryView;
   activeKind: PetKind;
+  activeFormat: GalleryFormat;
   galleryMeta: GalleryMeta;
   creatorMeta: GalleryMeta;
   creatorsMeta: GalleryMeta;
@@ -97,6 +100,7 @@ export function useAppNavigationActions({
     page: number;
     view: GalleryView;
     kind: PetKind;
+    format: GalleryFormat;
     content: ContentMode;
   }) => void;
   scrollPageTop: () => void;
@@ -113,7 +117,7 @@ export function useAppNavigationActions({
     setContentMode(mode);
     const nextTags = mode === "safe" ? activeTags.filter((tag) => tag !== "nsfw") : activeTags;
     if (route.name === "gallery") {
-      const nextState = { query, tags: nextTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, content: mode };
+      const nextState = { query, tags: nextTags, sort: activeSort, page: 1, view: activeView, kind: activeKind, format: activeFormat, content: mode };
       pushGalleryState(nextState);
       setLoading(true);
       try {

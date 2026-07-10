@@ -115,6 +115,7 @@ export type Route =
 
 export type GallerySort = "new" | "popular" | "views" | "discussed" | "random";
 export type GalleryView = "standard" | "compact";
+export type GalleryFormat = "all" | "v2" | "v1";
 export type PetKind = "all" | "object" | "animal" | "person" | "creature";
 export type EditablePetKind = Exclude<PetKind, "all">;
 export type ContentMode = "safe" | "all";
@@ -213,6 +214,7 @@ export type GalleryUrlState = {
   page: number;
   view: GalleryView;
   kind: PetKind;
+  format: GalleryFormat;
   content: ContentMode;
 };
 

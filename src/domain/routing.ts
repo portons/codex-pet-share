@@ -1,6 +1,7 @@
 import {
   defaultGalleryUrlState,
   isContentMode,
+  isGalleryFormat,
   isGallerySort,
   isGalleryView,
   isPetKind,
@@ -87,6 +88,7 @@ export function galleryUrlStateFromHash(): GalleryUrlState {
   const sort = params.get("sort");
   const view = params.get("view");
   const kind = params.get("kind");
+  const format = params.get("format");
   const content = params.get("content");
   const contentMode = isContentMode(content) ? content : storedContentMode();
   return {
@@ -96,6 +98,7 @@ export function galleryUrlStateFromHash(): GalleryUrlState {
     page: parsePositivePage(params.get("page")),
     view: isGalleryView(view) ? view : defaultGalleryUrlState.view,
     kind: isPetKind(kind) ? kind : defaultGalleryUrlState.kind,
+    format: isGalleryFormat(format) ? format : defaultGalleryUrlState.format,
     content: contentMode
   };
 }
@@ -140,6 +143,9 @@ export function galleryHash(state: Partial<GalleryUrlState> = {}) {
   }
   if (next.kind !== defaultGalleryUrlState.kind) {
     params.set("kind", next.kind);
+  }
+  if (next.format !== defaultGalleryUrlState.format) {
+    params.set("format", next.format);
   }
   if (next.content !== defaultGalleryUrlState.content) {
     params.set("content", next.content);

@@ -107,7 +107,7 @@
 /* Animations */
 @keyframes sprite-play {
   from {
-    background-position: 0 var(--sprite-y);
+    background-position: var(--sprite-x, 0) var(--sprite-y);
   }
   to {
     background-position: var(--sprite-end-x) var(--sprite-y);

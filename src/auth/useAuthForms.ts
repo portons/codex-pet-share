@@ -11,6 +11,13 @@ export type AuthProvider = {
 
 export type AuthMode = "login" | "register" | "forgot" | "reset";
 
+export type ApiKeySummary = {
+  id: string;
+  name: string;
+  createdAt: string;
+  lastUsedAt: string | null;
+};
+
 function validateUsername(value: string) {
   const nextDisplayName = value.trim().replace(/\s+/g, " ");
   if (nextDisplayName.length < 2 || nextDisplayName.length > 32) {
@@ -59,6 +66,12 @@ export function useAuthForms({
   const [settingsAvatarBusy, setSettingsAvatarBusy] = useState(false);
   const [settingsAvatarPets, setSettingsAvatarPets] = useState<Pet[]>([]);
   const [settingsAvatarPetsLoading, setSettingsAvatarPetsLoading] = useState(false);
+  const [apiKeys, setApiKeys] = useState<ApiKeySummary[]>([]);
+  const [apiKeysLoading, setApiKeysLoading] = useState(false);
+  const [apiKeyBusy, setApiKeyBusy] = useState("");
+  const [newApiKeyName, setNewApiKeyName] = useState("Codex uploader");
+  const [newApiKeySecret, setNewApiKeySecret] = useState("");
+  const [apiKeyStatus, setApiKeyStatus] = useState("");
 
   function selectAuthMode(next: AuthMode) {
     setAuthMode(next);
@@ -66,8 +79,9 @@ export function useAuthForms({
     setPassword("");
   }
 
-  function openAuth() {
-    setAuthStatus("");
+  function openAuth(status = "") {
+    setAuthMode("login");
+    setAuthStatus(status);
     setAuthOpen(true);
     void loadAuthProviders();
   }
@@ -93,15 +107,21 @@ export function useAuthForms({
     setSettingsNewPassword("");
     setSettingsStatus("");
     setSettingsAvatarStatus("");
+    setApiKeyStatus("");
+    setNewApiKeySecret("");
+    setNewApiKeyName("Codex uploader");
     setSettingsOpen(true);
     void loadSettingsAvatarPets();
+    void loadApiKeys();
   }
 
   function closeSettings() {
-    if (settingsBusy || settingsAvatarBusy) return;
+    if (settingsBusy || settingsAvatarBusy || apiKeyBusy) return;
     setSettingsOpen(false);
     setSettingsStatus("");
     setSettingsAvatarStatus("");
+    setApiKeyStatus("");
+    setNewApiKeySecret("");
   }
 
   async function loadSettingsAvatarPets() {
@@ -114,6 +134,65 @@ export function useAuthForms({
       setSettingsAvatarStatus(error instanceof Error ? error.message : "Could not load your pets.");
     } finally {
       setSettingsAvatarPetsLoading(false);
+    }
+  }
+
+  async function loadApiKeys() {
+    if (!user || apiKeysLoading) return;
+    setApiKeysLoading(true);
+    setApiKeyStatus("");
+    try {
+      const body = await readJson<{ apiKeys: ApiKeySummary[] }>(await apiFetch("/api/auth/api-keys"));
+      setApiKeys(body.apiKeys);
+    } catch (error) {
+      setApiKeyStatus(error instanceof Error ? error.message : "Could not load API keys.");
+    } finally {
+      setApiKeysLoading(false);
+    }
+  }
+
+  async function createApiKey(event: FormEvent) {
+    event.preventDefault();
+    if (!user || apiKeyBusy) return;
+    const name = newApiKeyName.trim();
+    if (!name) {
+      setApiKeyStatus("API key name is required.");
+      return;
+    }
+    setApiKeyBusy("create");
+    setApiKeyStatus("");
+    setNewApiKeySecret("");
+    try {
+      const body = await readJson<{ apiKey: ApiKeySummary & { key: string } }>(
+        await apiFetch("/api/auth/api-keys", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        })
+      );
+      setApiKeys((current) => [body.apiKey, ...current]);
+      setNewApiKeySecret(body.apiKey.key);
+      setNewApiKeyName("Codex uploader");
+      setApiKeyStatus("API key created. Copy it now; it will not be shown again.");
+    } catch (error) {
+      setApiKeyStatus(error instanceof Error ? error.message : "Could not create API key.");
+    } finally {
+      setApiKeyBusy("");
+    }
+  }
+
+  async function revokeApiKey(id: string) {
+    if (!user || apiKeyBusy) return;
+    setApiKeyBusy(id);
+    setApiKeyStatus("");
+    try {
+      await readJson<{ ok: true }>(await apiFetch(`/api/auth/api-keys/${id}`, { method: "DELETE" }));
+      setApiKeys((current) => current.filter((key) => key.id !== id));
+      setApiKeyStatus("API key revoked.");
+    } catch (error) {
+      setApiKeyStatus(error instanceof Error ? error.message : "Could not revoke API key.");
+    } finally {
+      setApiKeyBusy("");
     }
   }
 
@@ -415,7 +494,17 @@ export function useAuthForms({
     settingsAvatarBusy,
     settingsAvatarPets,
     settingsAvatarPetsLoading,
+    apiKeys,
+    apiKeysLoading,
+    apiKeyBusy,
+    newApiKeyName,
+    setNewApiKeyName,
+    newApiKeySecret,
+    apiKeyStatus,
     loadSettingsAvatarPets,
+    loadApiKeys,
+    createApiKey,
+    revokeApiKey,
     submitSettings,
     submitAvatar,
     deleteAccount,
