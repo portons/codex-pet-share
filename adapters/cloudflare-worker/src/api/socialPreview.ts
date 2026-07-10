@@ -4,16 +4,16 @@ import { listPets } from "./pets";
 import { first } from "../core/db";
 import { HttpError, html } from "../core/http";
 import { getAssetBytes, petAssetKey } from "../storage/assets";
-import type { AppContext, CollectionRow, PetRow, PublicUser } from "../core/types";
+import type { AppContext, CollectionRow, PetRow, PetSpriteVersion, PublicUser } from "../core/types";
 
 const cardWidth = 1200;
 const cardHeight = 630;
 const previewFrameWidth = 96;
 const previewFrameHeight = 104;
-const previewStripWidth = 5472;
+const previewStripWidths: Record<PetSpriteVersion, number> = { 1: 5472, 2: 7008 };
 const previewStripHeight = 104;
 const maxPets = 8;
-const rendererVersion = "2";
+const rendererVersion = "3";
 
 type CollectionOwner = {
   handle: string;
@@ -25,6 +25,7 @@ type SocialPet = {
   id: string;
   displayName: string;
   shareImageUrl: string;
+  spriteVersionNumber: PetSpriteVersion;
 };
 
 export async function handleCollectionSocialImage(ctx: AppContext, slug?: string) {
@@ -249,11 +250,23 @@ async function petSpriteLayers(ctx: AppContext, pets: Array<{ id: string }>) {
     const x = startX + col * (tileWidth + layout.gap);
     const y = layout.top + row * (tileHeight + layout.gap);
     const url = `data:image/webp;base64,${bytesToBase64(await getAssetBytes(ctx, `${pet.id}/preview.webp`))}`;
+    const previewStripWidth = socialPetSpriteVersion(pet) === 2 ? previewStripWidths[2] : previewStripWidths[1];
     return `<svg x="${x}" y="${y}" width="${tileWidth}" height="${tileHeight}" viewBox="0 0 ${previewFrameWidth} ${previewFrameHeight}" overflow="hidden">
       <image href="${escapeXml(url)}" x="0" y="0" width="${previewStripWidth}" height="${previewStripHeight}" image-rendering="pixelated"/>
     </svg>`;
   }));
   return layers.join("\n    ");
+}
+
+function socialPetSpriteVersion(pet: { id: string; spriteVersionNumber?: PetSpriteVersion; validation_report_json?: string | null }): PetSpriteVersion {
+  if (pet.spriteVersionNumber === 2) return 2;
+  if (!pet.validation_report_json) return 1;
+  try {
+    const report = JSON.parse(pet.validation_report_json) as { atlasSize?: unknown; spriteVersionNumber?: unknown };
+    return report.spriteVersionNumber === 2 || report.atlasSize === "1536x2288" ? 2 : 1;
+  } catch {
+    return 1;
+  }
 }
 
 function emptyPetLayer() {

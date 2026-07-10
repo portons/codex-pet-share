@@ -1,0 +1,8 @@
+{
+  "id": "debug-duck-v2",
+  "displayName": "Debug Duck v2",
+  "description": "A squishy yellow rubber duck programmer for debugging sessions, upgraded with 16 clockwise look-direction animations.",
+  "spritesheetPath": "spritesheet.webp",
+  "spriteVersionNumber": 2,
+  "kind": "animal"
+}

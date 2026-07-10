@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { bytesToArrayBuffer, downloadBlob, encodePetStateGif, loadPetSpritesheet } from "../downloads/gifExport";
-import { petStates, type PetState } from "../domain/config";
+import { petAnimationRows, type PetAnimationRow } from "../domain/config";
 import { loadFflate } from "../domain/lazyCodecs";
 import type { Pet } from "../domain/types";
 
-export function usePetGifExport(pet: Pet, activeState: PetState) {
+export function usePetGifExport(pet: Pet, activeState: PetAnimationRow) {
   const [gifExportBusy, setGifExportBusy] = useState("");
   const [gifExportStatus, setGifExportStatus] = useState("");
 
-  async function exportStateGif(state: PetState, busyId: string) {
+  async function exportStateGif(state: PetAnimationRow, busyId: string) {
     if (gifExportBusy) return;
     setGifExportBusy(busyId);
     setGifExportStatus("");
@@ -39,7 +39,7 @@ export function usePetGifExport(pet: Pet, activeState: PetState) {
     try {
       const spritesheet = await loadPetSpritesheet(pet);
       const files: Record<string, Uint8Array> = {};
-      for (const state of petStates) {
+      for (const state of petAnimationRows(pet.spriteVersionNumber)) {
         const gif = await encodePetStateGif(spritesheet, state);
         files[`${pet.id}-${state.id}.gif`] = new Uint8Array(await gif.arrayBuffer());
       }

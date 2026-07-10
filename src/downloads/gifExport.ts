@@ -2,7 +2,7 @@ import {
   gifAlphaThreshold,
   spriteCellHeight,
   spriteCellWidth,
-  type PetState
+  type PetAnimationRow
 } from "../domain/config";
 import { apiUrl } from "../domain/http";
 import { loadGifenc } from "../domain/lazyCodecs";
@@ -66,7 +66,7 @@ function snapAlphaToBinary(data: Uint8ClampedArray, threshold: number) {
   }
 }
 
-export async function encodePetStateGif(spritesheet: HTMLImageElement, state: PetState) {
+export async function encodePetStateGif(spritesheet: HTMLImageElement, state: PetAnimationRow) {
   const { applyPalette, GIFEncoder, quantize } = await loadGifenc();
   const canvas = document.createElement("canvas");
   canvas.width = spriteCellWidth;

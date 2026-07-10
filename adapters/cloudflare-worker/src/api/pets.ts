@@ -1,7 +1,7 @@
 import { currentUser, requireUser } from "./auth";
 import { auditAdminAction } from "./adminAudit";
 import { allowedTags, slugPattern } from "./constants";
-import { parseJson, parsePetKind, validateManifest, validatePosterImage, validatePreviewImage, validateShareImage, validateSpritesheet, validationFromBytes } from "./validation";
+import { parseJson, parsePetKind, spriteVersionFromReport, validateManifest, validatePosterImage, validatePreviewImage, validateShareImage, validateSpritesheet, validationFromBytes, type Manifest } from "./validation";
 import { all, first, nowIso, tags, validationReport } from "../core/db";
 import { HttpError, json } from "../core/http";
 import { createZip } from "../core/zip";
@@ -91,11 +91,13 @@ export async function listPets(ctx: AppContext, query = "", ownerId?: string, fi
 
 export function serializePet(ctx: AppContext, row: PetRow, report?: ValidationReport, likeContext?: Set<string>, viewer?: Viewer) {
   const version = String(Date.parse(row.updated_at || row.created_at));
+  const currentReport = report || validationReport(row) || undefined;
   return {
     id: row.id,
     displayName: row.display_name,
     description: row.description,
     spritesheetPath: row.spritesheet_path,
+    spriteVersionNumber: spriteVersionFromReport(currentReport),
     kind: row.kind,
     ownerId: row.owner_id,
     ownerHandle: row.owner_handle || null,
@@ -114,7 +116,7 @@ export function serializePet(ctx: AppContext, row: PetRow, report?: ValidationRe
     previewUrl: petAssetUrl(ctx, `${row.id}/preview.webp`, version),
     shareImageUrl: petAssetUrl(ctx, `${row.id}/share.png`, version),
     downloadUrl: `/api/pets/${row.id}/download?v=${version}`,
-    validationReport: report || validationReport(row) || undefined
+    validationReport: currentReport
   };
 }
 
@@ -137,13 +139,14 @@ async function uploadPet(ctx: AppContext, user: AuthUser) {
   const kind = form.kind ? parsePetKind(form.kind) : manifest.kind;
   if (!kind) throw new HttpError("pet kind is required", 400);
   if (await getPet(ctx, manifest.id)) return json({ error: "pet id already exists" }, 409);
-  validateSpritesheet(spritesheetFile.bytes); validateShareImage(shareImageFile.bytes); validatePreviewImage(previewImageFile.bytes); validatePosterImage(posterImageFile.bytes);
+  const spriteVersionNumber = validateSpritesheet(spritesheetFile.bytes, manifest.spriteVersionNumber || 1);
+  validateShareImage(shareImageFile.bytes); validatePreviewImage(previewImageFile.bytes, spriteVersionNumber); validatePosterImage(posterImageFile.bytes);
   await putAsset(ctx, `${manifest.id}/pet.json`, new TextEncoder().encode(JSON.stringify(manifest, null, 2) + "\n"), "application/json");
   await putAsset(ctx, `${manifest.id}/spritesheet.webp`, spritesheetFile.bytes, "image/webp");
   await putAsset(ctx, `${manifest.id}/share.png`, shareImageFile.bytes, "image/png");
   await putAsset(ctx, `${manifest.id}/preview.webp`, previewImageFile.bytes, "image/webp");
   await putAsset(ctx, `${manifest.id}/poster.webp`, posterImageFile.bytes, "image/webp");
-  const report = validationFromBytes(manifest, spritesheetFile.bytes);
+  const report = validationFromBytes(manifest, spritesheetFile.bytes, spriteVersionNumber);
   await upsertPetRow(ctx, {
     id: manifest.id, displayName: manifest.displayName, description: manifest.description, spritesheetPath: manifest.spritesheetPath,
     kind, ownerId: user.id, source: "upload", tags: parseTags(form.tags), validationReport: report
@@ -200,14 +203,18 @@ async function updatePetSpritesheet(ctx: AppContext, petId: string, user: AuthUs
   const shareImageFile = requireFile(form, "shareImage");
   const previewImageFile = requireFile(form, "previewImage");
   const posterImageFile = requireFile(form, "posterImage");
-  validateSpritesheet(spritesheetFile.bytes); validateShareImage(shareImageFile.bytes); validatePreviewImage(previewImageFile.bytes); validatePosterImage(posterImageFile.bytes);
-  const report = validationFromBytes({
+  const spriteVersionNumber = validateSpritesheet(spritesheetFile.bytes);
+  validateShareImage(shareImageFile.bytes); validatePreviewImage(previewImageFile.bytes, spriteVersionNumber); validatePosterImage(posterImageFile.bytes);
+  const manifest: Manifest = {
     id: pet.id,
     displayName: pet.display_name,
     description: pet.description,
     spritesheetPath: "spritesheet.webp",
+    ...(spriteVersionNumber === 2 ? { spriteVersionNumber: 2 as const } : {}),
     kind: pet.kind
-  }, spritesheetFile.bytes);
+  };
+  const report = validationFromBytes(manifest, spritesheetFile.bytes, spriteVersionNumber);
+  await putAsset(ctx, `${pet.id}/pet.json`, new TextEncoder().encode(JSON.stringify(manifest, null, 2) + "\n"), "application/json");
   await putAsset(ctx, `${pet.id}/spritesheet.webp`, spritesheetFile.bytes, "image/webp");
   await putAsset(ctx, `${pet.id}/share.png`, shareImageFile.bytes, "image/png");
   await putAsset(ctx, `${pet.id}/preview.webp`, previewImageFile.bytes, "image/webp");
@@ -274,7 +281,9 @@ async function resolveValidationReport(ctx: AppContext, pet: PetRow) {
   const cached = validationReport(pet);
   if (cached) return cached;
   const manifest = validateManifest(JSON.parse(new TextDecoder().decode(await getAssetBytes(ctx, `${pet.id}/pet.json`))));
-  const report = validationFromBytes(manifest, await getAssetBytes(ctx, `${pet.id}/spritesheet.webp`));
+  const spritesheet = await getAssetBytes(ctx, `${pet.id}/spritesheet.webp`);
+  const spriteVersionNumber = validateSpritesheet(spritesheet, manifest.spriteVersionNumber || 1);
+  const report = validationFromBytes(manifest, spritesheet, spriteVersionNumber);
   await ctx.env.DB.prepare("update pets set validation_report_json = ? where id = ?").bind(JSON.stringify(report), pet.id).run();
   return report;
 }

@@ -2,8 +2,9 @@ import { parseJsonArray } from "./core/db";
 import { html, json } from "./core/http";
 import type { AppContext } from "./core/types";
 
-const previewFrameCount = 57;
 const previewFrameWidth = 96;
+const v1PreviewFrameCount = 57;
+const v2PreviewFrameCount = 73;
 
 type MaintenancePet = {
   id: string;
@@ -11,6 +12,7 @@ type MaintenancePet = {
   created_at: string;
   updated_at: string;
   tags_json: string;
+  validation_report_json: string | null;
   owner_shadowbanned_at: string | null;
 };
 
@@ -63,10 +65,10 @@ export async function maintenanceResponse(ctx: AppContext, parts: string[]) {
     .pet { position: absolute; left: var(--left); top: var(--top); width: 96px; height: 104px; touch-action: none; cursor: grab; user-select: none; animation: roam var(--speed) ease-in-out infinite alternate; animation-delay: var(--delay); }
     .pet.dragging { cursor: grabbing; animation: none; z-index: 10; }
     .bob { position: relative; width: 100%; height: 100%; animation: bob 1.8s ease-in-out infinite; animation-delay: var(--delay); }
-    .previewStrip { width: 96px; height: 104px; background-repeat: no-repeat; background-position: 0 0; background-size: auto 104px; image-rendering: pixelated; animation: preview-strip-play ${Math.max(previewFrameCount * 300, 2000)}ms steps(${previewFrameCount}) infinite; will-change: background-position; filter: drop-shadow(0 12px 18px rgba(0,0,0,.28)); }
+    .previewStrip { width: 96px; height: 104px; background-repeat: no-repeat; background-position: 0 0; background-size: auto 104px; image-rendering: pixelated; animation: preview-strip-play var(--preview-duration) steps(var(--preview-frames)) infinite; will-change: background-position; filter: drop-shadow(0 12px 18px rgba(0,0,0,.28)); }
     @keyframes roam { from { translate: 0 0; } to { translate: var(--dx) var(--dy); } }
     @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
-    @keyframes preview-strip-play { from { background-position: 0 0; } to { background-position: -${previewFrameCount * previewFrameWidth}px 0; } }
+    @keyframes preview-strip-play { from { background-position: 0 0; } to { background-position: var(--preview-end-x) 0; } }
     @media (max-width: 640px) {
       .pet { width: 72px; height: 78px; }
       .previewStrip { transform: scale(.75); transform-origin: top left; }
@@ -118,6 +120,7 @@ async function maintenancePets(ctx: AppContext) {
       p.created_at,
       p.updated_at,
       p.tags_json,
+      p.validation_report_json,
       u.shadowbanned_at as owner_shadowbanned_at
     from pets p
     left join users u on u.id = p.owner_id
@@ -135,8 +138,21 @@ function renderPets(pets: MaintenancePet[]) {
     const slot = petSlots[index];
     const version = String(Date.parse(pet.updated_at || pet.created_at));
     const url = `/assets/pets/${encodeURIComponent(pet.id)}/preview.webp?v=${encodeURIComponent(version)}`;
-    return `<div class="pet ${slot.className}" style="--left: ${slot.left}; --top: ${slot.top}; --speed: ${slot.speed}; --delay: ${slot.delay}; --dx: ${slot.dx}; --dy: ${slot.dy};"><div class="bob"><div class="previewStrip" style="background-image: url('${url}')"></div></div></div>`;
+    const previewFrames = maintenancePreviewFrameCount(pet);
+    const previewDuration = Math.max(previewFrames * 300, 2000);
+    return `<div class="pet ${slot.className}" style="--left: ${slot.left}; --top: ${slot.top}; --speed: ${slot.speed}; --delay: ${slot.delay}; --dx: ${slot.dx}; --dy: ${slot.dy};"><div class="bob"><div class="previewStrip" style="background-image: url('${url}'); --preview-frames: ${previewFrames}; --preview-duration: ${previewDuration}ms; --preview-end-x: -${previewFrames * previewFrameWidth}px"></div></div></div>`;
   }).join("");
+}
+
+function maintenancePreviewFrameCount(pet: MaintenancePet) {
+  try {
+    const report = JSON.parse(pet.validation_report_json || "null") as { atlasSize?: unknown; spriteVersionNumber?: unknown } | null;
+    return report?.spriteVersionNumber === 2 || report?.atlasSize === "1536x2288"
+      ? v2PreviewFrameCount
+      : v1PreviewFrameCount;
+  } catch {
+    return v1PreviewFrameCount;
+  }
 }
 
 function escapeHtml(value: string) {

@@ -56,6 +56,15 @@ The frontend expects an API under `VITE_APP_API_BASE_URL` with these groups:
 - `POST /api/rooms`, `GET /api/rooms/:id`, `POST /api/rooms/:id/close`
 - admin routes under `/api/admin/*`
 
+Pet responses include `spriteVersionNumber` (`1` or `2`). V1 packages use a
+`1536x1872` WebP atlas and may omit the manifest field. V2 packages use a
+`1536x2288` WebP atlas and must set `spriteVersionNumber: 2`; rows 9-10 contain
+16 clockwise look directions in 22.5-degree steps, while row 0 / column 6 is
+the dedicated neutral look cell. Providers should validate
+the manifest marker and atlas height together while continuing to serve v1.
+Generated `preview.webp` is `5472x104` for v1 and `7008x104` for v2; generated
+`poster.webp` remains `192x208` for both.
+
 Responses should match the TypeScript types in `src/domain/types.ts`. Collection
 detail responses include the same pagination metadata shape as gallery
 responses. Gallery sort values are `new`, `popular`, `views`, `discussed`,

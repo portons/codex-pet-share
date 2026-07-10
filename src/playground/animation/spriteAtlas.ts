@@ -46,6 +46,7 @@ export function applyAtlasFrame(
 ) {
   const columns = opts?.columns ?? ATLAS_COLS;
   const rows = opts?.rows ?? ATLAS_ROWS;
+  texture.repeat.y = 1 / rows;
   if (opts?.flipX) {
     texture.repeat.x = -1 / columns;
     texture.offset.x = (frameIdx + 1) / columns;
@@ -60,7 +61,8 @@ export function applyPetSpriteVisuals(
   sprite: THREE.Sprite,
   material: THREE.SpriteMaterial,
   texture: THREE.Texture,
-  frame: PetSpriteAnimationFrame
+  frame: PetSpriteAnimationFrame,
+  atlasRows = ATLAS_ROWS
 ) {
   sprite.position.y = frame.spriteY;
   sprite.scale.set(SPRITE_WIDTH * frame.scaleModX, SPRITE_HEIGHT * frame.scaleModY, 1);
@@ -70,7 +72,7 @@ export function applyPetSpriteVisuals(
   } else if (!material.color.equals(whiteColor)) {
     material.color.copy(whiteColor);
   }
-  applyAtlasFrame(texture, frame.def.row, frame.frameIdx, { flipX: frame.facingFlip === -1 });
+  applyAtlasFrame(texture, frame.def.row, frame.frameIdx, { rows: atlasRows, flipX: frame.facingFlip === -1 });
 }
 
 export function remotePetFrame(row: number, broadcastFrame: number, rowStart: number, sprinting: boolean, now: number) {

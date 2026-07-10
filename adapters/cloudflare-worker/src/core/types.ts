@@ -55,6 +55,7 @@ export type PublicUser = {
 };
 
 export type PetKind = "object" | "animal" | "person" | "creature";
+export type PetSpriteVersion = 1 | 2;
 export type PetSort = "new" | "popular" | "views" | "discussed" | "random";
 export type ContentMode = "safe" | "all";
 
@@ -65,6 +66,7 @@ export type ValidationReport = {
   statesDetected: number;
   manifestBytes: number;
   spritesheetBytes: number;
+  spriteVersionNumber?: PetSpriteVersion;
 };
 
 export type PetRow = {

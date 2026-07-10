@@ -1,7 +1,7 @@
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import { DownloadCommandRow, type DownloadCommandMode } from "../downloads/DownloadCommandRow";
 import { trackEvent } from "../domain/analytics";
-import { petStates, type TagName } from "../domain/config";
+import { petAnimationRows, type TagName } from "../domain/config";
 import { isNsfwPet, petCodexInstallUrl, petImportCommand } from "../domain/pets";
 import type { ContentMode, GalleryMeta, Pet, PetComment, User } from "../domain/types";
 import { copyText } from "../ui/clipboard";
@@ -84,17 +84,24 @@ export function PetDetail({
   onReactToComment: (comment: PetComment, reaction: string) => void | Promise<void>;
   onLoadMoreComments: () => void | Promise<void>;
 }) {
-  const [activeStateId, setActiveStateId] = useState<(typeof petStates)[number]["id"]>("idle");
+  const [activeStateId, setActiveStateId] = useState("idle");
   const [cursorPreview, setCursorPreview] = useState(false);
   const [copiedDownloadCommand, setCopiedDownloadCommand] = useState(false);
   const [downloadCommandMode, setDownloadCommandMode] = useState<DownloadCommandMode>("cli");
   const canCursorPreview = useCursorPreviewSupport();
   const cursorPreviewEnabled = cursorPreview && canCursorPreview;
   const cursorPreviewReady = useCursorPreviewAssets(pet, cursorPreviewEnabled);
-  const { cursorPoint, cursorStateId, cursorRotationDeg } = useCursorPreviewMotion(cursorPreviewEnabled);
+  const { cursorPoint, cursorStateId, cursorRotationDeg, cursorLookDirectionIndex } = useCursorPreviewMotion(
+    cursorPreviewEnabled,
+    pet.spriteVersionNumber === 2
+  );
+  const animationRows = useMemo(
+    () => petAnimationRows(pet.spriteVersionNumber),
+    [pet.spriteVersionNumber]
+  );
   const activeState = useMemo(
-    () => petStates.find((state) => state.id === activeStateId) || petStates[0],
-    [activeStateId]
+    () => animationRows.find((state) => state.id === activeStateId) || animationRows[0],
+    [activeStateId, animationRows]
   );
   const { gifExportBusy, gifExportStatus, exportStateGif, exportCurrentStateGif, exportAllStateGifs } = usePetGifExport(pet, activeState);
 
@@ -165,6 +172,9 @@ export function PetDetail({
             <span className="detailSpecimenItem">id / <strong>{specimenId}</strong></span>
             <span className="detailSpecimenSep" aria-hidden="true">·</span>
             <span className="detailSpecimenItem">by <OwnerLabel pet={pet} className="detailSpecimenOwner" /></span>
+            <span className={`petFormatPill ${pet.spriteVersionNumber === 2 ? "v2" : "v1"}`}>
+              {pet.spriteVersionNumber === 2 ? "v2 · new · 16 look directions" : "v1 · legacy · supported"}
+            </span>
             {isNsfwPet(pet) ? <span className="detailNsfwPill">NSFW</span> : null}
           </p>
           <h1 className="detailTitle">{pet.displayName}</h1>
@@ -189,7 +199,9 @@ export function PetDetail({
               onClick={() => setCursorPreview(!cursorPreview)}
             >
               <span className="detailWalkButtonGlyph" aria-hidden="true">{cursorPreview ? "✓" : "→"}</span>
-              {cursorPreview ? "Walking with you" : "Take it for a walk"}
+              {pet.spriteVersionNumber === 2
+                ? cursorPreview ? "Looking with you" : "Try its 16 look directions"
+                : cursorPreview ? "Walking with you" : "Take this supported v1 pet for a walk"}
             </button>
           ) : null}
         </div>
@@ -297,7 +309,9 @@ export function PetDetail({
 
       <article className="detailStates" aria-label="Animation states">
         <header className="detailSectionHeader">
-          <span className="detailSectionLabel">Animation states</span>
+          <span className="detailSectionLabel">
+            {pet.spriteVersionNumber === 2 ? "Animation states + look directions" : "Animation states"}
+          </span>
           <div className="detailStatesActions">
             <button
               className="btn btnSm"
@@ -342,7 +356,7 @@ export function PetDetail({
           </div>
         ) : null}
         <div className="detailStatesGrid">
-          {petStates.map((state) => (
+          {animationRows.map((state) => (
             <div
               className={`detailStateTile ${state.id === activeState.id ? "active" : ""}`}
               key={state.id}
@@ -467,7 +481,7 @@ export function PetDetail({
           aria-hidden="true"
         >
           {cursorPreviewReady ? (
-            <CursorPetPreview pet={pet} stateId={cursorStateId} />
+            <CursorPetPreview pet={pet} stateId={cursorStateId} lookDirectionIndex={cursorLookDirectionIndex} />
           ) : (
             <div className="cursorPetLoader">
               <Spinner size={14} />

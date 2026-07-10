@@ -273,9 +273,11 @@ export function PetCard({
               className={`petCardQuickAction ${previewActive ? "activeSoft" : ""}`}
               type="button"
               aria-pressed={previewActive}
-              aria-label="Preview on cursor"
-              title="Preview on cursor"
-              data-tooltip={previewActive ? "Stop cursor preview" : "Preview on cursor"}
+              aria-label={pet.spriteVersionNumber === 2 ? "Preview 16 look directions on cursor" : "Preview on cursor"}
+              title={pet.spriteVersionNumber === 2 ? "V2 cursor preview · 16 look directions" : "V1 cursor preview"}
+              data-tooltip={previewActive
+                ? "Stop cursor preview"
+                : pet.spriteVersionNumber === 2 ? "Try 16-direction v2 looks" : "Preview supported v1 pet"}
               onClick={() => {
                 trackCardAction("card_cursor_preview_click");
                 onPreview(pet);
@@ -348,6 +350,9 @@ export function PetCard({
               onPointerDown={stopCardPropagation}
             >
               by <OwnerLabel pet={pet} />
+              <span className={`petFormatPill ${pet.spriteVersionNumber === 2 ? "v2" : "v1"}`}>
+                {pet.spriteVersionNumber === 2 ? "v2 · new · looks" : "v1 · legacy"}
+              </span>
             </div>
           </div>
           {!compact && <PetStats pet={pet} />}

@@ -28,7 +28,8 @@ The checked-in Cloudflare adapter uses:
 
 - Worker Assets for `dist/`
 - D1 for users, sessions, pets, likes, collections, and room metadata
-- R2 for `pet.json`, `spritesheet.webp`, `share.png`, and `preview.webp`
+- R2 for `pet.json`, `spritesheet.webp`, `share.png`, `preview.webp`, and
+  `poster.webp`
 - Durable Objects for authenticated room presence and broadcasts
 - Wrangler secrets for `AUTH_SECRET` and `PET_STATS_SALT`
 
@@ -47,6 +48,7 @@ The manifest schema is:
   "displayName": "Pet Name",
   "description": "Short description.",
   "spritesheetPath": "spritesheet.webp",
+  "spriteVersionNumber": 2,
   "kind": "object"
 }
 ```
@@ -54,14 +56,20 @@ The manifest schema is:
 `kind` must be one of `object`, `animal`, `person`, or `creature`. The frontend
 normalizes the manifest id into a lowercase hyphen slug before upload. The
 backend enforces a nonempty slug, `displayName` up to 80 chars, `description` up
-to 280 chars, and `spritesheetPath: "spritesheet.webp"`.
+to 280 chars, and `spritesheetPath: "spritesheet.webp"`. The
+`spriteVersionNumber` field is omitted for v1 and must be exactly `2` for v2.
 
 Spritesheet contract:
 
-- Atlas size: `1536x1872`
-- Grid: 8 columns x 9 rows
+- V1 atlas: `1536x1872`, 8 columns x 9 rows, no manifest version field
+- V2 atlas: `1536x2288`, 8 columns x 11 rows, `spriteVersionNumber: 2`
 - Cell size: `192x208`
 - File type: WebP
+
+V2 preserves rows 0-8, uses row 0 / column 6 as the dedicated neutral look
+cell, and adds rows 9-10 for 16 clockwise look directions in 22.5-degree steps.
+A provider must reject a v2-height sheet without the marker and a v1-height
+sheet with the marker.
 
 Upload flow:
 
@@ -71,12 +79,13 @@ Upload flow:
    normalized id, atlas size, and cell size before submit.
 3. `src/uploads/uploadAssets.ts` generates:
    - `share.png`: 1200x630 PNG for social cards
-   - `preview.webp`: 5472x104 WebP preview strip, one 96x104 frame for every
-     frame in every animation state
+   - `preview.webp`: one 96x104 frame for every supported cell; `5472x104` for
+     v1 and `7008x104` for v2
+   - `poster.webp`: 192x208 WebP from the first idle cell
 4. `src/uploads/useUploadWorkflow.ts` posts multipart form fields
-   `manifest`, `spritesheet`, `shareImage`, `previewImage`, `kind`, and `tags`
-   to `POST /api/pets`.
-5. The backend validates all files, stores the four assets, records a validation
+   `manifest`, `spritesheet`, `shareImage`, `previewImage`, `posterImage`,
+   `kind`, and `tags` to `POST /api/pets`.
+5. The backend validates all files, stores the five assets, records a validation
    report, refreshes app data, and navigates to the new pet detail route.
 
 The download package endpoint returns only `pet.json` and `spritesheet.webp` in
@@ -95,14 +104,17 @@ There are three preview layers:
 Cursor preview is separate:
 
 - Enabled only on hover/fine-pointer devices.
-- Preloads both `previewUrl` and `spritesheetUrl`.
-- Uses `idle`, `waiting`, `running-left`, and `running-right`.
+- Preloads `spritesheetUrl`.
+- V1 uses `idle`, `waiting`, `running-left`, and `running-right`.
+- V2 maps pointer motion to the 16 cells in rows 9-10 and falls back to idle in
+  the pointer deadzone.
 - Clamps to viewport edges and tilts based on horizontal pointer speed.
 
 GIF export is generated on demand from the canonical API spritesheet route:
 
 - `GET /api/pets/:id/spritesheet`
-- `gifenc` encodes one selected animation state.
+- `gifenc` encodes one selected animation row. V2 "all GIFs" exports the two
+  look-direction rows alongside the original nine states.
 - Output uses source cell size `192x208`.
 - Alpha below `gifAlphaThreshold` (`200`) is snapped transparent.
 
@@ -123,6 +135,14 @@ state rows.
 | `waiting` | 6 | 6 | 4 | yes |
 | `running` | 7 | 6 | 12 | yes |
 | `review` | 8 | 6 | 6 | yes |
+| `look-000-157` (v2) | 9 | 8 | n/a | preview/export |
+| `look-180-337` (v2) | 10 | 8 | n/a | preview/export |
+
+The sprite editor and avatar frame picker derive their rows and atlas height
+from `spriteVersionNumber`; v2 exposes labeled look cells while v1 remains
+limited to the original nine rows. Playground players, swapped pets, local
+NPCs, and remote NPCs derive UV row count from the loaded image height so v1
+and v2 can coexist in the same room.
 
 Animation responsibilities:
 

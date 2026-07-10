@@ -57,7 +57,7 @@ These weren't worth env-var-izing for the typical fork. If you want to change th
 | Color palette (warm cream, rust accent) | `src/app/styles.css` `:root` block | Edit the CSS variables (`--accent`, `--surface`, etc.) |
 | Hero copy / about text | `src/app/App.tsx` | Search for the long-form copy and edit. |
 | Email templates | Auth provider settings, not source | Edit per-project in Auth settings. |
-| Spritesheet aspect ratio (1536×1872, 8 frames × 9 states) | `src/playground/animation/*`, `src/playground/core/config.ts`, and the backend adapter validator | Major refactor — both the renderer and the manifest validator need to agree. Out of scope for a typical rebrand. |
+| Spritesheet contract (v1 1536×1872 or v2 1536×2288) | `src/domain/config.ts`, `src/playground/*`, upload/editor surfaces, and the backend adapter validator | Both formats are part of the public contract. A new format must update validation, previews, GIF export, editing, and playground UV math together. |
 
 ## Existing share-image PNGs in storage
 

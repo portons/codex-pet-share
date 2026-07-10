@@ -13,6 +13,11 @@ export const SPRITE_CELL_W = 192;
 export const SPRITE_CELL_H = 208;
 export const ATLAS_COLS = 8;
 export const ATLAS_ROWS = 9;
+export const V2_ATLAS_ROWS = 11;
+
+export function petAtlasRowsFromHeight(height: number) {
+  return Math.round(height / SPRITE_CELL_H) === V2_ATLAS_ROWS ? V2_ATLAS_ROWS : ATLAS_ROWS;
+}
 
 export type StateId =
   | "idle"

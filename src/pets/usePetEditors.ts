@@ -169,11 +169,12 @@ export function usePetEditors({
         displayName: pet.displayName,
         description: pet.description,
         spritesheetPath: pet.spritesheetPath,
+        ...(pet.spriteVersionNumber === 2 ? { spriteVersionNumber: 2 as const } : {}),
         kind: pet.kind
       };
       const [shareImage, previewImage, posterImage] = await Promise.all([
         generateShareImage(manifest, spritesheet),
-        generatePreviewImage(spritesheet),
+        generatePreviewImage(spritesheet, pet.spriteVersionNumber),
         generatePosterImage(spritesheet)
       ]);
       const form = new FormData();

@@ -9,6 +9,7 @@ export type RemotePet = {
   mat: THREE.SpriteMaterial;
   tex: THREE.Texture;
   imgReady: boolean;
+  atlasRows: number;
   loadingOrb: THREE.Sprite | null;
   targetX: number;
   targetY: number;
@@ -37,6 +38,7 @@ export type RemoteNpc = {
   mat: THREE.SpriteMaterial;
   tex: THREE.Texture;
   imgReady: boolean;
+  atlasRows: number;
   loadingOrb: THREE.Sprite | null;
   targetX: number;
   targetY: number;

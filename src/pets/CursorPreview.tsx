@@ -8,6 +8,8 @@ import {
   cursorPreviewTiltSpeedFactor,
   cursorPreviewWidth,
   cursorWaitingDelayMs,
+  lookDirectionCell,
+  lookDirectionStepDegrees,
   petStates,
   type CursorPreviewStateId
 } from "../domain/config";
@@ -16,11 +18,27 @@ import { PetSprite } from "./PetPreview";
 
 export function CursorPetPreview({
   pet,
-  stateId
+  stateId,
+  lookDirectionIndex
 }: {
   pet: Pet;
   stateId: CursorPreviewStateId;
+  lookDirectionIndex?: number | null;
 }) {
+  if (pet.spriteVersionNumber === 2 && lookDirectionIndex !== null && lookDirectionIndex !== undefined) {
+    const lookCell = lookDirectionCell(lookDirectionIndex);
+    return (
+      <PetSprite
+        pet={pet}
+        row={lookCell.row}
+        frames={1}
+        staticFrame={lookCell.frame}
+        label={`${lookDirectionIndex * lookDirectionStepDegrees} degree look`}
+        size="small"
+        transparent
+      />
+    );
+  }
   const state = petStates.find((petState) => petState.id === stateId) || petStates[0];
   return (
     <PetSprite
@@ -109,12 +127,14 @@ export function useCursorPreviewAssets(pet: Pet | null, enabled: boolean) {
   return ready;
 }
 
-export function useCursorPreviewMotion(enabled: boolean) {
+export function useCursorPreviewMotion(enabled: boolean, useLookDirections = false) {
   const [cursorPoint, setCursorPoint] = useState<{ x: number; y: number } | null>(null);
   const [stateId, setStateId] = useState<CursorPreviewStateId>("idle");
   const [rotationDeg, setRotationDeg] = useState(0);
+  const [lookDirectionIndex, setLookDirectionIndex] = useState<number | null>(null);
   const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
   const lastXRef = useRef<number | null>(null);
+  const lastYRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
   const idleTimerRef = useRef<number | null>(null);
   const waitingTimerRef = useRef<number | null>(null);
@@ -146,7 +166,9 @@ export function useCursorPreviewMotion(enabled: boolean) {
       setCursorPoint(null);
       setStateId("idle");
       setRotationDeg(0);
+      setLookDirectionIndex(null);
       lastXRef.current = null;
+      lastYRef.current = null;
       lastTimeRef.current = null;
       return;
     }
@@ -161,10 +183,12 @@ export function useCursorPreviewMotion(enabled: boolean) {
       idleTimerRef.current = window.setTimeout(() => {
         setStateId("idle");
         setRotationDeg(0);
+        setLookDirectionIndex(null);
       }, cursorIdleDelayMs);
       waitingTimerRef.current = window.setTimeout(() => {
         setStateId("waiting");
         setRotationDeg(0);
+        setLookDirectionIndex(null);
       }, cursorWaitingDelayMs);
     };
 
@@ -173,26 +197,35 @@ export function useCursorPreviewMotion(enabled: boolean) {
     setStateId("idle");
     setRotationDeg(0);
     lastXRef.current = startPoint.x;
+    lastYRef.current = startPoint.y;
     lastTimeRef.current = performance.now();
     resetTimers();
 
     const onPointerMove = (event: PointerEvent) => {
       const now = performance.now();
       setCursorPoint(clampCursorPreviewPoint(event.clientX, event.clientY));
-      if (lastXRef.current !== null && lastTimeRef.current !== null) {
+      if (lastXRef.current !== null && lastYRef.current !== null && lastTimeRef.current !== null) {
         const deltaX = event.clientX - lastXRef.current;
-        if (Math.abs(deltaX) >= 2) {
+        const deltaY = event.clientY - lastYRef.current;
+        if (Math.hypot(deltaX, deltaY) >= 2) {
           const deltaTime = Math.max(now - lastTimeRef.current, 1);
           const speed = Math.abs(deltaX) / deltaTime;
           const tilt = Math.min(
             cursorPreviewMaxTiltDeg,
             Math.max(cursorPreviewMinTiltDeg, speed * cursorPreviewTiltSpeedFactor)
           );
-          setStateId(deltaX > 0 ? "running-right" : "running-left");
-          setRotationDeg(deltaX > 0 ? tilt : -tilt);
+          if (useLookDirections) {
+            const clockwiseFromUp = (Math.atan2(deltaX, -deltaY) * 180 / Math.PI + 360) % 360;
+            setLookDirectionIndex(Math.round(clockwiseFromUp / lookDirectionStepDegrees) % 16);
+            setRotationDeg(0);
+          } else if (Math.abs(deltaX) >= 2) {
+            setStateId(deltaX > 0 ? "running-right" : "running-left");
+            setRotationDeg(deltaX > 0 ? tilt : -tilt);
+          }
         }
       }
       lastXRef.current = event.clientX;
+      lastYRef.current = event.clientY;
       lastTimeRef.current = now;
       resetTimers();
     };
@@ -209,7 +242,7 @@ export function useCursorPreviewMotion(enabled: boolean) {
         waitingTimerRef.current = null;
       }
     };
-  }, [enabled]);
+  }, [enabled, useLookDirections]);
 
-  return { cursorPoint, cursorStateId: stateId, cursorRotationDeg: rotationDeg };
+  return { cursorPoint, cursorStateId: stateId, cursorRotationDeg: rotationDeg, cursorLookDirectionIndex: lookDirectionIndex };
 }

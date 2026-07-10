@@ -429,7 +429,10 @@ function Gallery({
   const canCursorPreview = useCursorPreviewSupport();
   const cursorPreviewEnabled = Boolean(previewPet && canCursorPreview);
   const cursorPreviewReady = useCursorPreviewAssets(previewPet, cursorPreviewEnabled);
-  const { cursorPoint, cursorStateId, cursorRotationDeg } = useCursorPreviewMotion(cursorPreviewEnabled);
+  const { cursorPoint, cursorStateId, cursorRotationDeg, cursorLookDirectionIndex } = useCursorPreviewMotion(
+    cursorPreviewEnabled,
+    previewPet?.spriteVersionNumber === 2
+  );
   const publicCollectionByPetId = useMemo(() => {
     const byPetId = new Map<string, Pick<CollectionSummary, "slug" | "displayName">>();
     for (const collection of collections) {
@@ -457,6 +460,17 @@ function Gallery({
         signedIn={Boolean(user)}
         onSignIn={onSignIn}
       />
+      <div className="petFormatGuide galleryFormatGuide" role="note" aria-label="Supported Codex pet formats">
+        <div className="petFormatGuideCopy">
+          <span className="petFormatGuideEyebrow">Codex pet formats</span>
+          <strong>V2 pets are new—and they can look around.</strong>
+          <span>V2 adds a neutral look plus 16 directional poses. Original v1 pets are legacy, but remain fully supported.</span>
+        </div>
+        <div className="petFormatGuideBadges" aria-hidden="true">
+          <span className="petFormatPill v2">v2 · new · 16 looks</span>
+          <span className="petFormatPill v1">v1 · legacy · supported</span>
+        </div>
+      </div>
       <GallerySearch
         query={query}
         activeTags={activeTags}
@@ -573,7 +587,7 @@ function Gallery({
           aria-hidden="true"
         >
           {cursorPreviewReady ? (
-            <CursorPetPreview pet={previewPet} stateId={cursorStateId} />
+            <CursorPetPreview pet={previewPet} stateId={cursorStateId} lookDirectionIndex={cursorLookDirectionIndex} />
           ) : (
             <div className="cursorPetLoader">
               <Spinner size={14} />

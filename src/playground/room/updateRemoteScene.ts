@@ -7,7 +7,7 @@ import {
   SPRITE_HEIGHT,
   STREAK_SPAWN_INTERVAL
 } from "../core/config";
-import { NPC_ATLAS_COLS, NPC_ATLAS_ROWS, NPC_DEFS } from "../world/toys";
+import { NPC_ATLAS_COLS, NPC_DEFS } from "../world/toys";
 import { positionAnchor } from "./roomOverlay";
 import type { RemoteNpc, RemotePet } from "./remoteActors";
 import type { RoomMode } from "./types";
@@ -65,7 +65,9 @@ export function updateRemoteScene({
     sprite.position.y += (extrapY - sprite.position.y) * REMOTE_PET_LERP;
     sprite.position.z += (extrapZ - sprite.position.z) * REMOTE_PET_LERP;
     sprite.scale.set(remote.scaleX, remote.scaleY, 1);
-    applyAtlasFrame(remote.tex, remote.row, remotePetFrame(remote.row, remote.frame, remote.rowStart, remote.sprinting, now));
+    applyAtlasFrame(remote.tex, remote.row, remotePetFrame(remote.row, remote.frame, remote.rowStart, remote.sprinting, now), {
+      rows: remote.atlasRows
+    });
 
     const remoteOnGround = sprite.position.y <= 0.05;
     const remoteSpeed = Math.hypot(remote.vx, remote.vz);
@@ -129,7 +131,7 @@ export function updateRemoteScene({
       }
       const elapsed = (now - remote.rowStart) / 1000;
       const frameIdx = Math.floor(elapsed * remote.fps) % remote.frames;
-      applyAtlasFrame(remote.tex, remote.row, frameIdx, { columns: NPC_ATLAS_COLS, rows: NPC_ATLAS_ROWS });
+      applyAtlasFrame(remote.tex, remote.row, frameIdx, { columns: NPC_ATLAS_COLS, rows: remote.atlasRows });
     }
   }
 

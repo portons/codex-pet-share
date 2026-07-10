@@ -1,0 +1,10 @@
+{
+  "visual_qa": "pass",
+  "qa_note": "All rows preserve Debug Duck identity and semantics, the labeled clockwise look loop is coherent with unmistakable cardinals, and no clipping, opaque backgrounds, scale pop, broken props, or visible interior holes appear",
+  "repair_rows": "none",
+  "repair_notes": "none",
+  "reviewer": "independent root-level static visual QA",
+  "detailed_direction_semantics": "qa/direction-semantics.json",
+  "blind_validation": "qa/direction-blind-validation.json",
+  "continuity": "qa/look-continuity.json"
+}

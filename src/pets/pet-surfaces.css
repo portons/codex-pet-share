@@ -55,11 +55,109 @@
   width: 192px;
   height: 208px;
   background-repeat: no-repeat;
-  background-position: 0 var(--sprite-y);
-  background-size: 1536px 1872px;
+  background-position: var(--sprite-x, 0) var(--sprite-y);
+  background-size: 1536px var(--sprite-atlas-height, 1872px);
   image-rendering: pixelated;
   animation: sprite-play var(--sprite-duration) steps(var(--sprite-frames)) infinite;
   will-change: background-position;
+}
+
+.sprite.staticSprite {
+  animation: none;
+}
+
+.petFormatPill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 2px 6px;
+  border: 1px solid color-mix(in srgb, var(--accent-deep) 32%, var(--border));
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.petFormatPill.v2 {
+  border-color: color-mix(in srgb, var(--accent-deep) 45%, var(--border));
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+.petFormatPill.v1 {
+  border-color: var(--border);
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+
+.petFormatGuide {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent-deep) 24%, var(--border));
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at 88% 20%, var(--accent-glow), transparent 34%),
+    var(--surface-warm);
+}
+
+.petFormatGuideCopy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.petFormatGuideCopy strong {
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.petFormatGuideCopy > span:last-child {
+  max-width: 72ch;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.petFormatGuideEyebrow {
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.petFormatGuideBadges {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.galleryFormatGuide {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 720px) {
+  .petFormatGuide {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .petFormatGuideBadges {
+    justify-content: flex-start;
+  }
 }
 
 .previewStrip {

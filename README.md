@@ -88,10 +88,16 @@ Run from a trusted environment (local dev or CI).
 
 Upload a folder containing exactly:
 
-- `pet.json` — manifest (name, description, kind, animation states).
-- `spritesheet.webp` — `1536 x 1872`, 9 animation rows × 8 frame columns.
+- `pet.json` — manifest (name, description, kind, and optional `spriteVersionNumber`).
+- `spritesheet.webp` — either the original v1 `1536 x 1872` atlas (9 rows × 8 columns), or a v2 `1536 x 2288` atlas (11 rows × 8 columns) with `spriteVersionNumber: 2`.
 
-The backend adapter validator rejects mismatched dimensions, manifest schema errors, and unknown `kind`s.
+V2 keeps the original nine animation rows, adds a dedicated neutral look cell at
+row 0 / column 6, and adds two rows containing 16 clockwise look directions.
+The backend adapter validator rejects mismatched manifest versions/dimensions,
+schema errors, and unknown `kind`s; v1 packages remain supported without a
+version field.
+
+The gallery labels both formats: v2 is the new format, while v1 is legacy and supported. Real v1/v2 Debug Duck packages live under `test-assets/pets/`; run `npm run check:pet-fixtures` to verify their manifest markers and atlas dimensions.
 
 ## Secret boundary
 

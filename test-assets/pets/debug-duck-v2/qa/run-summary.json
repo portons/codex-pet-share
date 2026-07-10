@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "spriteVersionNumber": 2,
+  "run_dir": "/Users/porton/Documents/petshare/.tmp/debug-duck-v2-run",
+  "spritesheet": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2/spritesheet.webp",
+  "validation": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2/qa/validation-extended.json",
+  "chroma_despill": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2/qa/chroma-despill-extended.json",
+  "contact_sheet": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2/qa/contact-sheet-extended.png",
+  "direction_sheet": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2/qa/look-directions.png",
+  "direction_semantics": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2/qa/direction-semantics.json",
+  "blind_direction_validation": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2/qa/direction-blind-validation.json",
+  "continuity": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2/qa/look-continuity.json",
+  "review": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2/qa/review.json",
+  "final_visual_qa": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2/qa/final-visual-qa.json",
+  "package": "/Users/porton/Documents/petshare/test-assets/pets/debug-duck-v2"
+}

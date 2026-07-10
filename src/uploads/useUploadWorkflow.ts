@@ -10,6 +10,8 @@ import {
   generateShareImage,
   normalizeUploadManifest,
   readUploadManifest,
+  readSpritesheetVersion,
+  validateManifestSpriteVersion,
   uploadManifestFile
 } from "./uploadAssets";
 
@@ -42,9 +44,11 @@ export function useUploadWorkflow({
     const form = new FormData();
     try {
       const manifest = { ...normalizeUploadManifest(await readUploadManifest(uploadState.manifest)), kind: uploadState.kind };
+      const spriteVersionNumber = await readSpritesheetVersion(uploadState.spritesheet);
+      validateManifestSpriteVersion(manifest, spriteVersionNumber);
       const [shareImage, previewImage, posterImage] = await Promise.all([
         generateShareImage(manifest, uploadState.spritesheet),
-        generatePreviewImage(uploadState.spritesheet),
+        generatePreviewImage(uploadState.spritesheet, spriteVersionNumber),
         generatePosterImage(uploadState.spritesheet)
       ]);
       form.append("manifest", uploadManifestFile(manifest));

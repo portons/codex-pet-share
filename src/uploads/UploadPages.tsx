@@ -12,7 +12,7 @@ import { SignInGate } from "../ui/SignInGate";
 import { UploadsSkeleton } from "../ui/Skeletons";
 import { Spinner } from "../ui/Spinner";
 import { FileField } from "./FileField";
-import { normalizePetSlug, readUploadManifest } from "./uploadAssets";
+import { normalizePetSlug, readSpritesheetVersion, readUploadManifest } from "./uploadAssets";
 import { UploadValidationPreview } from "./UploadValidationPreview";
 
 export function YourUploads({
@@ -182,6 +182,17 @@ export function UploadPage({
       </header>
       <form className="uploadForm" onSubmit={onSubmit}>
         <div className="uploadControls card">
+          <div className="petFormatGuide uploadFormatGuide" role="note">
+            <div className="petFormatGuideCopy">
+              <span className="petFormatGuideEyebrow">Choose a Codex format</span>
+              <strong>V2 is the new format.</strong>
+              <span>Use a 1536×2288 sheet plus <code>spriteVersionNumber: 2</code> for a neutral look and 16 directions. Legacy 1536×1872 v1 pets still work without a version field.</span>
+            </div>
+            <div className="petFormatGuideBadges" aria-hidden="true">
+              <span className="petFormatPill v2">v2 · recommended</span>
+              <span className="petFormatPill v1">v1 · supported</span>
+            </div>
+          </div>
           <FileField
             accept="application/json,.json"
             file={uploadState.manifest}
@@ -232,9 +243,24 @@ export function UploadPage({
 
 function UploadLivePreview({ uploadState }: { uploadState: UploadState }) {
   const { manifest, manifestError } = useUploadManifestPreview(uploadState.manifest);
+  const { spritesheetVersion, spritesheetError } = useUploadSpritesheetPreview(uploadState.spritesheet);
   const spritesheetUrl = useObjectUrl(uploadState.spritesheet);
   const normalizedId = manifest ? normalizePetSlug(manifest.id) : "";
-  const spriteStyle = spritesheetUrl ? { backgroundImage: `url("${spritesheetUrl}")` } : undefined;
+  const declaredVersion = manifest?.spriteVersionNumber === 2 ? 2 : 1;
+  const resolvedVersion = spritesheetVersion || declaredVersion;
+  const versionMismatch = Boolean(manifest && spritesheetVersion && declaredVersion !== spritesheetVersion);
+  const previewReady = Boolean(
+    manifest
+    && spritesheetUrl
+    && spritesheetVersion
+    && !manifestError
+    && !spritesheetError
+    && !versionMismatch
+  );
+  const spriteStyle = spritesheetUrl ? {
+    backgroundImage: `url("${spritesheetUrl}")`,
+    "--upload-atlas-size": `800% ${(resolvedVersion === 2 ? 11 : 9) * 100}%`
+  } as CSSProperties : undefined;
   const displayName = manifest?.displayName || "Package preview";
   const description = manifest?.description || "No manifest loaded.";
 
@@ -245,7 +271,9 @@ function UploadLivePreview({ uploadState }: { uploadState: UploadState }) {
           <span className="fieldLabel">Live package</span>
           <strong>{displayName}</strong>
         </div>
-        <span className="uploadPreviewState">{spritesheetUrl && manifest ? "Ready" : "Draft"}</span>
+        <span className="uploadPreviewState">
+          {versionMismatch ? "Mismatch" : spritesheetError || manifestError ? "Invalid" : previewReady ? "Ready" : "Draft"}
+        </span>
       </div>
 
       <div className="uploadSpriteStage">
@@ -268,6 +296,11 @@ function UploadLivePreview({ uploadState }: { uploadState: UploadState }) {
         <PreviewMetaItem label="spritesheet" value={uploadState.spritesheet ? formatBytes(uploadState.spritesheet.size) : "missing"} />
         <PreviewMetaItem label="id" value={normalizedId || manifestError || "pending"} />
         <PreviewMetaItem label="kind" value={uploadState.kind} />
+        <PreviewMetaItem label="format" value={`v${resolvedVersion}`} />
+        <PreviewMetaItem
+          label="atlas"
+          value={spritesheetVersion ? `1536×${spritesheetVersion === 2 ? 2288 : 1872}` : spritesheetError || "pending"}
+        />
       </div>
 
       <div className="uploadPreviewPills">
@@ -325,6 +358,37 @@ function useUploadManifestPreview(file: File | null) {
   }, [file]);
 
   return { manifest, manifestError };
+}
+
+function useUploadSpritesheetPreview(file: File | null) {
+  const [spritesheetVersion, setSpritesheetVersion] = useState<1 | 2 | null>(null);
+  const [spritesheetError, setSpritesheetError] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+    if (!file) {
+      setSpritesheetVersion(null);
+      setSpritesheetError("");
+      return;
+    }
+    readSpritesheetVersion(file)
+      .then((version) => {
+        if (!alive) return;
+        setSpritesheetVersion(version);
+        setSpritesheetError("");
+      })
+      .catch((error) => {
+        if (!alive) return;
+        setSpritesheetVersion(null);
+        setSpritesheetError(error instanceof Error ? error.message : "spritesheet is invalid");
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [file]);
+
+  return { spritesheetVersion, spritesheetError };
 }
 
 function useObjectUrl(file: File | null) {

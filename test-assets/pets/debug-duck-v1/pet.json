@@ -1,0 +1,7 @@
+{
+  "id": "debug-duck",
+  "displayName": "Debug Duck",
+  "description": "A squishy yellow rubber duck programmer for debugging sessions.",
+  "spritesheetPath": "spritesheet.webp",
+  "kind": "animal"
+}

@@ -22,6 +22,17 @@
   background: color-mix(in srgb, var(--surface) 92%, var(--surface-soft));
 }
 
+.spriteEditorVersionNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
 .spriteEditorHeader h2 {
   margin: 2px 0 0;
   color: var(--ink);

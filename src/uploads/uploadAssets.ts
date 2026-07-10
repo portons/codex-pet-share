@@ -2,13 +2,19 @@ import { APP_HANDLE, APP_NAME } from "../branding/brand";
 import webpEncWasmUrl from "@jsquash/webp/codec/enc/webp_enc.wasm?url";
 import webpEncSimdWasmUrl from "@jsquash/webp/codec/enc/webp_enc_simd.wasm?url";
 import {
+  allPetAnimationRows,
   isEditablePetKind,
-  petStates,
+  isPetSpriteVersion,
+  petEditorAnimationRows,
+  previewFrameCountForVersion,
+  previewSpriteFramesForVersion,
+  spriteAtlasRows,
   spriteCellWidth,
-  previewFrameCount,
-  spriteCellHeight
+  spriteCellHeight,
+  spriteSheetHeight,
+  spriteSheetWidth
 } from "../domain/config";
-import type { EditablePetKind, UploadManifest } from "../domain/types";
+import type { EditablePetKind, PetSpriteVersion, UploadManifest } from "../domain/types";
 
 export type SpriteFixOperation = "swap-running-rows" | "mirror-right-to-left" | "mirror-left-to-right";
 export type SpriteFrameTarget = number | "all";
@@ -25,19 +31,59 @@ export type PetSpriteEditorOperation =
 let webpEncodePromise: Promise<typeof import("@jsquash/webp/encode").default> | null = null;
 
 export async function readUploadManifest(file: File): Promise<UploadManifest> {
-  let value: Partial<UploadManifest>;
+  let value: Record<string, unknown>;
   try {
-    value = JSON.parse(await file.text()) as Partial<UploadManifest>;
+    const parsed = JSON.parse(await file.text()) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error();
+    }
+    value = parsed as Record<string, unknown>;
   } catch {
     throw new Error("pet.json must be valid JSON");
+  }
+  const rawSpriteVersion = value.spriteVersionNumber;
+  if (rawSpriteVersion !== undefined && rawSpriteVersion !== 2) {
+    throw new Error("pet.json spriteVersionNumber must be 2 when provided");
   }
   return {
     id: String(value.id || ""),
     displayName: String(value.displayName || ""),
     description: String(value.description || ""),
     spritesheetPath: String(value.spritesheetPath || ""),
+    ...(rawSpriteVersion === 2 ? { spriteVersionNumber: 2 as const } : {}),
     kind: isEditablePetKind(String(value.kind || "")) ? String(value.kind) as EditablePetKind : undefined
   };
+}
+
+export async function readSpritesheetVersion(file: File): Promise<PetSpriteVersion> {
+  const imageUrl = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    image.decoding = "async";
+    image.src = imageUrl;
+    await image.decode();
+    if (image.naturalWidth !== spriteSheetWidth) {
+      throw new Error(`spritesheet must be ${spriteSheetWidth}px wide`);
+    }
+    const version = (Object.keys(spriteAtlasRows) as Array<`${PetSpriteVersion}`>)
+      .map(Number)
+      .find((candidate) => image.naturalHeight === spriteSheetHeight(candidate as PetSpriteVersion));
+    if (!isPetSpriteVersion(version)) {
+      throw new Error(`spritesheet must be ${spriteSheetWidth}x${spriteSheetHeight(1)} (v1) or ${spriteSheetWidth}x${spriteSheetHeight(2)} (v2)`);
+    }
+    return version;
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
+export function validateManifestSpriteVersion(manifest: UploadManifest, spritesheetVersion: PetSpriteVersion) {
+  const manifestVersion: PetSpriteVersion = manifest.spriteVersionNumber === 2 ? 2 : 1;
+  if (manifestVersion !== spritesheetVersion) {
+    throw new Error(spritesheetVersion === 2
+      ? "v2 spritesheets require spriteVersionNumber: 2 in pet.json"
+      : "spriteVersionNumber: 2 requires a 1536x2288 spritesheet");
+  }
 }
 
 export function normalizePetSlug(value: string) {
@@ -132,7 +178,7 @@ export async function generateShareImage(manifest: UploadManifest, spritesheet: 
   }
 }
 
-export async function generatePreviewImage(spritesheet: File) {
+export async function generatePreviewImage(spritesheet: File, spriteVersionNumber: PetSpriteVersion = 1) {
   const imageUrl = URL.createObjectURL(spritesheet);
   try {
     const image = new Image();
@@ -141,7 +187,8 @@ export async function generatePreviewImage(spritesheet: File) {
     await image.decode();
 
     const canvas = document.createElement("canvas");
-    canvas.width = previewFrameCount * 96;
+    const previewFrames = previewSpriteFramesForVersion(spriteVersionNumber);
+    canvas.width = previewFrameCountForVersion(spriteVersionNumber) * 96;
     canvas.height = 104;
     const context = canvas.getContext("2d");
     if (!context) {
@@ -150,21 +197,19 @@ export async function generatePreviewImage(spritesheet: File) {
 
     context.imageSmoothingEnabled = false;
     let frameIndex = 0;
-    for (const state of petStates) {
-      for (let frame = 0; frame < state.frames; frame += 1) {
-        context.drawImage(
-          image,
-          frame * 192,
-          state.row * 208,
-          192,
-          208,
-          frameIndex * 96,
-          0,
-          96,
-          104
-        );
-        frameIndex += 1;
-      }
+    for (const frame of previewFrames) {
+      context.drawImage(
+        image,
+        frame.frame * 192,
+        frame.row * 208,
+        192,
+        208,
+        frameIndex * 96,
+        0,
+        96,
+        104
+      );
+      frameIndex += 1;
     }
 
     return encodeCanvasAsWebp(canvas, "preview.webp", 78);
@@ -305,9 +350,10 @@ function applyRowRemap(
   rowMap: Record<number, number>
 ) {
   const sourceCanvas = snapshotCanvas(canvas);
-  for (const state of petStates) {
-    const sourceRow = clampInteger(rowMap[state.row] ?? state.row, 0, petStates.length - 1);
-    context.clearRect(0, state.row * spriteCellHeight, canvas.width, spriteCellHeight);
+  const rowCount = spriteRowCount(canvas);
+  for (let targetRow = 0; targetRow < rowCount; targetRow += 1) {
+    const sourceRow = clampInteger(rowMap[targetRow] ?? targetRow, 0, rowCount - 1);
+    context.clearRect(0, targetRow * spriteCellHeight, canvas.width, spriteCellHeight);
     context.drawImage(
       sourceCanvas,
       0,
@@ -315,7 +361,7 @@ function applyRowRemap(
       canvas.width,
       spriteCellHeight,
       0,
-      state.row * spriteCellHeight,
+      targetRow * spriteCellHeight,
       canvas.width,
       spriteCellHeight
     );
@@ -330,8 +376,8 @@ function applyFrameReplacement(
   sourceFrame: number
 ) {
   const sourceCanvas = snapshotCanvas(canvas);
-  const normalizedRow = clampInteger(row, 0, petStates.length - 1);
-  const frameCount = frameCountForRow(normalizedRow);
+  const normalizedRow = clampInteger(row, 0, spriteRowCount(canvas) - 1);
+  const frameCount = frameCountForRow(normalizedRow, canvas);
   const normalizedFrame = clampInteger(frame, 0, frameCount - 1);
   const normalizedSourceFrame = clampInteger(sourceFrame, 0, frameCount - 1);
   copyCell(sourceCanvas, context, normalizedRow, normalizedSourceFrame, normalizedRow, normalizedFrame);
@@ -343,13 +389,14 @@ function applyFrameTransforms(
   transforms: SpriteFrameTransform[]
 ) {
   const sourceCanvas = snapshotCanvas(canvas);
+  const rowCount = spriteRowCount(canvas);
   for (const transform of transforms) {
-    const row = clampInteger(transform.row, 0, petStates.length - 1);
+    const row = clampInteger(transform.row, 0, rowCount - 1);
     const dx = clampInteger(transform.dx, -48, 48);
     const dy = clampInteger(transform.dy, -48, 48);
     const rotate = normalizeRotation(transform.rotate);
     if (dx === 0 && dy === 0 && rotate === 0) continue;
-    for (const frame of framesForTarget(row, transform.frame)) {
+    for (const frame of framesForTarget(row, transform.frame, canvas)) {
       const x = frame * spriteCellWidth;
       const y = row * spriteCellHeight;
       context.save();
@@ -379,8 +426,9 @@ function applyPixelPatch(
   context: CanvasRenderingContext2D,
   operation: Extract<PetSpriteEditorOperation, { kind: "pixel-patch" }>
 ) {
-  const row = clampInteger(operation.row, 0, petStates.length - 1);
-  const frame = clampInteger(operation.frame, 0, frameCountForRow(row) - 1);
+  const canvas = context.canvas;
+  const row = clampInteger(operation.row, 0, spriteRowCount(canvas) - 1);
+  const frame = clampInteger(operation.frame, 0, frameCountForRow(row, canvas) - 1);
   const cellX = frame * spriteCellWidth;
   const cellY = row * spriteCellHeight;
   const imageData = context.getImageData(cellX, cellY, spriteCellWidth, spriteCellHeight);
@@ -433,15 +481,20 @@ function snapshotCanvas(canvas: HTMLCanvasElement) {
   return sourceCanvas;
 }
 
-function framesForTarget(row: number, target: SpriteFrameTarget) {
-  const frameCount = frameCountForRow(row);
+function framesForTarget(row: number, target: SpriteFrameTarget, canvas: HTMLCanvasElement) {
+  const frameCount = frameCountForRow(row, canvas);
   return target === "all"
     ? Array.from({ length: frameCount }, (_, frame) => frame)
     : [clampInteger(target, 0, frameCount - 1)];
 }
 
-function frameCountForRow(row: number) {
-  return petStates.find((state) => state.row === row)?.frames ?? 8;
+function frameCountForRow(row: number, canvas: HTMLCanvasElement) {
+  const spriteVersionNumber = spriteRowCount(canvas) === 11 ? 2 : 1;
+  return petEditorAnimationRows(spriteVersionNumber).find((state) => state.row === row)?.frames ?? 8;
+}
+
+function spriteRowCount(canvas: HTMLCanvasElement) {
+  return clampInteger(canvas.height / spriteCellHeight, 1, allPetAnimationRows.length);
 }
 
 function clampInteger(value: number, min: number, max: number) {

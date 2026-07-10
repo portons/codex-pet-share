@@ -1,6 +1,6 @@
 import { APP_HANDLE } from "../branding/brand";
 import type { DownloadCommandMode } from "../downloads/DownloadCommandRow";
-import { galleryRequestTags, isEditablePetKind } from "./config";
+import { galleryRequestTags, isEditablePetKind, isPetSpriteVersion } from "./config";
 import { petAssetUrl } from "./http";
 import type { CollectionSummary, GalleryRecentComment, GalleryUrlState, Pet } from "./types";
 
@@ -35,8 +35,13 @@ export function collectionCodexInstallUrl(collection: CollectionInstallTarget) {
 }
 
 export function normalizePet(pet: Pet): Pet {
+  const reportedVersion = pet.validationReport?.spriteVersionNumber;
+  const inferredVersion = pet.validationReport?.atlasSize === "1536x2288" ? 2 : 1;
   return {
     ...pet,
+    spriteVersionNumber: isPetSpriteVersion(pet.spriteVersionNumber)
+      ? pet.spriteVersionNumber
+      : isPetSpriteVersion(reportedVersion) ? reportedVersion : inferredVersion,
     tags: pet.tags || [],
     likeCount: pet.likeCount || 0,
     commentCount: pet.commentCount || 0,

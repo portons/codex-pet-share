@@ -10,7 +10,14 @@ import {
   type PointerEvent,
   type SetStateAction
 } from "react";
-import { petStates, spriteCellHeight, spriteCellWidth, type PetState } from "../domain/config";
+import {
+  petEditorAnimationRows,
+  petFrameLabel,
+  spriteCellHeight,
+  spriteCellWidth,
+  spriteSheetHeight,
+  type PetAnimationRow
+} from "../domain/config";
 import type { Pet } from "../domain/types";
 import { Icon, type IconName } from "../ui/Icon";
 import { Spinner } from "../ui/Spinner";
@@ -99,8 +106,9 @@ const rotationOptions = [
   { id: "270", label: "270" }
 ] as const satisfies Array<{ id: `${AlignRotation}`; label: string }>;
 
-function stateForRow(row: number) {
-  return petStates.find((state) => state.row === row) || petStates[0];
+function stateForRow(row: number, spriteVersionNumber: Pet["spriteVersionNumber"] = 1) {
+  return petEditorAnimationRows(spriteVersionNumber).find((state) => state.row === row)
+    || petEditorAnimationRows(spriteVersionNumber)[0];
 }
 
 function rowPlanForOperation(operation: SpriteFixOperation): SpriteRowPlan {
@@ -135,11 +143,15 @@ export function SpriteFixerModal({
   onSubmit: (event: FormEvent, operation: PetSpriteEditorOperation) => boolean | Promise<boolean>;
   onClose: () => void;
 }) {
-  const initialDraft = useMemo(() => readSpriteEditorDraft(pet.id), [pet.id]);
+  const editorStates = useMemo(() => petEditorAnimationRows(pet.spriteVersionNumber), [pet.spriteVersionNumber]);
+  const initialDraft = useMemo(
+    () => readSpriteEditorDraft(pet.id, pet.spriteVersionNumber),
+    [pet.id, pet.spriteVersionNumber]
+  );
   const [activeTool, setActiveTool] = useState<EditorToolId>(initialDraft?.activeTool || "repair");
   const [directionOperation, setDirectionOperation] = useState<SpriteFixOperation | null>(initialDraft?.directionOperation || null);
   const [rowMap, setRowMap] = useState<Record<number, number>>(() =>
-    initialDraft?.rowMap || Object.fromEntries(petStates.map((state) => [state.row, state.row]))
+    initialDraft?.rowMap || Object.fromEntries(editorStates.map((state) => [state.row, state.row]))
   );
   const [rowMapTargetRow, setRowMapTargetRow] = useState(1);
   const [frameRow, setFrameRow] = useState(initialDraft?.frameRow ?? 1);
@@ -162,14 +174,14 @@ export function SpriteFixerModal({
 
   const afterPlan = useMemo(() => directionOperation ? rowPlanForOperation(directionOperation) : currentRunPlan, [directionOperation]);
   const selectedDirection = directionOptions.find((option) => option.id === directionOperation) || null;
-  const selectedFrameState = stateForRow(frameRow);
-  const selectedAlignState = stateForRow(alignRow);
+  const selectedFrameState = stateForRow(frameRow, pet.spriteVersionNumber);
+  const selectedAlignState = stateForRow(alignRow, pet.spriteVersionNumber);
   const selectedAlignEdit = alignEdits[alignRow] || createDefaultAlignEdit();
-  const selectedPreviewState = stateForRow(previewRow);
-  const rowMapChanged = petStates.some((state) => (rowMap[state.row] ?? state.row) !== state.row);
-  const rowMapChangeCount = petStates.filter((state) => (rowMap[state.row] ?? state.row) !== state.row).length;
+  const selectedPreviewState = stateForRow(previewRow, pet.spriteVersionNumber);
+  const rowMapChanged = editorStates.some((state) => (rowMap[state.row] ?? state.row) !== state.row);
+  const rowMapChangeCount = editorStates.filter((state) => (rowMap[state.row] ?? state.row) !== state.row).length;
   const pixelPatchCount = Object.keys(pixelEdits).length;
-  const alignTransforms = useMemo(() => serializeAlignTransforms(alignEdits), [alignEdits]);
+  const alignTransforms = useMemo(() => serializeAlignTransforms(alignEdits, editorStates), [alignEdits, editorStates]);
   const alignMoved = alignTransforms.length > 0;
   const frameRepairReady = frameIndex !== null && sourceFrameIndex !== null && frameIndex !== sourceFrameIndex;
   const hasFrameDraft = frameIndex !== null || sourceFrameIndex !== null;
@@ -313,7 +325,7 @@ export function SpriteFixerModal({
 
   function changePixelRow(row: number) {
     setPixelRow(row);
-    setPixelFrame((current) => Math.min(current, stateForRow(row).frames - 1));
+    setPixelFrame((current) => Math.min(current, stateForRow(row, pet.spriteVersionNumber).frames - 1));
     setPixelEdits({});
   }
 
@@ -337,6 +349,14 @@ export function SpriteFixerModal({
           <div>
             <p className="metaText">Sprite editor</p>
             <h2>{pet.displayName}</h2>
+            <p className="spriteEditorVersionNote">
+              <span className={`petFormatPill ${pet.spriteVersionNumber === 2 ? "v2" : "v1"}`}>
+                {pet.spriteVersionNumber === 2 ? "v2 · new" : "v1 · legacy"}
+              </span>
+              {pet.spriteVersionNumber === 2
+                ? "Editing all 11 rows, including the neutral look cell and 16 labeled directions."
+                : "Editing the original 9-row format; Codex still supports it."}
+            </p>
           </div>
           <div className="spriteEditorHeaderActions">
             {draftWasRestored ? <span className="spriteEditorDraftPill">Draft restored</span> : null}
@@ -438,13 +458,14 @@ export function SpriteFixerModal({
             ) : null}
             {activeTool === "rows" ? (
               <RowsInspector
+                pet={pet}
                 busy={busy}
                 rowMap={rowMap}
                 rowMapChanged={rowMapChanged}
                 rowMapChangeCount={rowMapChangeCount}
                 selectedTargetRow={rowMapTargetRow}
                 resetSelected={() => updateRowMap(rowMapTargetRow, rowMapTargetRow)}
-                resetAll={() => setRowMap(Object.fromEntries(petStates.map((state) => [state.row, state.row])))}
+                resetAll={() => setRowMap(Object.fromEntries(editorStates.map((state) => [state.row, state.row])))}
               />
             ) : null}
             {activeTool === "frames" ? (
@@ -574,6 +595,7 @@ function DirectionInspector({
 }
 
 function RowsInspector({
+  pet,
   busy,
   rowMap,
   rowMapChanged,
@@ -582,6 +604,7 @@ function RowsInspector({
   resetSelected,
   resetAll
 }: {
+  pet: Pet;
   busy: boolean;
   rowMap: Record<number, number>;
   rowMapChanged: boolean;
@@ -590,8 +613,8 @@ function RowsInspector({
   resetSelected: () => void;
   resetAll: () => void;
 }) {
-  const selectedTarget = stateForRow(selectedTargetRow);
-  const selectedSource = stateForRow(rowMap[selectedTargetRow] ?? selectedTargetRow);
+  const selectedTarget = stateForRow(selectedTargetRow, pet.spriteVersionNumber);
+  const selectedSource = stateForRow(rowMap[selectedTargetRow] ?? selectedTargetRow, pet.spriteVersionNumber);
   return (
     <div className="spriteEditorInspectorPanel">
       <PanelTitle title="State rows" />
@@ -821,16 +844,17 @@ function RowsStage({
   setSelectedTargetRow: (row: number) => void;
   updateRowMap: (targetRow: number, sourceRow: number) => void;
 }) {
-  const selectedTarget = stateForRow(selectedTargetRow);
+  const editorStates = petEditorAnimationRows(pet.spriteVersionNumber);
+  const selectedTarget = stateForRow(selectedTargetRow, pet.spriteVersionNumber);
   const selectedSourceRow = rowMap[selectedTargetRow] ?? selectedTargetRow;
   return (
     <div className="spriteEditorRowsStage">
       <section className="spriteEditorStagePanel">
         <StageHeading title="Target states" label="click target" />
         <div className="spriteEditorRowPreviewGrid">
-          {petStates.map((targetState) => {
+          {editorStates.map((targetState) => {
             const sourceRow = rowMap[targetState.row] ?? targetState.row;
-            const sourceState = stateForRow(sourceRow);
+            const sourceState = stateForRow(sourceRow, pet.spriteVersionNumber);
             const selected = selectedTargetRow === targetState.row;
             return (
               <button
@@ -873,7 +897,7 @@ function FramesStage({
   setSourceFrameIndex
 }: {
   pet: Pet;
-  frameState: PetState;
+  frameState: PetAnimationRow;
   frameIndex: number | null;
   sourceFrameIndex: number | null;
   setFrameRow: (row: number) => void;
@@ -1011,7 +1035,10 @@ function PixelCleanStage({
 
   return (
     <section className="spriteEditorStagePanel pixelStage">
-      <StageHeading title="Pixel clean" label={`${stateForRow(row).label}, frame ${frame + 1}`} />
+      <StageHeading
+        title="Pixel clean"
+        label={`${stateForRow(row, pet.spriteVersionNumber).label}, ${petFrameLabel(row, frame, pet.spriteVersionNumber)}`}
+      />
       <div className="spriteEditorCellPicker">
         <RowThumbnailPicker pet={pet} selectedRow={row} onSelect={setRow} />
         <FrameThumbnailPicker pet={pet} row={row} selectedFrame={frame} onSelect={setFrame} />
@@ -1063,14 +1090,15 @@ function AlignStage({
   setRow: (row: number) => void;
   setFrame: (row: number, frame: SpriteFrameTarget) => void;
 }) {
-  const state = stateForRow(selectedRow);
+  const editorStates = petEditorAnimationRows(pet.spriteVersionNumber);
+  const state = stateForRow(selectedRow, pet.spriteVersionNumber);
   const previewFrame = selectedEdit.frame === "all" ? 0 : selectedEdit.frame;
   return (
     <div className="spriteEditorAlignStage">
       <section className="spriteEditorStagePanel primary spriteEditorTransformMotionPanel">
         <StageHeading title="All animation rows" label={transformCount === 0 ? "current vs after" : `after includes ${formatTransformCount(transformCount)}`} />
         <div className="spriteEditorTransformMotionGrid">
-          {petStates.map((rowState) => {
+          {editorStates.map((rowState) => {
             const edit = edits[rowState.row] || createDefaultAlignEdit();
             const changed = isAlignEditChanged(edit);
             const selected = rowState.row === state.row;
@@ -1115,7 +1143,7 @@ function AlignStage({
       <section className="spriteEditorStagePanel compact spriteEditorAtlasPanel">
         <StageHeading title="Frame targets" label={transformCount === 0 ? "no transforms yet" : formatTransformCount(transformCount)} />
         <div className="spriteEditorAtlasContext">
-          {petStates.map((rowState) => {
+          {editorStates.map((rowState) => {
             const edit = edits[rowState.row] || createDefaultAlignEdit();
             const shifted = isAlignEditChanged(edit);
             return (
@@ -1163,7 +1191,7 @@ function RuntimePreviewStage({
   setRow
 }: {
   pet: Pet;
-  state: PetState;
+  state: PetAnimationRow;
   setRow: (row: number) => void;
 }) {
   return (
@@ -1186,7 +1214,7 @@ function RunPreviewTile({
   size
 }: {
   pet: Pet;
-  state: PetState;
+  state: PetAnimationRow;
   rowPlan: SpriteRowPlan;
   side: "left" | "right";
   size: "small" | "large";
@@ -1214,7 +1242,7 @@ function RowThumbnailPicker({
 }) {
   return (
     <div className="spriteEditorRowPicker" aria-label="Choose animation row">
-      {petStates.map((state) => {
+      {petEditorAnimationRows(pet.spriteVersionNumber).map((state) => {
         const selected = selectedRow === state.row;
         return (
           <button
@@ -1244,7 +1272,7 @@ function FrameThumbnailPicker({
   selectedFrame: number;
   onSelect: (frame: number) => void;
 }) {
-  const state = stateForRow(row);
+  const state = stateForRow(row, pet.spriteVersionNumber);
   return (
     <FrameStripPicker
       frames={state.frames}
@@ -1288,7 +1316,7 @@ function FrameStripPicker({
         const hasTransform = shouldShift && (shiftX !== 0 || shiftY !== 0 || rotate !== 0);
         return (
           <button
-            aria-label={`Choose frame ${frame + 1}`}
+            aria-label={`Choose ${petFrameLabel(row, frame, pet.spriteVersionNumber)}`}
             aria-pressed={selected}
             className={selected ? "active" : ""}
             key={frame}
@@ -1305,7 +1333,7 @@ function FrameStripPicker({
               shiftY={shouldShift ? shiftY : 0}
               size={size}
             />
-            <span>{frame + 1}</span>
+            <span>{petFrameLabel(row, frame, pet.spriteVersionNumber)}</span>
           </button>
         );
       })}
@@ -1323,7 +1351,7 @@ function FrameChoiceTimeline({
   onSelect
 }: {
   pet: Pet;
-  state: PetState;
+  state: PetAnimationRow;
   selectedFrame: number | null;
   pairedFrame: number | null;
   selectedLabel: string;
@@ -1337,7 +1365,7 @@ function FrameChoiceTimeline({
         const paired = pairedFrame === frame;
         return (
           <button
-            aria-label={`Choose frame ${frame + 1} as ${selectedLabel}`}
+            aria-label={`Choose ${petFrameLabel(state.row, frame, pet.spriteVersionNumber)} as ${selectedLabel}`}
             className={`spriteEditorTimelineFrame ${selected ? "selectedTarget" : ""} ${paired ? "selectedSource" : ""}`}
             key={frame}
             type="button"
@@ -1346,7 +1374,7 @@ function FrameChoiceTimeline({
             {selected ? <b>{selectedLabel}</b> : null}
             {paired ? <b className="secondary">{pairedLabel}</b> : null}
             <SpriteFrame pet={pet} row={state.row} frame={frame} size={74} />
-            <span>{frame + 1}</span>
+            <span>{petFrameLabel(state.row, frame, pet.spriteVersionNumber)}</span>
           </button>
         );
       })}
@@ -1361,7 +1389,7 @@ function FrameRepairPreview({
   sourceFrame
 }: {
   pet: Pet;
-  state: PetState;
+  state: PetAnimationRow;
   targetFrame: number | null;
   sourceFrame: number | null;
 }) {
@@ -1373,7 +1401,7 @@ function FrameRepairPreview({
           <div className={`spriteEditorTimelineFrame ${replaced ? "replaced" : ""}`} key={frame}>
             {replaced ? <b>repaired</b> : null}
             <SpriteFrame pet={pet} row={state.row} frame={replaced ? sourceFrame : frame} size={74} />
-            <span>{frame + 1}</span>
+            <span>{petFrameLabel(state.row, frame, pet.spriteVersionNumber)}</span>
           </div>
         );
       })}
@@ -1421,7 +1449,7 @@ function SpriteStrip({
   );
 }
 
-function RunPlanStrip({ pet, state, rowPlan, size }: { pet: Pet; state: PetState; rowPlan: SpriteRowPlan; size: number }) {
+function RunPlanStrip({ pet, state, rowPlan, size }: { pet: Pet; state: PetAnimationRow; rowPlan: SpriteRowPlan; size: number }) {
   const plan = rowPlan[state.row] || { sourceRow: state.row, flipX: false };
   return (
     <div className="spriteEditorStrip">
@@ -1442,7 +1470,7 @@ function AnimatedSprite({
   className = ""
 }: {
   pet: Pet;
-  state: PetState;
+  state: PetAnimationRow;
   rowPlan?: SpriteRowPlan;
   alignEdits?: AlignDraftMap;
   size: number;
@@ -1495,7 +1523,7 @@ function SpriteFrame({
     height: `${height}px`,
     backgroundImage: `url(${pet.spritesheetUrl})`,
     backgroundPosition: `-${frame * size}px -${row * height}px`,
-    backgroundSize: `${spriteCellWidth * 8 * scale}px ${spriteCellHeight * 9 * scale}px`,
+    backgroundSize: `${spriteCellWidth * 8 * scale}px ${spriteSheetHeight(pet.spriteVersionNumber) * scale}px`,
     transform: `translate(${shiftX * scale}px, ${shiftY * scale}px) rotate(${rotate}deg)${flipX ? " scaleX(-1)" : ""}`
   };
   return (
@@ -1907,8 +1935,8 @@ function removeAlignEdit(setAlignEdits: Dispatch<SetStateAction<AlignDraftMap>>,
   });
 }
 
-function serializeAlignTransforms(edits: AlignDraftMap): SpriteFrameTransform[] {
-  return petStates
+function serializeAlignTransforms(edits: AlignDraftMap, states: readonly PetAnimationRow[]): SpriteFrameTransform[] {
+  return states
     .map((state) => ({
       row: state.row,
       ...(edits[state.row] || createDefaultAlignEdit())
@@ -1955,7 +1983,7 @@ function draftStorageKey(petId: string) {
   return `${spriteEditorDraftPrefix}${petId}`;
 }
 
-function readSpriteEditorDraft(petId: string): SpriteEditorDraft | null {
+function readSpriteEditorDraft(petId: string, spriteVersionNumber: Pet["spriteVersionNumber"]): SpriteEditorDraft | null {
   try {
     const raw = window.localStorage.getItem(draftStorageKey(petId));
     if (!raw) return null;
@@ -1965,19 +1993,32 @@ function readSpriteEditorDraft(petId: string): SpriteEditorDraft | null {
       version: 1,
       activeTool: value.activeTool,
       directionOperation: isSpriteFixOperation(value.directionOperation) ? value.directionOperation : null,
-      rowMap: normalizeDraftRowMap(value.rowMap),
-      frameRow: normalizeDraftRow(value.frameRow, 1),
-      frameIndex: normalizeNullableFrame(value.frameIndex, normalizeDraftRow(value.frameRow, 1)),
-      sourceFrameIndex: normalizeNullableFrame(value.sourceFrameIndex, normalizeDraftRow(value.frameRow, 1)),
-      pixelRow: normalizeDraftRow(value.pixelRow, 0),
-      pixelFrame: normalizeDraftFrame(value.pixelFrame, normalizeDraftRow(value.pixelRow, 0), 0),
+      rowMap: normalizeDraftRowMap(value.rowMap, spriteVersionNumber),
+      frameRow: normalizeDraftRow(value.frameRow, 1, spriteVersionNumber),
+      frameIndex: normalizeNullableFrame(
+        value.frameIndex,
+        normalizeDraftRow(value.frameRow, 1, spriteVersionNumber),
+        spriteVersionNumber
+      ),
+      sourceFrameIndex: normalizeNullableFrame(
+        value.sourceFrameIndex,
+        normalizeDraftRow(value.frameRow, 1, spriteVersionNumber),
+        spriteVersionNumber
+      ),
+      pixelRow: normalizeDraftRow(value.pixelRow, 0, spriteVersionNumber),
+      pixelFrame: normalizeDraftFrame(
+        value.pixelFrame,
+        normalizeDraftRow(value.pixelRow, 0, spriteVersionNumber),
+        0,
+        spriteVersionNumber
+      ),
       pixelMode: isPixelMode(value.pixelMode) ? value.pixelMode : "erase",
       pixelZoom: clampDraftNumber(value.pixelZoom, 2, 10, 5),
       pixelBrushSize: clampDraftNumber(value.pixelBrushSize, 1, 15, 3),
       pixelTolerance: clampDraftNumber(value.pixelTolerance, 0, 96, 20),
       pixelEdits: normalizePixelEdits(value.pixelEdits),
-      alignRow: normalizeDraftRow(value.alignRow, 1),
-      alignEdits: normalizeAlignEdits(value.alignEdits)
+      alignRow: normalizeDraftRow(value.alignRow, 1, spriteVersionNumber),
+      alignEdits: normalizeAlignEdits(value.alignEdits, spriteVersionNumber)
     };
   } catch {
     return null;
@@ -2004,25 +2045,37 @@ function isPixelMode(value: unknown): value is PixelMode {
   return pixelModes.some((mode) => mode.id === value);
 }
 
-function normalizeDraftRow(value: unknown, fallback: number) {
-  return clampDraftNumber(value, 0, petStates.length - 1, fallback);
+function normalizeDraftRow(value: unknown, fallback: number, spriteVersionNumber: Pet["spriteVersionNumber"]) {
+  return clampDraftNumber(value, 0, petEditorAnimationRows(spriteVersionNumber).length - 1, fallback);
 }
 
-function normalizeDraftFrame(value: unknown, row: number, fallback: number) {
-  return clampDraftNumber(value, 0, stateForRow(row).frames - 1, fallback);
+function normalizeDraftFrame(
+  value: unknown,
+  row: number,
+  fallback: number,
+  spriteVersionNumber: Pet["spriteVersionNumber"]
+) {
+  return clampDraftNumber(value, 0, stateForRow(row, spriteVersionNumber).frames - 1, fallback);
 }
 
-function normalizeNullableFrame(value: unknown, row: number) {
-  return value === null || value === undefined ? null : normalizeDraftFrame(value, row, 0);
+function normalizeNullableFrame(value: unknown, row: number, spriteVersionNumber: Pet["spriteVersionNumber"]) {
+  return value === null || value === undefined ? null : normalizeDraftFrame(value, row, 0, spriteVersionNumber);
 }
 
-function normalizeDraftFrameTarget(value: unknown, row: number): SpriteFrameTarget {
-  return value === "all" ? "all" : normalizeDraftFrame(value, row, 0);
+function normalizeDraftFrameTarget(
+  value: unknown,
+  row: number,
+  spriteVersionNumber: Pet["spriteVersionNumber"]
+): SpriteFrameTarget {
+  return value === "all" ? "all" : normalizeDraftFrame(value, row, 0, spriteVersionNumber);
 }
 
-function normalizeDraftRowMap(value: unknown) {
+function normalizeDraftRowMap(value: unknown, spriteVersionNumber: Pet["spriteVersionNumber"]) {
   const record = value && typeof value === "object" ? value as Record<string, unknown> : {};
-  return Object.fromEntries(petStates.map((state) => [state.row, normalizeDraftRow(record[state.row], state.row)]));
+  return Object.fromEntries(petEditorAnimationRows(spriteVersionNumber).map((state) => [
+    state.row,
+    normalizeDraftRow(record[state.row], state.row, spriteVersionNumber)
+  ]));
 }
 
 function normalizePixelEdits(value: unknown): PixelPatchMap {
@@ -2045,10 +2098,10 @@ function normalizePixelEdits(value: unknown): PixelPatchMap {
   return next;
 }
 
-function normalizeAlignEdits(value: unknown): AlignDraftMap {
+function normalizeAlignEdits(value: unknown, spriteVersionNumber: Pet["spriteVersionNumber"]): AlignDraftMap {
   const record = value && typeof value === "object" ? value as Record<string, unknown> : {};
   const next: AlignDraftMap = {};
-  for (const state of petStates) {
+  for (const state of petEditorAnimationRows(spriteVersionNumber)) {
     const rawEdit = record[state.row];
     if (!rawEdit || typeof rawEdit !== "object") continue;
     const edit = rawEdit as Partial<AlignEdit>;
@@ -2057,7 +2110,7 @@ function normalizeAlignEdits(value: unknown): AlignDraftMap {
     const rotate = normalizeDraftRotation(edit.rotate);
     if (dx === 0 && dy === 0 && rotate === 0) continue;
     next[state.row] = {
-      frame: normalizeDraftFrameTarget(edit.frame, state.row),
+      frame: normalizeDraftFrameTarget(edit.frame, state.row, spriteVersionNumber),
       dx,
       dy,
       rotate

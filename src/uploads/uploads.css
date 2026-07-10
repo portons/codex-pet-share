@@ -181,6 +181,10 @@
   padding: 26px;
 }
 
+.uploadFormatGuide {
+  margin-bottom: 2px;
+}
+
 .uploadControls > .fileField,
 .uploadControls .uploadTagSection {
   counter-increment: upload-step;
@@ -340,7 +344,7 @@
   aspect-ratio: 192 / 208;
   background-position: 0 0;
   background-repeat: no-repeat;
-  background-size: 800% 900%;
+  background-size: var(--upload-atlas-size, 800% 900%);
   filter: drop-shadow(0 18px 18px rgba(15, 15, 14, 0.2));
   image-rendering: pixelated;
   animation: upload-preview-float 4200ms var(--ease-spring) infinite;
@@ -460,7 +464,7 @@
   border-radius: 5px;
   background-position: calc(var(--upload-frame) * 14.285714%) 0;
   background-repeat: no-repeat;
-  background-size: 800% 900%;
+  background-size: var(--upload-atlas-size, 800% 900%);
   image-rendering: pixelated;
 }
 

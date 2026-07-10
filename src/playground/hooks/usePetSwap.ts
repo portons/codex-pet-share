@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import { petTextureAssetUrl } from "../../domain/http";
 import type { Pet } from "../../domain/types";
+import { petAtlasRowsFromHeight } from "../core/config";
 import type { RoomMode } from "../room/types";
 
 const SWAP_COOLDOWN_MS = 30_000;
@@ -81,6 +82,7 @@ export function usePetSwap({
         i.src = spritesheetUrl;
       });
       tex.image = img;
+      tex.repeat.y = 1 / petAtlasRowsFromHeight(img.naturalHeight);
       tex.needsUpdate = true;
 
       livePetRef.current = { id: target.id, displayName: target.displayName, spritesheetUrl };

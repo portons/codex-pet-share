@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "source": "/Users/porton/.codex/pets/debug-duck/spritesheet.webp",
+  "exact_archive": "/Users/porton/Documents/petshare/.tmp/debug-duck-v2-run/references/source-v1-atlas.webp",
+  "preserved_png": "/Users/porton/Documents/petshare/.tmp/debug-duck-v2-run/final/spritesheet-preserved.png",
+  "source_sha256": "6225b5ad1df624159c1798a396993d5e46647076f74e1191b829e74d4b6270de",
+  "archive_sha256": "6225b5ad1df624159c1798a396993d5e46647076f74e1191b829e74d4b6270de",
+  "archive_byte_identical": true,
+  "source_size": [
+    1536,
+    1872
+  ],
+  "preserved_size": [
+    1536,
+    1872
+  ],
+  "alpha_difference_pixels": 0,
+  "visible_rgba_difference_pixels": 0,
+  "hidden_rgb_pixels_zeroed": 1104895,
+  "preserved_rows": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "note": "Only RGB under alpha=0 differs in the strict-validation PNG; every visible RGBA pixel and every alpha value is unchanged."
+}

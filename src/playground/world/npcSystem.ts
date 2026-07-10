@@ -5,6 +5,7 @@
 import * as THREE from "three";
 import { petTextureAssetUrl } from "../../domain/http";
 import { canOccupyPlaygroundPosition, clampToPlaygroundFloor } from "../core/collision";
+import { petAtlasRowsFromHeight } from "../core/config";
 
 // NPC slot system — up to MAX_NPCS wandering AI pets at once. Each NPC is a
 // distinct sprite atlas (different pet) so the user can populate the park.
@@ -45,6 +46,7 @@ type Npc = {
   mat: THREE.SpriteMaterial;
   tex: THREE.Texture;
   imgReady: boolean;
+  atlasRows: number;
   state: NpcState;
   stateStart: number;
   row: number;
@@ -190,6 +192,7 @@ export function makeNpcSystem(
       mat,
       tex,
       imgReady: false,
+      atlasRows: NPC_ATLAS_ROWS,
       state: "idle",
       stateStart: performance.now(),
       row: NPC_DEFS.idle.row,
@@ -216,6 +219,8 @@ export function makeNpcSystem(
       return null;
     }
     img.onload = () => {
+      npc.atlasRows = petAtlasRowsFromHeight(img.naturalHeight);
+      tex.repeat.y = 1 / npc.atlasRows;
       npc.imgReady = true;
       tex.needsUpdate = true;
       sprite.visible = true;
@@ -325,7 +330,7 @@ export function makeNpcSystem(
         n.tex.repeat.x = 1 / NPC_ATLAS_COLS;
         n.tex.offset.x = frameIdx / NPC_ATLAS_COLS;
       }
-      n.tex.offset.y = (NPC_ATLAS_ROWS - 1 - n.row) / NPC_ATLAS_ROWS;
+      n.tex.offset.y = (n.atlasRows - 1 - n.row) / n.atlasRows;
     }
   }
 

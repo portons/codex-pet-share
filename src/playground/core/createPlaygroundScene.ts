@@ -11,7 +11,7 @@ import {
 } from "./config";
 import { addRoPronteraBiome } from "./roBiome";
 
-export function createPlaygroundScene(canvas: HTMLCanvasElement, img: HTMLImageElement) {
+export function createPlaygroundScene(canvas: HTMLCanvasElement, img: HTMLImageElement, atlasRows = ATLAS_ROWS) {
   const disposables: Array<{ dispose: () => void }> = [];
   const texture = new THREE.Texture(img);
   texture.magFilter = THREE.NearestFilter;
@@ -20,7 +20,7 @@ export function createPlaygroundScene(canvas: HTMLCanvasElement, img: HTMLImageE
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
   texture.generateMipmaps = false;
-  texture.repeat.set(1 / ATLAS_COLS, 1 / ATLAS_ROWS);
+  texture.repeat.set(1 / ATLAS_COLS, 1 / atlasRows);
   texture.needsUpdate = true;
 
   const scene = new THREE.Scene();
@@ -75,6 +75,7 @@ export function createPlaygroundScene(canvas: HTMLCanvasElement, img: HTMLImageE
     spriteMat,
     shadow,
     loadingOrbTexture,
+    atlasRows,
     disposables
   };
 }

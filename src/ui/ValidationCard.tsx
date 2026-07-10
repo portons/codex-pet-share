@@ -18,6 +18,9 @@ export function ValidationReportCard({ report }: { report?: ValidationReport }) 
   return (
     <section className="validationCard" aria-label="Package validation">
       <ValidationItem label="manifest" value={report.manifestId} />
+      <ValidationItem label="format" value={`v${report.spriteVersionNumber || (report.atlasSize === "1536x2288" ? 2 : 1)}`} />
+      <ValidationItem label="atlas" value={report.atlasSize} />
+      <ValidationItem label="rows" value={String(report.statesDetected)} />
       <ValidationItem label="pet.json" value={formatBytes(report.manifestBytes)} />
       <ValidationItem label="spritesheet" value={formatBytes(report.spritesheetBytes)} />
     </section>

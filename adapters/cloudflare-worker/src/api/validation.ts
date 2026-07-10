@@ -1,5 +1,5 @@
 import { HttpError } from "../core/http";
-import type { PetKind, ValidationReport } from "../core/types";
+import type { PetKind, PetSpriteVersion, ValidationReport } from "../core/types";
 import { allowedPetKinds } from "./constants";
 
 export type Manifest = {
@@ -7,12 +7,15 @@ export type Manifest = {
   displayName: string;
   description: string;
   spritesheetPath: "spritesheet.webp";
+  spriteVersionNumber?: 2;
   kind?: PetKind;
 };
 
-const atlas = { width: 1536, height: 1872 };
+const atlases: Record<PetSpriteVersion, { width: number; height: number; states: number }> = {
+  1: { width: 1536, height: 1872, states: 9 },
+  2: { width: 1536, height: 2288, states: 11 }
+};
 const cell = { width: 192, height: 208 };
-const stateCount = 9;
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export function validateManifest(value: unknown): Manifest {
@@ -24,12 +27,23 @@ export function validateManifest(value: unknown): Manifest {
   const displayName = String(input.displayName || "").trim();
   const description = String(input.description || "").trim();
   const spritesheetPath = String(input.spritesheetPath || "");
+  const spriteVersionNumber = input.spriteVersionNumber;
   const kind = input.kind === undefined ? undefined : parsePetKind(input.kind);
   if (!slugPattern.test(id)) throw new HttpError("pet.json id must contain letters or numbers", 400);
   if (!displayName || displayName.length > 80) throw new HttpError("pet.json displayName is required", 400);
   if (!description || description.length > 280) throw new HttpError("pet.json description is required", 400);
   if (spritesheetPath !== "spritesheet.webp") throw new HttpError("pet.json spritesheetPath must be spritesheet.webp", 400);
-  return { id, displayName, description, spritesheetPath, kind };
+  if (spriteVersionNumber !== undefined && spriteVersionNumber !== 2) {
+    throw new HttpError("pet.json spriteVersionNumber must be 2 when provided", 400);
+  }
+  return {
+    id,
+    displayName,
+    description,
+    spritesheetPath,
+    ...(spriteVersionNumber === 2 ? { spriteVersionNumber: 2 as const } : {}),
+    kind
+  };
 }
 
 export function normalizePetSlug(value: string) {
@@ -60,11 +74,21 @@ export function parseJson(value: string, name: string) {
   }
 }
 
-export function validateSpritesheet(bytes: Uint8Array) {
+export function validateSpritesheet(bytes: Uint8Array, expectedVersion?: PetSpriteVersion): PetSpriteVersion {
   const size = webpSize(bytes, "spritesheet");
-  if (size.width !== atlas.width || size.height !== atlas.height) {
-    throw new HttpError(`spritesheet must be ${atlas.width}x${atlas.height}`, 400);
+  const version = ([1, 2] as const).find((candidate) => {
+    const atlas = atlases[candidate];
+    return size.width === atlas.width && size.height === atlas.height;
+  });
+  if (!version) {
+    throw new HttpError("spritesheet must be 1536x1872 (v1) or 1536x2288 (v2)", 400);
   }
+  if (expectedVersion && version !== expectedVersion) {
+    throw new HttpError(version === 2
+      ? "v2 spritesheets require spriteVersionNumber: 2 in pet.json"
+      : "spriteVersionNumber: 2 requires a 1536x2288 spritesheet", 400);
+  }
+  return version;
 }
 
 export function validateShareImage(bytes: Uint8Array) {
@@ -72,9 +96,12 @@ export function validateShareImage(bytes: Uint8Array) {
   if (size.width !== 1200 || size.height !== 630) throw new HttpError("share.png must be 1200x630", 400);
 }
 
-export function validatePreviewImage(bytes: Uint8Array) {
+export function validatePreviewImage(bytes: Uint8Array, spriteVersionNumber: PetSpriteVersion = 1) {
   const size = webpSize(bytes, "preview.webp");
-  if (size.width !== 5472 || size.height !== 104) throw new HttpError("preview.webp must be 5472x104", 400);
+  const expectedWidth = spriteVersionNumber === 2 ? 7008 : 5472;
+  if (size.width !== expectedWidth || size.height !== 104) {
+    throw new HttpError(`preview.webp must be ${expectedWidth}x104 for v${spriteVersionNumber}`, 400);
+  }
 }
 
 export function validatePosterImage(bytes: Uint8Array) {
@@ -82,16 +109,23 @@ export function validatePosterImage(bytes: Uint8Array) {
   if (size.width !== cell.width || size.height !== cell.height) throw new HttpError(`poster.webp must be ${cell.width}x${cell.height}`, 400);
 }
 
-export function validationFromBytes(manifest: Manifest, spritesheet: Uint8Array): ValidationReport {
+export function validationFromBytes(manifest: Manifest, spritesheet: Uint8Array, version?: PetSpriteVersion): ValidationReport {
   const size = webpSize(spritesheet, "spritesheet");
+  const spriteVersionNumber = version || validateSpritesheet(spritesheet, manifest.spriteVersionNumber || 1);
   return {
     manifestId: manifest.id,
     atlasSize: `${size.width}x${size.height}`,
     cellSize: `${cell.width}x${cell.height}`,
-    statesDetected: stateCount,
+    statesDetected: atlases[spriteVersionNumber].states,
     manifestBytes: new TextEncoder().encode(JSON.stringify(manifest, null, 2) + "\n").length,
-    spritesheetBytes: spritesheet.length
+    spritesheetBytes: spritesheet.length,
+    spriteVersionNumber
   };
+}
+
+export function spriteVersionFromReport(report: ValidationReport | null | undefined): PetSpriteVersion {
+  if (report?.spriteVersionNumber === 2 || report?.atlasSize === "1536x2288") return 2;
+  return 1;
 }
 
 function webpSize(bytes: Uint8Array, name: string) {

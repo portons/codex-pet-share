@@ -5,7 +5,7 @@ with Cloudflare services:
 
 - Worker Assets serve the Vite build.
 - D1 stores users, sessions, pets, likes, collections, and room metadata.
-- R2 stores pet packages and generated social/preview images.
+- R2 stores pet packages and generated social/preview/poster images.
 - Durable Objects provide multiplayer room presence and broadcast.
 
 Secrets are set with Wrangler and are not committed:
@@ -32,3 +32,10 @@ npm run adapter:cloudflare:migrate
 After creating the D1 database, copy the returned `database_id` into
 `adapters/cloudflare-worker/wrangler.toml`. Replace the placeholder app origin,
 CORS origins, Worker name, and route before deploying.
+
+The adapter accepts both Codex pet atlas formats. V1 uses a `1536x1872` WebP
+and no manifest version marker. V2 uses a `1536x2288` WebP and requires
+`spriteVersionNumber: 2`; the final two rows contain 16 clockwise look
+directions and row 0 / column 6 contains the dedicated neutral look cell.
+Upload validation keeps the manifest marker, atlas height, and
+generated preview-strip width in sync.

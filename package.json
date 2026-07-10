@@ -23,6 +23,7 @@
     "adapter:cloudflare:deploy": "wrangler deploy -c adapters/cloudflare-worker/wrangler.toml",
     "adapter:cloudflare:migrate": "wrangler d1 migrations apply your-pet-share -c adapters/cloudflare-worker/wrangler.toml --remote",
     "adapter:cloudflare:migrate:local": "wrangler d1 migrations apply your-pet-share -c adapters/cloudflare-worker/wrangler.toml --local",
+    "check:pet-fixtures": "node scripts/check-pet-fixtures.mjs",
     "build:social-card": "node scripts/build-social-card.mjs",
     "build:nav-mark": "node scripts/build-nav-mark.mjs"
   },

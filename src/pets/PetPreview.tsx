@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   petStates,
-  previewFrameCount,
+  previewFrameCountForVersion,
+  spriteSheetHeight,
   type PetState
 } from "../domain/config";
 import type { Pet } from "../domain/types";
@@ -12,7 +13,8 @@ export function PetSprite({
   frames,
   label,
   size = "medium",
-  transparent = false
+  transparent = false,
+  staticFrame
 }: {
   pet: Pet;
   row: number;
@@ -20,6 +22,7 @@ export function PetSprite({
   label: string;
   size?: "thumb" | "small" | "medium" | "large";
   transparent?: boolean;
+  staticFrame?: number;
 }) {
   return (
     <div
@@ -27,14 +30,16 @@ export function PetSprite({
       aria-label={`${pet.displayName} ${label} preview`}
     >
       <div
-        className="sprite"
+        className={`sprite ${staticFrame === undefined ? "" : "staticSprite"}`}
         style={
           {
             backgroundImage: `url(${pet.spritesheetUrl})`,
+            "--sprite-x": `${(staticFrame || 0) * -192}px`,
             "--sprite-y": `${row * -208}px`,
             "--sprite-end-x": `${frames * -192}px`,
             "--sprite-frames": frames,
-            "--sprite-duration": `${Math.max(frames * 260, 1400)}ms`
+            "--sprite-duration": `${Math.max(frames * 260, 1400)}ms`,
+            "--sprite-atlas-height": `${spriteSheetHeight(pet.spriteVersionNumber)}px`
           } as CSSProperties
         }
       />
@@ -51,6 +56,7 @@ export function CyclingPetPreview({
   size?: "thumb" | "medium" | "large";
   transparent?: boolean;
 }) {
+  const previewFrameCount = previewFrameCountForVersion(pet.spriteVersionNumber);
   return (
     <div
       className={`spriteFrame previewStripFrame ${transparent ? "transparent" : "previewSurface"} ${size}`}
@@ -146,10 +152,12 @@ export function GalleryPetPreview({
             style={
               {
                 backgroundImage: `url(${pet.spritesheetUrl})`,
+                "--sprite-x": "0px",
                 "--sprite-y": `${state.row * -208}px`,
                 "--sprite-end-x": `${state.frames * -192}px`,
                 "--sprite-frames": state.frames,
-                "--sprite-duration": `${Math.max(state.frames * 260, 1400)}ms`
+                "--sprite-duration": `${Math.max(state.frames * 260, 1400)}ms`,
+                "--sprite-atlas-height": `${spriteSheetHeight(pet.spriteVersionNumber)}px`
               } as CSSProperties
             }
           />

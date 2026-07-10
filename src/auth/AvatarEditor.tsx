@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState, type DragEvent, type PointerEvent } from "react";
 import webpEncWasmUrl from "@jsquash/webp/codec/enc/webp_enc.wasm?url";
 import webpEncSimdWasmUrl from "@jsquash/webp/codec/enc/webp_enc_simd.wasm?url";
-import { petStates, spriteCellHeight, spriteCellWidth } from "../domain/config";
+import {
+  petEditorAnimationRows,
+  petFrameLabel,
+  spriteAtlasRows,
+  spriteCellHeight,
+  spriteCellWidth
+} from "../domain/config";
 import type { Pet, User } from "../domain/types";
 import { Icon } from "../ui/Icon";
 import { Spinner } from "../ui/Spinner";
@@ -61,7 +67,8 @@ export function AvatarEditor({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [localStatus, setLocalStatus] = useState("");
   const selectedPet = pets.find((pet) => pet.id === selectedPetId) || null;
-  const selectedState = petStates.find((state) => state.id === selectedStateId) || petStates[0];
+  const selectedPetRows = petEditorAnimationRows(selectedPet?.spriteVersionNumber || 1);
+  const selectedState = selectedPetRows.find((state) => state.id === selectedStateId) || selectedPetRows[0];
 
   useEffect(() => {
     return () => revokeObjectUrl();
@@ -70,6 +77,12 @@ export function AvatarEditor({
   useEffect(() => {
     if (!selectedPetId && pets.length) setSelectedPetId(pets[0].id);
   }, [pets, selectedPetId]);
+
+  useEffect(() => {
+    if (selectedPetRows.some((state) => state.id === selectedStateId)) return;
+    setSelectedStateId("idle");
+    setSelectedFrame(0);
+  }, [selectedPetRows, selectedStateId]);
 
   useEffect(() => {
     if (sourceKind !== "pet" || !selectedPet) return;
@@ -313,7 +326,7 @@ export function AvatarEditor({
                   }}
                   disabled={busy || !selectedPet}
                 >
-                  {petStates.map((state) => (
+                  {selectedPetRows.map((state) => (
                     <option key={state.id} value={state.id}>{state.label}</option>
                   ))}
                 </select>
@@ -326,7 +339,7 @@ export function AvatarEditor({
                     key={frame}
                     onClick={() => setSelectedFrame(frame)}
                     disabled={busy || !selectedPet}
-                    aria-label={`Frame ${frame + 1}`}
+                    aria-label={petFrameLabel(selectedState.row, frame, selectedPet?.spriteVersionNumber || 1)}
                   >
                     {selectedPet ? (
                       <span
@@ -335,7 +348,7 @@ export function AvatarEditor({
                         style={{
                           backgroundImage: `url(${selectedPet.spritesheetUrl})`,
                           backgroundPosition: `-${frame * 24}px -${selectedState.row * 26}px`,
-                          backgroundSize: `${8 * 24}px ${petStates.length * 26}px`
+                          backgroundSize: `${8 * 24}px ${spriteAtlasRows[selectedPet.spriteVersionNumber] * 26}px`
                         }}
                       />
                     ) : frame + 1}

@@ -4,6 +4,7 @@ import type { RoomPresence } from "../../realtime/roomChannel";
 import {
   ATLAS_COLS,
   ATLAS_ROWS,
+  petAtlasRowsFromHeight,
   SPRITE_HEIGHT,
   SPRITE_WIDTH
 } from "../core/config";
@@ -77,6 +78,7 @@ export function ensureRemotePet({
     mat,
     tex,
     imgReady: false,
+    atlasRows: ATLAS_ROWS,
     loadingOrb,
     targetX: 0,
     targetY: 0,
@@ -97,6 +99,8 @@ export function ensureRemotePet({
     footstepTimer: 0
   };
   img.onload = () => {
+    next.atlasRows = petAtlasRowsFromHeight(img.naturalHeight);
+    tex.repeat.y = 1 / next.atlasRows;
     next.imgReady = true;
     tex.needsUpdate = true;
     sprite.visible = true;
@@ -201,6 +205,7 @@ export function createRemoteNpc({
     mat,
     tex,
     imgReady: false,
+    atlasRows: NPC_ATLAS_ROWS,
     loadingOrb,
     targetX: x,
     targetY: y,
@@ -214,6 +219,8 @@ export function createRemoteNpc({
     rowStart: performance.now()
   };
   img.onload = () => {
+    npc.atlasRows = petAtlasRowsFromHeight(img.naturalHeight);
+    tex.repeat.y = 1 / npc.atlasRows;
     npc.imgReady = true;
     tex.needsUpdate = true;
     sprite.visible = true;

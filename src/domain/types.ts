@@ -13,6 +13,7 @@ export type Pet = {
   displayName: string;
   description: string;
   spritesheetPath: string;
+  spriteVersionNumber: PetSpriteVersion;
   kind: EditablePetKind;
   spritesheetUrl: string;
   posterUrl: string;
@@ -124,8 +125,11 @@ export type UploadManifest = {
   displayName: string;
   description: string;
   spritesheetPath: string;
+  spriteVersionNumber?: 2;
   kind?: EditablePetKind;
 };
+
+export type PetSpriteVersion = 1 | 2;
 
 export type UploadState = {
   manifest: File | null;
@@ -219,6 +223,7 @@ export type ValidationReport = {
   statesDetected: number;
   manifestBytes: number;
   spritesheetBytes: number;
+  spriteVersionNumber?: PetSpriteVersion;
 };
 
 export type EntityShareTarget = {

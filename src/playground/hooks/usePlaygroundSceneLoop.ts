@@ -1,7 +1,7 @@
 import { useEffect, useRef, type Dispatch, type RefObject, type SetStateAction } from "react";
 import * as THREE from "three";
 import type { Pet } from "../../domain/types";
-import { FLOOR_HALF, SPRITE_HEIGHT, SPRITE_WIDTH, type StateId } from "../core/config";
+import { FLOOR_HALF, petAtlasRowsFromHeight, SPRITE_HEIGHT, SPRITE_WIDTH, type StateId } from "../core/config";
 import { createPlaygroundScene } from "../core/createPlaygroundScene";
 import { attachCameraDragControls, attachKeyboardControls, attachZoomControls } from "../core/inputControls";
 import { loadImage } from "../core/loadImage";
@@ -104,7 +104,7 @@ export function usePlaygroundSceneLoop({
       try {
         const img = await loadImage(pet.spritesheetUrl);
         if (!alive) return;
-        const sceneSetup = createPlaygroundScene(canvas, img);
+        const sceneSetup = createPlaygroundScene(canvas, img, petAtlasRowsFromHeight(img.naturalHeight));
         texture = sceneSetup.texture;
         spriteTextureRef.current = texture;
 
@@ -211,7 +211,10 @@ export function usePlaygroundSceneLoop({
             petZ: sprite.position.z,
             spawnDust: spriteEffects.spawnDust
           });
-          applyPetSpriteVisuals(sprite, spriteMat, texture!, spriteFrame);
+          const liveAtlasRows = petAtlasRowsFromHeight(
+            (texture!.image as HTMLImageElement | undefined)?.naturalHeight || img.naturalHeight
+          );
+          applyPetSpriteVisuals(sprite, spriteMat, texture!, spriteFrame, liveAtlasRows);
 
           zoomDisplay = updateCameraZoom({ pressed, zoomTarget: zoomState, zoomDisplay, dt });
           updateCameraFollow({ camera, sprite, yaw: yawState.value, zoomDisplay });

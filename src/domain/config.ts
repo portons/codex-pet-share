@@ -4,6 +4,7 @@ import type {
   GalleryUrlState,
   GalleryView,
   PetKind,
+  PetSpriteVersion,
   UploadState
 } from "./types";
 
@@ -33,14 +34,80 @@ export const petStates = [
 ] as const;
 
 export type PetState = (typeof petStates)[number];
+export const petLookRows = [
+  { id: "look-000-157", label: "Look 000°–157.5°", row: 9, frames: 8 },
+  { id: "look-180-337", label: "Look 180°–337.5°", row: 10, frames: 8 }
+] as const;
+export type PetLookRow = (typeof petLookRows)[number];
+export type PetAnimationRow = {
+  readonly id: PetState["id"] | PetLookRow["id"];
+  readonly label: string;
+  readonly row: number;
+  readonly frames: number;
+};
+export const allPetAnimationRows: readonly PetAnimationRow[] = [...petStates, ...petLookRows];
+const allPetEditorRows: readonly PetAnimationRow[] = allPetAnimationRows.map((state) =>
+  state.row === 0 ? { ...state, frames: 7 } : state
+);
+
+export function petAnimationRows(version: PetSpriteVersion): readonly PetAnimationRow[] {
+  return version === 2 ? allPetAnimationRows : petStates;
+}
+
+export function petEditorAnimationRows(version: PetSpriteVersion): readonly PetAnimationRow[] {
+  return version === 2 ? allPetEditorRows : petStates;
+}
+
+export function petAnimationRow(version: PetSpriteVersion, row: number): PetAnimationRow {
+  return petAnimationRows(version).find((state) => state.row === row) || petStates[0];
+}
+
+export function petFrameLabel(row: number, frame: number, version: PetSpriteVersion = 1) {
+  if (version === 2 && row === 0 && frame === 6) return "Neutral look";
+  if (row < 9) return `Frame ${frame + 1}`;
+  const directionIndex = (row - 9) * spriteAtlasColumns + frame;
+  const degrees = directionIndex * lookDirectionStepDegrees;
+  const padded = Number.isInteger(degrees)
+    ? String(degrees).padStart(3, "0")
+    : degrees.toFixed(1).padStart(5, "0");
+  return `${padded}°`;
+}
 export type CursorPreviewStateId = "idle" | "waiting" | "running-left" | "running-right";
 
 export const previewFrameCount = petStates.reduce((total, state) => total + state.frames, 0);
 export const previewSpriteFrames = petStates.flatMap((state) =>
   Array.from({ length: state.frames }, (_, frame) => ({ row: state.row, frame }))
 );
+
+export function previewSpriteFramesForVersion(version: PetSpriteVersion) {
+  return petAnimationRows(version).flatMap((state) =>
+    Array.from({ length: state.frames }, (_, frame) => ({ row: state.row, frame }))
+  );
+}
+
+export function previewFrameCountForVersion(version: PetSpriteVersion) {
+  return previewSpriteFramesForVersion(version).length;
+}
 export const spriteCellWidth = 192;
 export const spriteCellHeight = 208;
+export const spriteAtlasColumns = 8;
+export const spriteAtlasRows: Record<PetSpriteVersion, number> = { 1: 9, 2: 11 };
+export const spriteSheetWidth = spriteCellWidth * spriteAtlasColumns;
+export const lookDirectionCount = 16;
+export const lookDirectionStepDegrees = 360 / lookDirectionCount;
+
+export function spriteSheetHeight(version: PetSpriteVersion) {
+  return spriteCellHeight * spriteAtlasRows[version];
+}
+
+export function isPetSpriteVersion(value: unknown): value is PetSpriteVersion {
+  return value === 1 || value === 2;
+}
+
+export function lookDirectionCell(directionIndex: number) {
+  const normalized = ((Math.round(directionIndex) % lookDirectionCount) + lookDirectionCount) % lookDirectionCount;
+  return { row: 9 + Math.floor(normalized / spriteAtlasColumns), frame: normalized % spriteAtlasColumns };
+}
 export const gifAlphaThreshold = 200;
 export const cursorPreviewWidth = 96;
 export const cursorPreviewHeight = 104;
