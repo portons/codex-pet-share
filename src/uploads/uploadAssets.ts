@@ -16,7 +16,13 @@ import {
 } from "../domain/config";
 import type { EditablePetKind, PetSpriteVersion, UploadManifest } from "../domain/types";
 
-export type SpriteFixOperation = "swap-running-rows" | "mirror-right-to-left" | "mirror-left-to-right";
+export type SpriteFixOperation =
+  | "swap-running-rows"
+  | "mirror-right-to-left"
+  | "mirror-left-to-right"
+  | "swap-look-rows"
+  | "mirror-look-right-to-left"
+  | "mirror-look-left-to-right";
 export type SpriteFrameTarget = number | "all";
 export type SpritePixelPatch = { x: number; y: number; r: number; g: number; b: number; a: number };
 export type SpriteFrameTransform = { row: number; frame: SpriteFrameTarget; dx: number; dy: number; rotate: number };
@@ -294,8 +300,11 @@ export async function editPetSpritesheet(spritesheet: File, operation: PetSprite
       operation.kind === "swap-running-rows"
       || operation.kind === "mirror-right-to-left"
       || operation.kind === "mirror-left-to-right"
+      || operation.kind === "swap-look-rows"
+      || operation.kind === "mirror-look-right-to-left"
+      || operation.kind === "mirror-look-left-to-right"
     ) {
-      applyRunningDirectionOperation(canvas, context, operation.kind);
+      applyDirectionOperation(canvas, context, operation.kind);
     } else if (operation.kind === "remap-rows") {
       applyRowRemap(canvas, context, operation.rowMap);
     } else if (operation.kind === "replace-frame") {
@@ -312,36 +321,64 @@ export async function editPetSpritesheet(spritesheet: File, operation: PetSprite
   }
 }
 
-function applyRunningDirectionOperation(
+function applyDirectionOperation(
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
   operation: SpriteFixOperation
 ) {
-  if (operation === "swap-running-rows") {
-    const runningRight = context.getImageData(0, spriteCellHeight, canvas.width, spriteCellHeight);
-    const runningLeft = context.getImageData(0, spriteCellHeight * 2, canvas.width, spriteCellHeight);
-    context.putImageData(runningLeft, 0, spriteCellHeight);
-    context.putImageData(runningRight, 0, spriteCellHeight * 2);
+  const isLookOperation = operation === "swap-look-rows"
+    || operation === "mirror-look-right-to-left"
+    || operation === "mirror-look-left-to-right";
+  const rightRow = isLookOperation ? 9 : 1;
+  const leftRow = isLookOperation ? 10 : 2;
+
+  if (operation === "swap-running-rows" || operation === "swap-look-rows") {
+    const right = context.getImageData(0, rightRow * spriteCellHeight, canvas.width, spriteCellHeight);
+    const left = context.getImageData(0, leftRow * spriteCellHeight, canvas.width, spriteCellHeight);
+    context.putImageData(left, 0, rightRow * spriteCellHeight);
+    context.putImageData(right, 0, leftRow * spriteCellHeight);
     return;
   }
 
-  const sourceRow = operation === "mirror-right-to-left" ? 1 : 2;
-  const targetRow = operation === "mirror-right-to-left" ? 2 : 1;
-  const source = context.getImageData(0, sourceRow * spriteCellHeight, canvas.width, spriteCellHeight);
-  const target = context.createImageData(canvas.width, spriteCellHeight);
-  for (let frame = 0; frame < 8; frame += 1) {
-    for (let y = 0; y < spriteCellHeight; y += 1) {
-      for (let x = 0; x < spriteCellWidth; x += 1) {
-        const sourceIndex = (y * canvas.width + frame * spriteCellWidth + x) * 4;
-        const targetIndex = (y * canvas.width + frame * spriteCellWidth + spriteCellWidth - 1 - x) * 4;
-        target.data[targetIndex] = source.data[sourceIndex];
-        target.data[targetIndex + 1] = source.data[sourceIndex + 1];
-        target.data[targetIndex + 2] = source.data[sourceIndex + 2];
-        target.data[targetIndex + 3] = source.data[sourceIndex + 3];
-      }
-    }
+  const mirrorsRightIntoLeft = operation === "mirror-right-to-left"
+    || operation === "mirror-look-right-to-left";
+  const sourceRow = mirrorsRightIntoLeft ? rightRow : leftRow;
+  const targetRow = mirrorsRightIntoLeft ? leftRow : rightRow;
+  const sourceCanvas = snapshotCanvas(canvas);
+  const firstTargetFrame = isLookOperation ? 1 : 0;
+
+  for (let targetFrame = firstTargetFrame; targetFrame < 8; targetFrame += 1) {
+    const sourceFrame = isLookOperation ? 8 - targetFrame : targetFrame;
+    copyMirroredCell(sourceCanvas, context, sourceRow, sourceFrame, targetRow, targetFrame);
   }
-  context.putImageData(target, 0, targetRow * spriteCellHeight);
+}
+
+function copyMirroredCell(
+  sourceCanvas: HTMLCanvasElement,
+  context: CanvasRenderingContext2D,
+  sourceRow: number,
+  sourceFrame: number,
+  targetRow: number,
+  targetFrame: number
+) {
+  const targetX = targetFrame * spriteCellWidth;
+  const targetY = targetRow * spriteCellHeight;
+  context.clearRect(targetX, targetY, spriteCellWidth, spriteCellHeight);
+  context.save();
+  context.translate(targetX + spriteCellWidth, targetY);
+  context.scale(-1, 1);
+  context.drawImage(
+    sourceCanvas,
+    sourceFrame * spriteCellWidth,
+    sourceRow * spriteCellHeight,
+    spriteCellWidth,
+    spriteCellHeight,
+    0,
+    0,
+    spriteCellWidth,
+    spriteCellHeight
+  );
+  context.restore();
 }
 
 function applyRowRemap(

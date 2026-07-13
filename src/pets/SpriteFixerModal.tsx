@@ -31,7 +31,9 @@ import type {
 import { fetchPetPackageSpritesheet } from "../uploads/uploadAssets";
 
 type EditorToolId = "repair" | "rows" | "frames" | "clean" | "align" | "preview";
-type SpriteRowPlan = Record<number, { sourceRow: number; flipX: boolean }>;
+type DirectionPairId = "run" | "look";
+type SpriteCellPlan = { sourceRow: number; sourceFrame: number; flipX: boolean };
+type SpriteRowPlan = Record<number, readonly SpriteCellPlan[]>;
 type PixelMode = "erase" | "restore" | "sample";
 type AlignRotation = 0 | 90 | 180 | 270;
 type PixelPatchMap = Record<string, SpritePixelPatch>;
@@ -67,31 +69,81 @@ const editorTools = [
   { id: "preview", label: "Preview", icon: "play", kicker: "runtime" }
 ] as const satisfies Array<{ id: EditorToolId; label: string; icon: IconName; kicker: string }>;
 
+const directionPairOptions = [
+  { id: "run", label: "Run" },
+  { id: "look", label: "Look around" }
+] as const satisfies Array<{ id: DirectionPairId; label: string }>;
+
+const directionPairs = {
+  run: {
+    title: "Run direction repair",
+    rightRow: 1,
+    leftRow: 2,
+    afterNote: "left row runs left, right row runs right"
+  },
+  look: {
+    title: "Look-around direction repair",
+    rightRow: 9,
+    leftRow: 10,
+    afterNote: "look cells match their labeled directions"
+  }
+} as const satisfies Record<DirectionPairId, {
+  title: string;
+  rightRow: number;
+  leftRow: number;
+  afterNote: string;
+}>;
+
 const directionOptions = [
   {
     id: "swap-running-rows",
+    pair: "run",
     label: "Swap run rows",
     detail: "The uploaded Run left and Run right rows are reversed.",
     action: "Save swapped rows"
   },
   {
     id: "mirror-right-to-left",
+    pair: "run",
     label: "Mirror right into left",
     detail: "Run right is correct. Rebuild Run left from that row.",
     action: "Save mirrored left"
   },
   {
     id: "mirror-left-to-right",
+    pair: "run",
     label: "Mirror left into right",
     detail: "Run left is correct. Rebuild Run right from that row.",
     action: "Save mirrored right"
+  },
+  {
+    id: "swap-look-rows",
+    pair: "look",
+    label: "Swap look rows",
+    detail: "The uploaded right-side and left-side look rows are reversed.",
+    action: "Save swapped look rows"
+  },
+  {
+    id: "mirror-look-right-to-left",
+    pair: "look",
+    label: "Mirror right looks into left",
+    detail: "Keep Down and rebuild the other seven left-side directions from the right-side row.",
+    action: "Save mirrored look-left"
+  },
+  {
+    id: "mirror-look-left-to-right",
+    pair: "look",
+    label: "Mirror left looks into right",
+    detail: "Keep Up and rebuild the other seven right-side directions from the left-side row.",
+    action: "Save mirrored look-right"
   }
-] as const satisfies Array<{ id: SpriteFixOperation; label: string; detail: string; action: string }>;
-
-const currentRunPlan: SpriteRowPlan = {
-  1: { sourceRow: 1, flipX: false },
-  2: { sourceRow: 2, flipX: false }
-};
+] as const satisfies Array<{
+  id: SpriteFixOperation;
+  pair: DirectionPairId;
+  label: string;
+  detail: string;
+  action: string;
+}>;
 
 const pixelModes = [
   { id: "erase", label: "Erase" },
@@ -111,23 +163,66 @@ function stateForRow(row: number, spriteVersionNumber: Pet["spriteVersionNumber"
     || petEditorAnimationRows(spriteVersionNumber)[0];
 }
 
-function rowPlanForOperation(operation: SpriteFixOperation): SpriteRowPlan {
-  if (operation === "mirror-right-to-left") {
-    return {
-      1: { sourceRow: 1, flipX: false },
-      2: { sourceRow: 1, flipX: true }
-    };
-  }
-  if (operation === "mirror-left-to-right") {
-    return {
-      1: { sourceRow: 2, flipX: true },
-      2: { sourceRow: 2, flipX: false }
-    };
-  }
+function directionPairForOperation(operation: SpriteFixOperation | null | undefined): DirectionPairId {
+  return operation === "swap-look-rows"
+    || operation === "mirror-look-right-to-left"
+    || operation === "mirror-look-left-to-right"
+    ? "look"
+    : "run";
+}
+
+function directionOptionsForPair(pair: DirectionPairId) {
+  return directionOptions.filter((option) => option.pair === pair);
+}
+
+function currentPlanForPair(pair: DirectionPairId): SpriteRowPlan {
+  const { rightRow, leftRow } = directionPairs[pair];
   return {
-    1: { sourceRow: 2, flipX: false },
-    2: { sourceRow: 1, flipX: false }
+    [rightRow]: identityCellPlan(rightRow),
+    [leftRow]: identityCellPlan(leftRow)
   };
+}
+
+function rowPlanForOperation(operation: SpriteFixOperation): SpriteRowPlan {
+  const pair = directionPairForOperation(operation);
+  const { rightRow, leftRow } = directionPairs[pair];
+  const plan = currentPlanForPair(pair);
+  if (operation === "swap-running-rows" || operation === "swap-look-rows") {
+    return {
+      [rightRow]: sourceCellPlan(leftRow),
+      [leftRow]: sourceCellPlan(rightRow)
+    };
+  }
+
+  const mirrorsRightIntoLeft = operation === "mirror-right-to-left"
+    || operation === "mirror-look-right-to-left";
+  const sourceRow = mirrorsRightIntoLeft ? rightRow : leftRow;
+  const targetRow = mirrorsRightIntoLeft ? leftRow : rightRow;
+  return {
+    ...plan,
+    [targetRow]: Array.from({ length: 8 }, (_, targetFrame) => {
+      if (pair === "look" && targetFrame === 0) {
+        return { sourceRow: targetRow, sourceFrame: 0, flipX: false };
+      }
+      return {
+        sourceRow,
+        sourceFrame: pair === "look" ? 8 - targetFrame : targetFrame,
+        flipX: true
+      };
+    })
+  };
+}
+
+function identityCellPlan(row: number): readonly SpriteCellPlan[] {
+  return sourceCellPlan(row);
+}
+
+function sourceCellPlan(sourceRow: number): readonly SpriteCellPlan[] {
+  return Array.from({ length: 8 }, (_, sourceFrame) => ({ sourceRow, sourceFrame, flipX: false }));
+}
+
+function cellPlanFor(rowPlan: SpriteRowPlan | undefined, row: number, frame: number): SpriteCellPlan {
+  return rowPlan?.[row]?.[frame] || { sourceRow: row, sourceFrame: frame, flipX: false };
 }
 
 export function SpriteFixerModal({
@@ -150,6 +245,9 @@ export function SpriteFixerModal({
   );
   const [activeTool, setActiveTool] = useState<EditorToolId>(initialDraft?.activeTool || "repair");
   const [directionOperation, setDirectionOperation] = useState<SpriteFixOperation | null>(initialDraft?.directionOperation || null);
+  const [directionPair, setDirectionPair] = useState<DirectionPairId>(
+    directionPairForOperation(initialDraft?.directionOperation)
+  );
   const [rowMap, setRowMap] = useState<Record<number, number>>(() =>
     initialDraft?.rowMap || Object.fromEntries(editorStates.map((state) => [state.row, state.row]))
   );
@@ -172,7 +270,11 @@ export function SpriteFixerModal({
   const workbenchRef = useRef<HTMLElement | null>(null);
   const inspectorRef = useRef<HTMLElement | null>(null);
 
-  const afterPlan = useMemo(() => directionOperation ? rowPlanForOperation(directionOperation) : currentRunPlan, [directionOperation]);
+  const currentDirectionPlan = useMemo(() => currentPlanForPair(directionPair), [directionPair]);
+  const afterPlan = useMemo(
+    () => directionOperation ? rowPlanForOperation(directionOperation) : currentDirectionPlan,
+    [currentDirectionPlan, directionOperation]
+  );
   const selectedDirection = directionOptions.find((option) => option.id === directionOperation) || null;
   const selectedFrameState = stateForRow(frameRow, pet.spriteVersionNumber);
   const selectedAlignState = stateForRow(alignRow, pet.spriteVersionNumber);
@@ -334,6 +436,11 @@ export function SpriteFixerModal({
     setPixelEdits({});
   }
 
+  function changeDirectionPair(pair: DirectionPairId) {
+    setDirectionPair(pair);
+    setDirectionOperation(null);
+  }
+
   return (
     <div
       className="modalBackdrop"
@@ -380,14 +487,20 @@ export function SpriteFixerModal({
               >
                 <Icon name={tool.icon} size={15} />
                 <span>{tool.label}</span>
-                <small>{tool.kicker}</small>
+                <small>{tool.id === "repair" && pet.spriteVersionNumber === 2 ? "run + look" : tool.kicker}</small>
               </button>
             ))}
           </nav>
 
           <main className="spriteEditorWorkbench" ref={workbenchRef}>
             {activeTool === "repair" ? (
-              <RepairStage pet={pet} afterPlan={afterPlan} currentPlan={currentRunPlan} hasSelection={Boolean(directionOperation)} />
+              <RepairStage
+                pet={pet}
+                pair={directionPair}
+                afterPlan={afterPlan}
+                currentPlan={currentDirectionPlan}
+                hasSelection={Boolean(directionOperation)}
+              />
             ) : null}
             {activeTool === "rows" ? (
               <RowsStage
@@ -450,7 +563,10 @@ export function SpriteFixerModal({
           <aside className="spriteEditorInspector" aria-label="Editor controls" ref={inspectorRef}>
             {activeTool === "repair" ? (
               <DirectionInspector
+                pet={pet}
                 busy={busy}
+                pair={directionPair}
+                setPair={changeDirectionPair}
                 directionOperation={directionOperation}
                 setDirectionOperation={setDirectionOperation}
                 selectedDirection={selectedDirection}
@@ -559,22 +675,42 @@ export function SpriteFixerModal({
 }
 
 function DirectionInspector({
+  pet,
   busy,
+  pair,
+  setPair,
   directionOperation,
   setDirectionOperation,
   selectedDirection
 }: {
+  pet: Pet;
   busy: boolean;
+  pair: DirectionPairId;
+  setPair: (pair: DirectionPairId) => void;
   directionOperation: SpriteFixOperation | null;
   setDirectionOperation: (operation: SpriteFixOperation) => void;
   selectedDirection: (typeof directionOptions)[number] | null;
 }) {
+  const options = directionOptionsForPair(pair);
   return (
     <div className="spriteEditorInspectorPanel">
-      <PanelTitle title="Run direction" />
-      <p className="spriteEditorPlanText">Pick the smallest repair that makes the running rows match their runtime meaning.</p>
-      <div className="spriteEditorOptionStack" role="radiogroup" aria-label="Run direction repair">
-        {directionOptions.map((option) => (
+      <PanelTitle title={pair === "look" ? "Look-around direction" : "Run direction"} />
+      {pet.spriteVersionNumber === 2 ? (
+        <SegmentedControl<DirectionPairId>
+          label="Rows"
+          value={pair}
+          values={directionPairOptions}
+          disabled={busy}
+          onChange={setPair}
+        />
+      ) : null}
+      <p className="spriteEditorPlanText">
+        {pair === "look"
+          ? "Pick the smallest repair that makes the two look-around rows match their v2 direction labels."
+          : "Pick the smallest repair that makes the running rows match their runtime meaning."}
+      </p>
+      <div className="spriteEditorOptionStack" role="radiogroup" aria-label={`${pair === "look" ? "Look-around" : "Run"} direction repair`}>
+        {options.map((option) => (
           <label className={`spriteEditorOption ${directionOperation === option.id ? "active" : ""}`} key={option.id}>
             <input
               checked={directionOperation === option.id}
@@ -777,18 +913,23 @@ function PreviewInspector() {
 
 function RepairStage({
   pet,
+  pair,
   afterPlan,
   currentPlan,
   hasSelection
 }: {
   pet: Pet;
+  pair: DirectionPairId;
   afterPlan: SpriteRowPlan;
   currentPlan: SpriteRowPlan;
   hasSelection: boolean;
 }) {
+  const config = directionPairs[pair];
+  const leftState = stateForRow(config.leftRow, pet.spriteVersionNumber);
+  const rightState = stateForRow(config.rightRow, pet.spriteVersionNumber);
   return (
     <section className="spriteEditorStagePanel primary directionStage">
-      <StageHeading title="Run direction repair" label={hasSelection ? "previewing selected edit" : "choose repair"} />
+      <StageHeading title={config.title} label={hasSelection ? "previewing selected edit" : "choose repair"} />
       <div className="spriteEditorDirectionCompare">
         <div className="spriteEditorDirectionColumn current">
           <div className="spriteEditorDirectionColumnHead">
@@ -796,35 +937,63 @@ function RepairStage({
             <span>before edit</span>
           </div>
           <div className="spriteEditorRunPair compact">
-            <RunPreviewTile pet={pet} state={stateForRow(2)} rowPlan={currentPlan} side="left" size="small" />
-            <RunPreviewTile pet={pet} state={stateForRow(1)} rowPlan={currentPlan} side="right" size="small" />
+            <DirectionPreviewTile
+              pet={pet}
+              label={pair === "look" ? "Look left" : leftState.label}
+              state={leftState}
+              rowPlan={currentPlan}
+              side="left"
+              size="small"
+            />
+            <DirectionPreviewTile
+              pet={pet}
+              label={pair === "look" ? "Look right" : rightState.label}
+              state={rightState}
+              rowPlan={currentPlan}
+              side="right"
+              size="small"
+            />
           </div>
         </div>
         <div className="spriteEditorDirectionColumn after">
           <div className="spriteEditorDirectionColumnHead">
             <h4>{hasSelection ? "After save" : "Choose repair"}</h4>
-            <span>{hasSelection ? "left row runs left, right row runs right" : "no direction edit selected"}</span>
+            <span>{hasSelection ? config.afterNote : "no direction edit selected"}</span>
           </div>
           <div className="spriteEditorRunPair">
-            <RunPreviewTile pet={pet} state={stateForRow(2)} rowPlan={afterPlan} side="left" size="large" />
-            <RunPreviewTile pet={pet} state={stateForRow(1)} rowPlan={afterPlan} side="right" size="large" />
+            <DirectionPreviewTile
+              pet={pet}
+              label={pair === "look" ? "Look left" : leftState.label}
+              state={leftState}
+              rowPlan={afterPlan}
+              side="left"
+              size="large"
+            />
+            <DirectionPreviewTile
+              pet={pet}
+              label={pair === "look" ? "Look right" : rightState.label}
+              state={rightState}
+              rowPlan={afterPlan}
+              side="right"
+              size="large"
+            />
           </div>
         </div>
       </div>
       <div className="spriteEditorDirectionStrips">
         <article>
           <header>
-            <strong>Run left row</strong>
+            <strong>{leftState.label} row</strong>
             <span>{hasSelection ? "after save" : "current"}</span>
           </header>
-          <RunPlanStrip pet={pet} state={stateForRow(2)} rowPlan={afterPlan} size={36} />
+          <DirectionPlanStrip pet={pet} state={leftState} rowPlan={afterPlan} size={36} />
         </article>
         <article>
           <header>
-            <strong>Run right row</strong>
+            <strong>{rightState.label} row</strong>
             <span>{hasSelection ? "after save" : "current"}</span>
           </header>
-          <RunPlanStrip pet={pet} state={stateForRow(1)} rowPlan={afterPlan} size={36} />
+          <DirectionPlanStrip pet={pet} state={rightState} rowPlan={afterPlan} size={36} />
         </article>
       </div>
     </section>
@@ -1206,14 +1375,16 @@ function RuntimePreviewStage({
   );
 }
 
-function RunPreviewTile({
+function DirectionPreviewTile({
   pet,
+  label,
   state,
   rowPlan,
   side,
   size
 }: {
   pet: Pet;
+  label: string;
   state: PetAnimationRow;
   rowPlan: SpriteRowPlan;
   side: "left" | "right";
@@ -1223,7 +1394,7 @@ function RunPreviewTile({
   return (
     <article className={`spriteEditorRunTile ${side} ${size}`}>
       <header>
-        <strong>{state.label}</strong>
+        <strong>{label}</strong>
         <span>{side} side</span>
       </header>
       <AnimatedSprite pet={pet} state={state} rowPlan={rowPlan} size={previewSize} fps={8} />
@@ -1449,13 +1620,22 @@ function SpriteStrip({
   );
 }
 
-function RunPlanStrip({ pet, state, rowPlan, size }: { pet: Pet; state: PetAnimationRow; rowPlan: SpriteRowPlan; size: number }) {
-  const plan = rowPlan[state.row] || { sourceRow: state.row, flipX: false };
+function DirectionPlanStrip({ pet, state, rowPlan, size }: { pet: Pet; state: PetAnimationRow; rowPlan: SpriteRowPlan; size: number }) {
   return (
     <div className="spriteEditorStrip">
-      {Array.from({ length: state.frames }, (_, frame) => (
-        <SpriteFrame frame={frame} key={frame} pet={pet} row={plan.sourceRow} size={size} flipX={plan.flipX} />
-      ))}
+      {Array.from({ length: state.frames }, (_, frame) => {
+        const plan = cellPlanFor(rowPlan, state.row, frame);
+        return (
+          <SpriteFrame
+            frame={plan.sourceFrame}
+            key={frame}
+            pet={pet}
+            row={plan.sourceRow}
+            size={size}
+            flipX={plan.flipX}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -1478,13 +1658,13 @@ function AnimatedSprite({
   className?: string;
 }) {
   const frame = useAnimationFrame(state.frames, fps);
-  const plan = rowPlan?.[state.row] || { sourceRow: state.row, flipX: false };
+  const plan = cellPlanFor(rowPlan, state.row, frame);
   const alignEdit = alignEditForFrame(alignEdits, state.row, frame);
   return (
     <SpriteFrame
       pet={pet}
       row={plan.sourceRow}
-      frame={frame}
+      frame={plan.sourceFrame}
       size={size}
       flipX={plan.flipX}
       shiftX={alignEdit?.dx || 0}
@@ -1844,7 +2024,7 @@ function SegmentedControl<TValue extends string>({
   return (
     <div className="spriteEditorSegmentedField">
       <span>{label}</span>
-      <div className="spriteEditorSegmented">
+      <div className="spriteEditorSegmented" style={{ gridTemplateColumns: `repeat(${values.length}, minmax(0, 1fr))` }}>
         {values.map((item) => (
           <button
             aria-pressed={value === item.id}
@@ -1989,10 +2169,14 @@ function readSpriteEditorDraft(petId: string, spriteVersionNumber: Pet["spriteVe
     if (!raw) return null;
     const value = JSON.parse(raw) as Partial<SpriteEditorDraft>;
     if (value.version !== 1 || !isEditorToolId(value.activeTool)) return null;
+    const directionOperation = isSpriteFixOperation(value.directionOperation)
+      && (spriteVersionNumber === 2 || directionPairForOperation(value.directionOperation) === "run")
+      ? value.directionOperation
+      : null;
     return {
       version: 1,
       activeTool: value.activeTool,
-      directionOperation: isSpriteFixOperation(value.directionOperation) ? value.directionOperation : null,
+      directionOperation,
       rowMap: normalizeDraftRowMap(value.rowMap, spriteVersionNumber),
       frameRow: normalizeDraftRow(value.frameRow, 1, spriteVersionNumber),
       frameIndex: normalizeNullableFrame(
