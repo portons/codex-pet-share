@@ -24,14 +24,13 @@
     max-height: calc(100vh - 120px);
     padding: 12px 12px 10px;
     background: var(--rail-bg);
-    border: 1px solid var(--border-soft, #efede5);
-    border-radius: 14px;
-    /* Diffusion shadow tinted toward the warm background — never a
-       cold neutral drop shadow that would feel grafted in. */
-    box-shadow: 0 18px 42px -28px rgba(96, 76, 38, 0.32);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    /* Token shadow plus the same 1px inner highlight the floating nav
+       island uses, so the rail reads as the same material family. */
+    box-shadow: var(--shadow-md), inset 0 1px 0 var(--inset-highlight);
     /* Subtle backdrop softness so the rail picks up some of the
-       surface warmth behind it without being a full glassmorphism
-       cliché — plus a 1px inner highlight to suggest edge refraction. */
+       surface behind it without being a full glassmorphism cliché. */
     backdrop-filter: saturate(110%) blur(6px);
     -webkit-backdrop-filter: saturate(110%) blur(6px);
     z-index: 4;
@@ -56,7 +55,7 @@
   gap: 8px;
   margin: 0 0 4px;
   padding: 0 2px;
-  color: var(--muted-strong, #4a4944);
+  color: var(--muted);
 }
 
 .liveCollectionsRailDot {
@@ -64,7 +63,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent, #d97a18);
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
   flex: 0 0 auto;
 }
 
@@ -73,7 +73,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: var(--accent, #d97a18);
+  background: var(--accent);
   opacity: 0.5;
   animation: collectionLivePulse 1.8s ease-out infinite;
 }
@@ -100,7 +100,7 @@
   gap: 10px;
   align-items: center;
   padding: 8px 8px 8px 6px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
   background: transparent;
   text-align: left;
@@ -110,15 +110,15 @@
   cursor: pointer;
   width: 100%;
   transition:
-    background 160ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
-    border-color 160ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+    background 200ms var(--ease-out),
+    border-color 200ms var(--ease-out);
 }
 
 .liveCollectionsRailRow:hover,
 .liveCollectionsRailRow:focus-visible {
   outline: none;
-  background: rgba(247, 226, 200, 0.45);
-  border-color: rgba(177, 90, 22, 0.22);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 /* Avatar stack: 2 thumbs at 36px, overlapping by 14px. Pets stay
@@ -140,8 +140,8 @@
   height: 36px;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--surface-soft, #efede5);
-  border: 1.5px solid var(--surface, #ffffff);
+  background: var(--surface-soft);
+  border: 1.5px solid var(--surface);
   z-index: calc(10 - var(--slot-index, 0));
 }
 
@@ -153,7 +153,7 @@
   height: 36px;
   border-radius: 50%;
   border: none;
-  background: var(--surface-soft, #efede5);
+  background: var(--surface-soft);
 }
 
 /* Stop the looping animation: pets in the rooms preview hold the
@@ -177,11 +177,13 @@
 }
 
 .liveCollectionsRailName {
-  font-family: var(--font-display, "Cabinet Grotesk", system-ui);
+  /* 13px UI text — sans, not display; display type is reserved for
+     big headings in this language. */
+  font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.005em;
-  color: var(--ink, #0f0f0e);
+  color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -191,46 +193,46 @@
   display: inline-flex;
   align-items: baseline;
   gap: 4px;
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.04em;
-  color: var(--muted, #6f6f69);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
 .liveCollectionsRailCount {
-  color: var(--accent-deep, #8a4a16);
+  color: var(--accent-deep);
   font-weight: 700;
 }
 
 .liveCollectionsRailWord {
   /* Lowercase, lighter — the count is the load-bearing token. */
-  color: var(--muted, #6f6f69);
+  color: var(--muted);
   font-weight: 500;
 }
 
 .liveCollectionsRailArrow {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-family: var(--font-mono);
   font-size: 14px;
-  color: var(--muted, #6f6f69);
+  color: var(--muted);
   opacity: 0;
   transform: translateX(-2px);
   transition:
-    opacity 180ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
-    transform 180ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
-    color 160ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+    opacity 200ms var(--ease-out),
+    transform 200ms var(--ease-out),
+    color 200ms var(--ease-out);
 }
 
 .liveCollectionsRailRow:hover .liveCollectionsRailArrow,
 .liveCollectionsRailRow:focus-visible .liveCollectionsRailArrow {
   opacity: 1;
   transform: translateX(2px);
-  color: var(--accent-deep, #8a4a16);
+  color: var(--accent-deep);
 }
 
 .liveCollectionsRailRow:hover .liveCollectionsRailName,
 .liveCollectionsRailRow:focus-visible .liveCollectionsRailName {
-  color: var(--accent-deep, #8a4a16);
+  color: var(--accent-deep);
 }
 
 .collectionCardShare {

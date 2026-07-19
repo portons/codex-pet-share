@@ -1,0 +1,136 @@
+/* Uploads list */
+.uploadsTable {
+  overflow: hidden;
+  width: 100%;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.uploadsHead {
+  background: var(--surface-warm);
+}
+
+.uploadsHead th {
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border-soft);
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.uploadsTable th:nth-child(1),
+.uploadsTable td:nth-child(1) {
+  width: auto;
+}
+
+.uploadsTable th:nth-child(2),
+.uploadsTable td:nth-child(2) {
+  width: 160px;
+}
+
+.uploadsTable th:nth-child(3),
+.uploadsTable td:nth-child(3) {
+  width: 150px;
+}
+
+.uploadsTable th:nth-child(4),
+.uploadsTable td:nth-child(4) {
+  width: 130px;
+}
+
+.uploadsTable th:nth-child(5),
+.uploadsTable td:nth-child(5) {
+  width: 198px;
+}
+
+.uploadsRow td {
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: middle;
+  transition: background 180ms var(--ease-out);
+}
+
+.uploadsRow:hover td {
+  background: var(--surface-warm);
+}
+
+.uploadsRow:last-child td {
+  border-bottom: 0;
+}
+
+.uploadsPackage {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rowPreview {
+  width: 72px;
+  height: 78px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.uploadsName h2 {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.025em;
+  line-height: 1.18;
+  color: var(--ink);
+}
+
+.uploadsName p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.uploadsFixLink {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  max-width: 100%;
+  min-height: 24px;
+  margin-top: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: color 180ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.uploadsFixLink:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.uploadsFixLink:active {
+  transform: translateY(1px);
+}
+
+.rowActions {
+  justify-content: flex-end;
+}
+

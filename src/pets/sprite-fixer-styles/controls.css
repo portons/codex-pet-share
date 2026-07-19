@@ -1,0 +1,192 @@
+.spriteEditorStagePanel,
+.spriteEditorInspectorPanel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+}
+
+.spriteEditorStagePanel {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+}
+
+.spriteEditorStagePanel.primary {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 30%, transparent), transparent 56%),
+    var(--surface);
+}
+
+.spriteEditorStagePanel.compact {
+  gap: 12px;
+  padding: 12px;
+}
+
+.spriteEditorStageHeading,
+.spriteEditorPanelTitle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.spriteEditorStageHeading h3,
+.spriteEditorPanelTitle h3 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 740;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+.spriteEditorStageHeading span,
+.spriteEditorPanelTitle span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 560;
+  letter-spacing: 0.06em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.spriteEditorInspectorPanel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.spriteEditorPlanText,
+.spriteEditorInspectorNote,
+.spriteEditorFinePrint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.spriteEditorFinePrint {
+  padding: 0 2px;
+}
+
+.spriteEditorOptionStack,
+.spriteEditorRowMap {
+  display: grid;
+  gap: 8px;
+}
+
+.spriteEditorOption {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.spriteEditorOption input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spriteEditorOption span {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 680;
+  letter-spacing: -0.01em;
+}
+
+.spriteEditorOption small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.spriteEditorOption.active {
+  border-color: color-mix(in srgb, var(--accent) 52%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface));
+}
+
+.spriteEditorRangeField,
+.spriteEditorSegmentedField {
+  display: grid;
+  gap: 6px;
+}
+
+.spriteEditorRangeField > span,
+.spriteEditorSegmentedField > span {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.spriteEditorRangeField strong {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.spriteEditorRangeField input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.spriteEditorSegmented {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-soft) 55%, var(--surface));
+}
+
+.spriteEditorSegmented button {
+  min-height: 30px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  transition: background 200ms var(--ease-swift), color 200ms var(--ease-swift),
+    box-shadow 200ms var(--ease-swift);
+}
+
+.spriteEditorSegmented button.active {
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.spriteEditorActions {
+  position: sticky;
+  bottom: -14px;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 8px 0 0;
+  background: color-mix(in srgb, var(--surface-soft) 34%, var(--surface));
+}
+
+.spriteEditorFullAction {
+  grid-column: 1 / -1;
+}
+

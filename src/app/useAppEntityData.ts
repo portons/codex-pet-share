@@ -140,6 +140,7 @@ export function useAppEntityData({
 
   async function loadDetail(id: string) {
     setDetailLoading(true);
+    setDetailPet(null);
     setMorePets([]);
     try {
       const moreParams = new URLSearchParams({

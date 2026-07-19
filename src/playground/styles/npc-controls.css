@@ -16,19 +16,19 @@
   gap: 6px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(16, 16, 15, 0.82);
-  color: #f5f0dc;
+  background: color-mix(in srgb, var(--terminal-bg) 84%, transparent);
+  color: var(--terminal-fg);
   font-size: 11px;
   letter-spacing: 0.04em;
   cursor: pointer;
-  transition: background 120ms ease;
+  transition: background 200ms var(--ease-swift);
   max-width: 160px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.playgroundNpcChip:hover { background: rgba(216, 78, 78, 0.85); }
+.playgroundNpcChip:hover { background: color-mix(in srgb, var(--danger) 72%, var(--terminal-bg)); }
 
 .playgroundNpcChipX {
   font-size: 13px;
@@ -38,9 +38,9 @@
 
 .playgroundNpcAddBtn {
   appearance: none;
-  border: 1px dashed rgba(245, 240, 220, 0.4);
-  background: rgba(16, 16, 15, 0.62);
-  color: #f5f0dc;
+  border: 1px dashed color-mix(in srgb, var(--terminal-fg) 40%, transparent);
+  background: color-mix(in srgb, var(--terminal-bg) 64%, transparent);
+  color: var(--terminal-fg);
   padding: 4px 12px;
   border-radius: 999px;
   font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
@@ -48,20 +48,21 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease;
+  transition: background 200ms var(--ease-swift), border-color 200ms var(--ease-swift),
+    color 200ms var(--ease-swift);
 }
 
 .playgroundNpcAddBtn:hover {
-  background: rgba(216, 242, 90, 0.18);
-  border-color: rgba(216, 242, 90, 0.75);
-  color: #d8f25a;
+  background: color-mix(in srgb, var(--terminal-prompt) 16%, transparent);
+  border-color: color-mix(in srgb, var(--terminal-prompt) 70%, transparent);
+  color: var(--terminal-prompt);
 }
 
 .playgroundResetBtn {
   appearance: none;
-  border: 1px solid rgba(245, 240, 220, 0.25);
-  background: rgba(16, 16, 15, 0.72);
-  color: #f5f0dc;
+  border: 1px solid color-mix(in srgb, var(--terminal-fg) 25%, transparent);
+  background: color-mix(in srgb, var(--terminal-bg) 74%, transparent);
+  color: var(--terminal-fg);
   width: 28px;
   height: 28px;
   padding: 0;
@@ -70,15 +71,16 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  transition: background 200ms var(--ease-swift), border-color 200ms var(--ease-swift),
+    color 200ms var(--ease-swift);
 }
 
 .playgroundResetBtn svg { display: block; }
 
 .playgroundResetBtn:hover {
-  background: rgba(232, 74, 74, 0.22);
-  border-color: rgba(232, 74, 74, 0.65);
-  color: #f6a4a4;
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 60%, transparent);
+  color: color-mix(in srgb, var(--danger) 42%, var(--terminal-fg));
 }
 
 /* Tooltip overrides for the playground chip + buttons — the canvas
@@ -119,30 +121,35 @@
      the +NPC button rect) so the popover escapes the canvas wrapper's
      overflow:hidden. */
   width: 260px;
-  background: rgba(16, 16, 15, 0.94);
-  border: 1px solid rgba(245, 240, 220, 0.18);
-  border-radius: 12px;
+  background: color-mix(in srgb, var(--terminal-bg) 95%, transparent);
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-lg);
   padding: 8px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-lg);
   z-index: 200;
   font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+  animation: menu-pop 260ms var(--ease-swift);
+  transform-origin: top right;
 }
 
 .playgroundNpcSearchInput {
   width: 100%;
   appearance: none;
-  border: 1px solid rgba(245, 240, 220, 0.25);
-  background: rgba(0, 0, 0, 0.45);
-  color: #f5f0dc;
+  border: 1px solid color-mix(in srgb, var(--terminal-fg) 25%, transparent);
+  background: var(--terminal-bg);
+  color: var(--terminal-fg);
+  caret-color: var(--terminal-prompt);
   font-family: inherit;
   font-size: 12px;
   padding: 6px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   outline: none;
+  transition: border-color 200ms var(--ease-swift), box-shadow 200ms var(--ease-swift);
 }
 
 .playgroundNpcSearchInput:focus {
-  border-color: #d8f25a;
+  border-color: var(--terminal-prompt);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .playgroundNpcSearchList {
@@ -154,17 +161,17 @@
   /* Slim themed scrollbar so the dark popover doesn't get a chunky
      system scrollbar slapped onto its right edge. */
   scrollbar-width: thin;
-  scrollbar-color: rgba(245, 240, 220, 0.25) transparent;
+  scrollbar-color: color-mix(in srgb, var(--terminal-fg) 25%, transparent) transparent;
 }
 
 .playgroundNpcSearchList::-webkit-scrollbar { width: 6px; }
 .playgroundNpcSearchList::-webkit-scrollbar-track { background: transparent; }
 .playgroundNpcSearchList::-webkit-scrollbar-thumb {
-  background: rgba(245, 240, 220, 0.22);
+  background: color-mix(in srgb, var(--terminal-fg) 22%, transparent);
   border-radius: 3px;
 }
 .playgroundNpcSearchList::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 240, 220, 0.4);
+  background: color-mix(in srgb, var(--terminal-fg) 40%, transparent);
 }
 
 .playgroundNpcSearchList > li { margin: 0; }
@@ -174,21 +181,24 @@
   appearance: none;
   border: 0;
   background: transparent;
-  color: #f5f0dc;
+  color: var(--terminal-fg);
   text-align: left;
   font-family: inherit;
   font-size: 12px;
   padding: 6px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   cursor: pointer;
-  transition: background 120ms ease;
+  transition: background 200ms var(--ease-swift), color 200ms var(--ease-swift);
 }
 
-.playgroundNpcSearchItem:hover { background: rgba(216, 242, 90, 0.18); }
+.playgroundNpcSearchItem:hover {
+  background: color-mix(in srgb, var(--terminal-prompt) 16%, transparent);
+  color: var(--terminal-prompt);
+}
 
 .playgroundNpcSearchEmpty {
   padding: 8px;
-  color: rgba(245, 240, 220, 0.55);
+  color: color-mix(in srgb, var(--terminal-fg) 55%, transparent);
   font-size: 11px;
   letter-spacing: 0.04em;
 }

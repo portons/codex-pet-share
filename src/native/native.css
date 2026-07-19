@@ -15,14 +15,17 @@
   align-items: center;
   gap: 14px;
   padding: 13px 14px;
-  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
-  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  border-radius: var(--radius-lg);
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 66%, transparent), transparent 64%),
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 46%, transparent), transparent 60%),
     color-mix(in srgb, var(--surface) 94%, transparent);
-  box-shadow: 0 18px 42px -28px var(--accent), var(--shadow-md);
-  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 var(--inset-highlight);
+  backdrop-filter: saturate(150%) blur(14px);
+  -webkit-backdrop-filter: saturate(150%) blur(14px);
   pointer-events: auto;
+  animation: menu-pop 260ms var(--ease-swift);
+  transform-origin: bottom right;
 }
 
 .nativePromptError {
@@ -47,8 +50,8 @@
   color: var(--accent-deep);
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
@@ -56,8 +59,8 @@
   overflow: hidden;
   color: var(--ink);
   font-size: 15px;
-  font-weight: 650;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.1;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -73,6 +76,12 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nativePrompt {
+    animation: none;
+  }
 }
 
 @media (max-width: 620px) {

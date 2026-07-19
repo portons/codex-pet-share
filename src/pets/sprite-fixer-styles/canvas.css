@@ -1,0 +1,240 @@
+.spriteEditorTimelineFrame {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 26%, transparent);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.spriteEditorTimelineFrame:not(button) {
+  cursor: default;
+}
+
+button.spriteEditorTimelineFrame {
+  font: inherit;
+  text-align: inherit;
+}
+
+button.spriteEditorTimelineFrame:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+}
+
+.spriteEditorTimelineFrame span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.spriteEditorTimelineFrame b {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  z-index: 1;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 82%, var(--accent-ink));
+  color: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 760;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.spriteEditorTimelineFrame b.secondary {
+  top: 26px;
+  background: color-mix(in srgb, var(--muted) 70%, var(--ink));
+  color: var(--surface);
+}
+
+.spriteEditorTimelineFrame.selectedTarget {
+  border-color: color-mix(in srgb, var(--accent) 70%, var(--border));
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.spriteEditorTimelineFrame.selectedSource {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted) 50%, transparent);
+}
+
+.spriteEditorTimelineFrame.replaced {
+  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+}
+
+.pixelStage {
+  min-height: min(660px, calc(100dvh - 220px));
+}
+
+.spriteEditorPixelLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px;
+  gap: 12px;
+  min-height: 0;
+}
+
+.spriteEditorPixelCanvasViewport {
+  min-width: 0;
+  max-height: min(640px, calc(100dvh - 260px));
+  overflow: auto;
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-sm);
+  background: var(--terminal-bg);
+  scrollbar-color: color-mix(in srgb, var(--accent) 45%, var(--muted)) var(--terminal-bg);
+  scrollbar-width: thin;
+}
+
+.spriteEditorPixelCanvas {
+  display: block;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.spriteEditorPixelCanvas.erase {
+  cursor: crosshair;
+}
+
+.spriteEditorPixelCanvas.restore {
+  cursor: cell;
+}
+
+.spriteEditorPixelCanvas.sample {
+  cursor: copy;
+}
+
+.spriteEditorPixelPreview {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.spriteEditorPixelPreview > div {
+  display: grid;
+  gap: 5px;
+}
+
+.spriteEditorPixelPreview span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.spriteEditorPixelPreview p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.spriteEditorMiniCanvas {
+  width: 96px;
+  height: 104px;
+  border: 1px solid var(--border-soft);
+  border-radius: 7px;
+  image-rendering: pixelated;
+}
+
+.spriteEditorInlineStats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.spriteEditorInlineStats span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.spriteEditorLoading {
+  display: grid;
+  min-height: 360px;
+  place-items: center;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.spriteEditorLoading.error {
+  color: var(--danger-fg);
+}
+
+.spriteEditorAlignCanvas {
+  position: relative;
+  display: grid;
+  height: 304px;
+  min-height: 0;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-sm);
+  background: var(--terminal-bg);
+}
+
+.spriteEditorAlignCanvas::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: 4;
+  width: 22px;
+  height: 22px;
+  border: 1px solid color-mix(in srgb, var(--accent) 78%, var(--ink));
+  border-radius: 999px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--accent) 82%, var(--ink)), color-mix(in srgb, var(--accent) 82%, var(--ink))) center / 1px 100% no-repeat,
+    linear-gradient(color-mix(in srgb, var(--accent) 82%, var(--ink)), color-mix(in srgb, var(--accent) 82%, var(--ink))) center / 100% 1px no-repeat;
+  opacity: 0.88;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.spriteEditorAlignCanvas .spriteFrameClip {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+}
+
+.spriteEditorAlignCanvas .spriteFrameClip.ghost {
+  opacity: 0.28;
+  filter: grayscale(1);
+}
+
+.spriteEditorAlignCanvas .spriteFrameClip.shifted {
+  z-index: 2;
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--border));
+}
+
+.runtimeStage {
+  align-content: start;
+}
+
+.spriteEditorRuntimeCanvas {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-sm);
+  background:
+    radial-gradient(circle at 50% 46%, var(--accent-glow), transparent 42%),
+    var(--terminal-bg);
+}
+
+.spriteEditorRuntimeCanvas .spriteFrameClip {
+  z-index: 1;
+}
+

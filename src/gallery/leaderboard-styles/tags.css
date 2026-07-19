@@ -1,0 +1,57 @@
+.tagPill {
+  transition: background 180ms var(--ease-out), border-color 180ms var(--ease-out),
+    color 180ms var(--ease-out);
+}
+
+.tagPill:hover {
+  border-color: var(--border-strong);
+  color: var(--ink);
+}
+
+.tagPill.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.petTags button,
+.petTags span {
+  background: transparent;
+  height: 24px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.petTags button {
+  cursor: pointer;
+  transition: border-color 180ms var(--ease-out), color 180ms var(--ease-out), background 180ms var(--ease-out);
+}
+
+.petTags button:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-warm);
+  color: var(--ink);
+}
+
+.petTags button.nsfwTag,
+.petTags span.nsfwTag,
+.nsfwNotice {
+  border-color: var(--danger-fg);
+  background: var(--danger-bg-hover);
+  color: var(--danger-fg);
+}
+
+.nsfwNotice {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  height: 24px;
+  margin: 0;
+  border: 1px solid var(--danger-fg);
+  border-radius: 999px;
+  padding: 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+

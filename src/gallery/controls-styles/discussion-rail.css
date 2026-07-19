@@ -1,0 +1,169 @@
+.discussionRail {
+  display: grid;
+  gap: 13px;
+  margin: 0 0 28px;
+  padding: 14px 0 18px;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.discussionRailIntro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.discussionRailKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.recentCommentList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recentCommentItem {
+  display: grid;
+  grid-template-rows: minmax(64px, auto) auto;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 62%, transparent);
+  animation: discussion-row-in 280ms var(--ease-out) both;
+  animation-delay: calc(var(--discussion-index) * 44ms);
+}
+
+.recentCommentMain {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.recentCommentPreview {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--floating-control-bg) 78%, transparent);
+}
+
+.recentCommentPreview img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.recentCommentBody {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-width: 0;
+  color: inherit;
+}
+
+.recentCommentPetContext {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.recentCommentPet {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--accent-deep);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: none;
+}
+
+.recentCommentText {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.42;
+  text-decoration: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.recentCommentPet:hover,
+.recentCommentText:hover,
+.recentCommentMeta a:hover,
+.discussionFeatureName:hover,
+.discussionRankName:hover,
+.discussionOwnerLink:hover {
+  color: var(--accent-deep);
+}
+
+.recentCommentMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.2;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.recentCommentAuthor {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.recentCommentAuthor .userAvatar {
+  width: 22px;
+  height: 22px;
+  font-size: 8px;
+}
+
+.recentCommentAuthor > span:not(.userAvatar),
+.recentCommentMeta a {
+  overflow: hidden;
+  color: var(--ink);
+  text-decoration: none;
+  text-overflow: ellipsis;
+}
+
+.discussionEmpty {
+  margin: 0;
+  padding: 13px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+

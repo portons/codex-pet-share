@@ -1,0 +1,10 @@
+.uploadTagSection .kindControls {
+  width: fit-content;
+  max-width: 100%;
+  justify-self: start;
+}
+
+.uploadTagSection .kindControls button {
+  flex: 0 0 auto;
+}
+

@@ -1,0 +1,84 @@
+.adminActions {
+  display: grid;
+  gap: 8px;
+}
+
+.adminPage {
+  gap: 18px;
+}
+
+.adminSection {
+  display: grid;
+  gap: 12px;
+}
+
+.adminSectionHeader h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.adminCollectionList {
+  display: grid;
+  gap: 14px;
+}
+
+.adminCollectionForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.35fr);
+  gap: 12px;
+  padding: 16px;
+}
+
+.adminCollectionForm label {
+  display: grid;
+  gap: 7px;
+}
+
+.adminCollectionForm label:has(textarea) {
+  grid-column: 1 / -1;
+}
+
+.adminCollectionForm .rowActions {
+  grid-column: 1 / -1;
+}
+
+.collectionCheckboxList {
+  display: grid;
+  gap: 8px;
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.collectionCheckbox {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-warm);
+  padding: 10px;
+}
+
+.collectionCheckbox span {
+  display: grid;
+  min-width: 0;
+}
+
+.collectionCheckbox strong,
+.collectionCheckbox small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collectionCheckbox small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}

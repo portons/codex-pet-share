@@ -1,0 +1,105 @@
+.userCollectionPreview {
+  display: block;
+  color: inherit;
+  overflow: hidden;
+}
+
+.userCollectionPreview .collectionPosterMosaic {
+  min-height: 126px;
+}
+
+.userCollectionPreview .collectionPosterMosaic.ambientPoc {
+  position: relative;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 16%, var(--border-soft));
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(170px circle at 34% 22%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 66%),
+    color-mix(in srgb, var(--surface-soft) 74%, transparent);
+  transition: border-color 200ms var(--ease-out), background 200ms var(--ease-out);
+}
+
+.userCollectionCard:hover .collectionPosterMosaic.ambientPoc,
+.userCollectionCard:focus-within .collectionPosterMosaic.ambientPoc {
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
+  background:
+    radial-gradient(190px circle at 64% 34%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 68%),
+    color-mix(in srgb, var(--surface-soft) 78%, transparent);
+}
+
+.userCollectionPreview .collectionPosterMosaic.ambientPoc .collectionPosterTile {
+  transition: transform 220ms var(--ease-out), border-color 220ms var(--ease-out);
+}
+
+.userCollectionCard:hover .collectionPosterMosaic.ambientPoc .collectionPosterTile:nth-child(1),
+.userCollectionCard:focus-within .collectionPosterMosaic.ambientPoc .collectionPosterTile:nth-child(1) {
+  transform: translate3d(0, -3px, 0) rotate(-1deg);
+}
+
+.userCollectionCard:hover .collectionPosterMosaic.ambientPoc .collectionPosterTile:nth-child(2),
+.userCollectionCard:focus-within .collectionPosterMosaic.ambientPoc .collectionPosterTile:nth-child(2) {
+  transform: translate3d(0, 2px, 0) rotate(1deg);
+}
+
+.userCollectionCard:hover .collectionPosterMosaic.ambientPoc .collectionPosterTile:nth-child(3),
+.userCollectionCard:focus-within .collectionPosterMosaic.ambientPoc .collectionPosterTile:nth-child(3) {
+  transform: translate3d(0, -2px, 0) rotate(2deg);
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .userCollectionCard.pocAmbientBento::before,
+  .userCollectionPreview .collectionPosterMosaic.ambientPoc,
+  .userCollectionPreview .collectionPosterMosaic.ambientPoc .collectionPosterTile {
+    transition: none;
+  }
+
+  .userCollectionCard.pocAmbientBento::before {
+    transform: none;
+  }
+
+  .userCollectionCard:hover .collectionPosterMosaic.ambientPoc .collectionPosterTile,
+  .userCollectionCard:focus-within .collectionPosterMosaic.ambientPoc .collectionPosterTile {
+    transform: none;
+  }
+}
+
+.userCollectionPreview .collectionPosterTile img {
+  width: min(100%, 88px);
+}
+
+.userCollectionEmptyPreview {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 126px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-warm);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.userCollectionCardActions {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.userCollectionPrimaryAction {
+  width: 100%;
+}
+
+.userCollectionSecondaryActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.userCollectionSecondaryActions .btn {
+  min-width: 0;
+}
+

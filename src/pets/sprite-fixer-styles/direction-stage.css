@@ -1,0 +1,209 @@
+.spriteEditorDirectionCompare {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.74fr) minmax(420px, 1.26fr);
+  gap: 12px;
+  min-height: 0;
+}
+
+.spriteEditorDirectionColumn {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 26%, transparent);
+}
+
+.spriteEditorDirectionColumn.after {
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 12%, var(--surface));
+}
+
+.spriteEditorDirectionColumnHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.spriteEditorDirectionColumnHead h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 740;
+  letter-spacing: -0.02em;
+}
+
+.spriteEditorDirectionColumnHead span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 560;
+  letter-spacing: 0.06em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.spriteEditorDirectionStrips {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+}
+
+.spriteEditorDirectionStrips article {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 22%, transparent);
+}
+
+.spriteEditorDirectionStrips header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.spriteEditorDirectionStrips strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 730;
+}
+
+.spriteEditorDirectionStrips span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.spriteEditorRunPair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  align-items: center;
+}
+
+.spriteEditorRunPair.compact {
+  gap: 10px;
+}
+
+.spriteEditorRunTile {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  width: max-content;
+  min-width: 172px;
+  min-height: 190px;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 32%, transparent);
+}
+
+.spriteEditorRunTile.small {
+  min-width: 128px;
+  min-height: 128px;
+  padding: 10px;
+}
+
+.spriteEditorRunTile.small header span {
+  display: none;
+}
+
+.spriteEditorRunTile header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.spriteEditorRunTile strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.spriteEditorRunTile span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.spriteEditorRunTile .spriteFrameClip {
+  align-self: center;
+}
+
+.spriteEditorRunTile.left .spriteFrameClip {
+  justify-self: start;
+}
+
+.spriteEditorRunTile.right .spriteFrameClip {
+  justify-self: end;
+}
+
+.spriteEditorRunPair > .spriteEditorRunTile.left {
+  justify-self: start;
+}
+
+.spriteEditorRunPair > .spriteEditorRunTile.right {
+  justify-self: end;
+}
+
+.spriteFrameClip {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: hidden;
+  --clip-checker: color-mix(in srgb, var(--terminal-fg) 8%, transparent);
+  border: 1px solid var(--terminal-border);
+  border-radius: 7px;
+  background-color: var(--terminal-bg);
+  background-image:
+    linear-gradient(45deg, var(--clip-checker) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--clip-checker) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--clip-checker) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--clip-checker) 75%);
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+  background-size: 12px 12px;
+  image-rendering: pixelated;
+}
+
+.spriteFrameClip.highlight {
+  border-color: color-mix(in srgb, var(--accent) 56%, var(--border));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.spriteFrameClip.transformRef::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: 11px;
+  height: 11px;
+  border: 1px solid color-mix(in srgb, var(--accent) 70%, var(--ink));
+  border-radius: 999px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--accent) 76%, var(--ink)), color-mix(in srgb, var(--accent) 76%, var(--ink))) center / 1px 100% no-repeat,
+    linear-gradient(color-mix(in srgb, var(--accent) 76%, var(--ink)), color-mix(in srgb, var(--accent) 76%, var(--ink))) center / 100% 1px no-repeat;
+  opacity: 0.78;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.spriteFrameImage {
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  will-change: transform;
+}
+

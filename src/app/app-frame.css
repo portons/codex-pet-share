@@ -1,0 +1,350 @@
+/* App frame — full-viewport workbench: a quiet icon rail + content canvas.
+   Chrome stays out of the pets' way; the rail is 68px of wayfinding. */
+.appFrame {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.appSidebar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100dvh;
+  padding: 16px 12px 14px;
+  border-right: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 55%, var(--bg));
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+/* Desktop rail mode: icons only, labels become tooltips to the right */
+@media (min-width: 1001px) {
+  .appSidebar {
+    overflow: visible;
+  }
+
+  .appSidebar .brandWordmark,
+  .appSidebar .sidebarSectionLabel,
+  .appSidebar .sidebarNavLabel,
+  .appSidebar .sidebarFooterLinks,
+  .appSidebar .accountButtonText {
+    display: none;
+  }
+
+  .sidebarBrand {
+    margin: 0 auto 16px;
+    padding-left: 0;
+  }
+
+  .sidebarNav {
+    justify-items: center;
+  }
+
+  .sidebarNavItem {
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .appSidebar [data-tooltip]::after {
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: calc(100% + 10px);
+    transform: translate(0, -50%);
+  }
+
+  .appSidebar [data-tooltip]:hover::after,
+  .appSidebar [data-tooltip]:focus-visible::after {
+    transform: translate(0, -50%);
+  }
+
+  .sidebarDesktopCluster .sidebarBottom {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 0 0;
+  }
+
+  .appSidebar .themeToggle,
+  .appSidebar .sidebarAccount .accountButton {
+    display: inline-grid;
+    place-items: center;
+    place-content: center;
+    justify-content: center;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .appSidebar .accountMenuList.sidebarAccountMenu {
+    top: auto;
+    right: auto;
+    bottom: 4px;
+    left: calc(100% + 10px);
+  }
+}
+
+.appCanvas {
+  min-width: 0;
+}
+
+.appContent {
+  width: min(1320px, 100% - 56px);
+  margin: 0 auto;
+  padding: 22px 0 96px;
+}
+
+.sidebarBrand {
+  margin: 0 4px 18px;
+}
+
+.sidebarSectionLabel {
+  margin: 10px 10px 6px;
+  color: var(--subtle);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.sidebarNav {
+  display: grid;
+  gap: 2px;
+}
+
+.sidebarNavItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  transition: background 200ms var(--ease-swift), color 200ms var(--ease-swift);
+}
+
+.sidebarNavItem:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface-soft) 65%, transparent);
+}
+
+.sidebarNavItem.active {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.sidebarSpacer {
+  flex: 1 1 auto;
+}
+
+.sidebarBottom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sidebarDesktopCluster .sidebarBottom {
+  padding: 12px 2px 0;
+  border-top: 1px solid var(--border-soft);
+}
+
+.sidebarAccount {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sidebarAccount .accountButton {
+  width: 100%;
+  justify-content: flex-start;
+  border: 1px solid var(--border);
+  background: var(--nav-action-bg);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+}
+
+.accountMenuList.sidebarAccountMenu {
+  top: auto;
+  right: auto;
+  bottom: calc(100% + 10px);
+  left: 0;
+  transform-origin: bottom left;
+}
+
+.sidebarFooterLinks {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 0 10px;
+}
+
+.sidebarFooterLinks a {
+  display: inline-flex;
+  align-items: center;
+  color: var(--subtle);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  transition: color 180ms var(--ease-out);
+}
+
+.sidebarFooterLinks a:hover {
+  color: var(--ink);
+}
+
+/* Topbar + drawer live only below the app breakpoint */
+.appTopbar {
+  display: none;
+}
+
+.sidebarBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: none;
+  border: 0;
+  background: rgba(0, 0, 0, 0.48);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms var(--ease-out);
+}
+
+@media (max-width: 1000px) {
+  .appFrame {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .appTopbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--nav-bg);
+    backdrop-filter: saturate(150%) blur(16px);
+    -webkit-backdrop-filter: saturate(150%) blur(16px);
+  }
+
+  .appTopbar .sidebarBottom {
+    justify-content: flex-end;
+  }
+
+  .appTopbar .sidebarAccount {
+    flex: 0 1 auto;
+  }
+
+  .appTopbar .sidebarAccount .accountButton {
+    width: 38px;
+    min-width: 38px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .appTopbar .accountButtonText {
+    display: none;
+  }
+
+  .appTopbar .accountMenuList.sidebarAccountMenu {
+    top: calc(100% + 10px);
+    bottom: auto;
+    right: 0;
+    left: auto;
+    transform-origin: top right;
+  }
+
+  .topbarMenuButton {
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--nav-action-bg);
+    color: var(--ink);
+    box-shadow: inset 0 1px 0 var(--inset-highlight);
+  }
+
+  .topbarBrand .brandMark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sidebarBackdrop {
+    display: block;
+  }
+
+  .sidebarBackdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .appSidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 120;
+    width: min(288px, calc(100vw - 48px));
+    border-right: 1px solid var(--border);
+    border-radius: 0;
+    background: var(--surface);
+    box-shadow: var(--shadow-modal);
+    transform: translateX(-104%);
+    transition: transform 300ms var(--ease-swift);
+  }
+
+  .appSidebar.open {
+    transform: translateX(0);
+  }
+
+  .appContent {
+    width: calc(100vw - 28px);
+    padding: 14px 0 64px;
+  }
+}
+
+/* The sidebar is flat. High-specificity terminal rule so no component
+   stylesheet (loaded later or not) reintroduces rounded corners here. */
+.appFrame .appSidebar,
+.appFrame .appSidebar *,
+.appFrame .appSidebar *::before,
+.appFrame .appSidebar *::after {
+  border-radius: 0 !important;
+}
+
+/* Same flatness for the mobile top bar chrome. */
+.appFrame .appTopbar,
+.appFrame .appTopbar *,
+.appFrame .appTopbar *::before,
+.appFrame .appTopbar *::after {
+  border-radius: 0 !important;
+}
+
+/* The logo PNG has rounded corners baked into the artwork — crop past
+   them and scale back up so the mark reads as a clean square. */
+.appFrame .brand .brandMark {
+  clip-path: inset(9%);
+  transform: scale(1.2);
+}
+
+.appFrame .brand:hover .brandMark {
+  animation: none;
+}

@@ -1,0 +1,23 @@
+/* Gallery grid — strictly uniform tiles; the inspector rail does the showing */
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(224px, 1fr));
+  gap: 14px;
+}
+
+.galleryGrid.compact {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.revealItem {
+  position: relative;
+  opacity: 0;
+  animation: item-rise 540ms var(--ease-out) forwards;
+  animation-delay: var(--delay);
+}
+
+.revealItem:has(.adminPetMenuList) {
+  z-index: 40;
+}
+

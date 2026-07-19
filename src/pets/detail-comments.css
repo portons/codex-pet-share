@@ -25,7 +25,7 @@
     linear-gradient(color-mix(in srgb, var(--accent) 14%, transparent) 1px, transparent 1px),
     linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, transparent) 1px, transparent 1px);
   background-size: 28px 28px;
-  mask-image: linear-gradient(135deg, rgba(15, 15, 14, 0.7), transparent 58%);
+  mask-image: linear-gradient(135deg, color-mix(in srgb, var(--ink) 70%, transparent), transparent 58%);
   opacity: 0.34;
 }
 
@@ -50,10 +50,21 @@
   color: var(--accent-deep);
   font-family: var(--font-mono);
   font-size: 10.5px;
-  font-weight: 650;
-  letter-spacing: 0.02em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   box-shadow: inset 0 1px 0 var(--inset-highlight);
+}
+
+.petCommentsSignal::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  animation: pulse 2.4s var(--ease-out) infinite;
 }
 
 .petCommentComposer {
@@ -95,12 +106,11 @@
   padding: 0 10px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--floating-control-bg);
+  background: color-mix(in srgb, var(--surface-soft) 55%, transparent);
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0;
-  box-shadow: inset 0 1px 0 var(--inset-highlight);
   transition:
     background 180ms var(--ease-out),
     border-color 180ms var(--ease-out),

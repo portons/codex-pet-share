@@ -184,13 +184,9 @@ export function UploadPage({
         <div className="uploadControls card">
           <div className="petFormatGuide uploadFormatGuide" role="note">
             <div className="petFormatGuideCopy">
-              <span className="petFormatGuideEyebrow">Choose a Codex format</span>
-              <strong>V2 is the new format.</strong>
-              <span>Use a 1536×2288 sheet plus <code>spriteVersionNumber: 2</code> for a neutral look and 16 directions. Legacy 1536×1872 v1 pets still work without a version field.</span>
-            </div>
-            <div className="petFormatGuideBadges" aria-hidden="true">
-              <span className="petFormatPill v2">V2 · recommended</span>
-              <span className="petFormatPill v1">V1 · supported</span>
+              <span className="petFormatGuideEyebrow">Sprite format</span>
+              <strong>1536×2288 sheet · neutral pose + 16 look directions.</strong>
+              <span>Set <code>spriteVersionNumber: 2</code> in pet.json. Legacy V1 sheets (1536×1872, no version field) still upload and run everywhere.</span>
             </div>
           </div>
           <FileField

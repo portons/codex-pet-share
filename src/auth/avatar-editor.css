@@ -43,16 +43,37 @@
 
 .avatarSourceTabs {
   display: flex;
-  gap: 6px;
-  padding: 4px;
+  gap: 2px;
+  padding: 3px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-soft) 55%, var(--surface));
 }
 
 .avatarSourceTabs .btn {
   height: 30px;
-  padding: 0 10px;
+  padding: 0 12px;
+  border-color: transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+}
+
+.avatarSourceTabs .btn:hover:not(:disabled) {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink);
+  transform: none;
+  box-shadow: none;
+}
+
+.avatarSourceTabs .btnPrimary,
+.avatarSourceTabs .btnPrimary:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: var(--shadow-sm);
 }
 
 .avatarEditorGrid {
@@ -72,13 +93,10 @@
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   background:
-    linear-gradient(45deg, rgba(15, 15, 14, 0.06) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(15, 15, 14, 0.06) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(15, 15, 14, 0.06) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(15, 15, 14, 0.06) 75%),
-    var(--surface);
-  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
-  background-size: 16px 16px;
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, 18px 18px;
+  background-color: var(--stage-checker-a);
 }
 
 .avatarStage canvas {
@@ -100,15 +118,17 @@
   gap: 8px;
   place-items: center;
   border: 0;
-  background: rgba(248, 244, 232, 0.78);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
   color: var(--muted);
   cursor: pointer;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0;
+  transition: color 200ms var(--ease-swift), background 200ms var(--ease-swift);
 }
 
 .avatarEmptyButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--surface) 62%, transparent);
   color: var(--ink);
 }
 
@@ -137,19 +157,28 @@
   height: 34px;
   place-items: center;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--muted);
   cursor: pointer;
   font-family: var(--font-mono);
   font-size: 11px;
   overflow: hidden;
+  transition: border-color 200ms var(--ease-swift), color 200ms var(--ease-swift),
+    box-shadow 200ms var(--ease-swift), transform 200ms var(--ease-swift);
 }
 
-.avatarFramePicker button:hover:not(:disabled),
+.avatarFramePicker button:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
 .avatarFramePicker button.isSelected {
   border-color: var(--ink);
   color: var(--ink);
+  box-shadow: var(--shadow-sm);
 }
 
 .avatarFrameThumb {

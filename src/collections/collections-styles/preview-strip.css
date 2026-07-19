@@ -1,0 +1,44 @@
+.userCollectionPreviewStrip {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, 18px 18px;
+  background-color: var(--stage-checker-a);
+  overflow: hidden;
+}
+
+.userCollectionPreviewSlot {
+  width: 52px;
+  height: 58px;
+  display: grid;
+  place-items: end center;
+  flex: 0 0 auto;
+}
+
+.collectionOwnerLine {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .userCollectionsHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .userCollectionsActions {
+    justify-content: flex-start;
+  }
+
+  .collectionPetAdderSearch {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,221 @@
+.searchShell {
+  position: relative;
+  display: block;
+}
+
+.searchShell .icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  color: var(--muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.searchInput {
+  padding-left: 40px;
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
+}
+
+.searchInput::placeholder {
+  color: var(--subtle);
+}
+
+/* Tag filters — padded segmented controls with a floating thumb */
+.sortControls,
+.viewControls,
+.kindControls,
+.formatControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-soft) 55%, var(--surface));
+}
+
+.sortControls button,
+.viewControls button,
+.kindControls button,
+.formatControls button {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  padding: 0 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0;
+  transition: background 220ms var(--ease-swift), color 220ms var(--ease-swift),
+    box-shadow 220ms var(--ease-swift);
+}
+
+.sortControls button:hover,
+.viewControls button:hover,
+.kindControls button:hover,
+.formatControls button:hover {
+  color: var(--ink);
+}
+
+.sortControls button.active,
+.viewControls button.active,
+.kindControls button.active,
+.formatControls button.active {
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.tagDropdown {
+  position: relative;
+  z-index: 6;
+}
+
+.tagDropdown:has(.tagDropdownMenu) {
+  z-index: 80;
+}
+
+.tagDropdownTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  padding: 0 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0;
+  transition: border-color 180ms var(--ease-out), color 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+
+.tagDropdownTrigger strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.tagDropdownTrigger:hover,
+.tagDropdownTrigger.active {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.tagDropdownTrigger:active {
+  transform: translateY(1px);
+}
+
+.tagDropdownMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 80;
+  width: 236px;
+  max-width: calc(100vw - 24px);
+  max-height: min(360px, calc(100vh - 48px));
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  animation: menu-pop 260ms var(--ease-swift);
+  transform-origin: top right;
+}
+
+.tagDropdownHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 4px 8px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.tagDropdownHead button {
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  padding: 0;
+  font: inherit;
+}
+
+.tagDropdownList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.tagDropdownOption {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  min-height: 30px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  padding: 0 8px 0 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+  text-align: left;
+  transition: background 180ms var(--ease-out), border-color 180ms var(--ease-out), color 180ms var(--ease-out);
+}
+
+.tagDropdownOption:hover,
+.tagDropdownOption.active {
+  border-color: var(--border);
+  background: var(--surface-warm);
+  color: var(--ink);
+}
+
+.tagCheck {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  color: var(--ink);
+}
+
+.tagFilters,
+.petTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tagPill,
+.petTags button,
+.petTags span {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  padding: 0 11px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+  font-weight: 500;
+  transition: background 180ms var(--ease-out), color 180ms var(--ease-out);
+}
+
+.petTags button:hover {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+

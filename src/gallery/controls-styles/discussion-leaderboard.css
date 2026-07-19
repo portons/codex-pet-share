@@ -1,0 +1,204 @@
+.discussionLeaderboard {
+  display: grid;
+  gap: 18px;
+}
+
+.discussionLeaderboardHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.discussionLeaderboardHeader h2 {
+  margin: 3px 0 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4.2vw, 52px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+}
+
+.discussionLeaderboardBoard {
+  display: grid;
+  gap: 18px;
+}
+
+.discussionTopThree {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.discussionFeatureCard {
+  display: grid;
+  grid-template-rows: auto minmax(126px, 1fr) auto;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 28%, var(--surface))),
+    var(--surface);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+}
+
+.discussionFeatureCopy,
+.discussionRankIdentity {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.discussionFeatureName,
+.discussionRankName {
+  width: fit-content;
+  max-width: 100%;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 0.95;
+  text-decoration: none;
+}
+
+.discussionFeatureName {
+  font-size: clamp(24px, 2.4vw, 34px);
+  letter-spacing: -0.015em;
+}
+
+.discussionRankName {
+  font-size: clamp(19px, 2.2vw, 30px);
+  letter-spacing: -0.012em;
+}
+
+.discussionOwnerLink {
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.discussionFeaturePet {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  min-height: 124px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at 50% 78%, var(--preview-ground), transparent 62%),
+    color-mix(in srgb, var(--surface) 78%, transparent);
+  transition: border-color 180ms var(--ease-out), background 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+.discussionFeaturePet:hover {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  transform: translateY(-1px);
+}
+
+.discussionFeaturePet img {
+  display: block;
+  align-self: center;
+  justify-self: center;
+  width: 100%;
+  height: auto;
+  max-width: 192px;
+  image-rendering: pixelated;
+}
+
+.discussionMetrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--border-soft);
+}
+
+.discussionRankList {
+  display: grid;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.discussionRankRow {
+  display: grid;
+  grid-template-columns: 56px minmax(260px, 1fr) minmax(260px, 0.82fr);
+  align-items: center;
+  gap: 20px;
+  min-height: 102px;
+  padding: 16px 18px;
+  border-top: 1px solid var(--border-soft);
+  animation: creator-row-in 420ms var(--ease-out) both;
+  animation-delay: var(--delay);
+}
+
+.discussionRankRow:first-child {
+  border-top: 0;
+}
+
+.discussionRankRow:hover {
+  background: color-mix(in srgb, var(--surface-warm) 44%, transparent);
+}
+
+@media (max-width: 980px) {
+  .discussionTopThree {
+    grid-template-columns: 1fr;
+  }
+
+  .discussionRankRow {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .discussionMetrics {
+    grid-column: 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .freshPetsDot::after {
+    animation: none;
+  }
+
+  .recentCommentItem,
+  .discussionRankRow {
+    animation: none;
+  }
+}
+
+@keyframes fresh-pulse {
+  from {
+    opacity: 0.34;
+    transform: scale(0.72);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes discussion-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

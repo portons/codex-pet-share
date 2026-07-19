@@ -1,0 +1,113 @@
+.petCardBody {
+  flex: 1;
+  width: 100%;
+  padding: 10px 18px 16px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  color: inherit;
+  text-align: left;
+}
+
+.petCard.compact .petCardBody {
+  padding: 8px 10px 6px;
+  gap: 5px;
+}
+
+.petCardBody.clickable {
+  cursor: pointer;
+}
+
+.cardMeta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.petCardIdentity {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.cardMeta .petStats {
+  flex-shrink: 0;
+  padding-top: 3px;
+}
+
+.petCard.compact .cardMeta {
+  display: grid;
+  gap: 5px;
+}
+
+.petCard.compact .cardMeta .petStats {
+  padding-top: 0;
+}
+
+.petCardBody h2 {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.025em;
+  line-height: 1.18;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.petCard.compact .petCardBody h2 {
+  font-size: 15px;
+}
+
+.petCardCollectionPill {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  max-width: calc(100% - 76px);
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent-soft) 74%, var(--surface));
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1;
+  text-decoration: none;
+  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+
+.petCardCollectionPill span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.petCardCollectionPill:hover,
+.petCardCollectionPill:focus-visible {
+  border-color: var(--accent-deep);
+  background: color-mix(in srgb, var(--accent-soft) 82%, var(--surface));
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.petCard.compact .petCardCollectionPill {
+  top: 6px;
+  left: 6px;
+  max-width: calc(100% - 60px);
+  min-height: 22px;
+  padding: 0 8px;
+  font-size: 10px;
+}
+

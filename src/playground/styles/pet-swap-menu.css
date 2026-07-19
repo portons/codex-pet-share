@@ -6,10 +6,10 @@
 }
 
 /* ── Pet swap pocketbook ────────────────────────────────────────────
-   Aesthetic: sprite collector's card sleeve. Cream paper interior,
+   Aesthetic: sprite collector's card sleeve. Porcelain interior,
    monospace stencil dividers, tiny inset cells with floating sprites.
-   Not a generic dropdown — every detail leans into the playground's
-   warm 90s-handheld feel. */
+   Not a generic dropdown — every detail leans into the collector's-
+   sleeve feel, restated in the neutral museum chrome. */
 
 .petSwapMenu {
   position: absolute;
@@ -20,21 +20,19 @@
   max-height: 420px;
   overflow-y: auto;
   padding: 10px 10px 12px;
-  /* Layered cream: outer paper shadow + inner subtle vignette so it
-     reads as a physical pocket cut into a heavier card. */
+  /* Faint amber wash at the top so it reads as a pocket cut into a
+     heavier card, not a flat dropdown. */
   background:
-    radial-gradient(120% 60% at 50% 0%, rgba(255, 233, 214, 0.55), transparent 70%),
-    var(--surface, #fbf6e6);
-  border: 1px solid rgba(140, 110, 60, 0.22);
-  border-radius: 14px;
-  box-shadow:
-    0 22px 46px -18px rgba(86, 56, 22, 0.32),
-    0 6px 18px -10px rgba(86, 56, 22, 0.22),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-  animation: petSwapMenuIn 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
-  /* Custom scrollbar — thin warm line, no chrome. */
+    radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--accent-soft) 70%, transparent), transparent 70%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), inset 0 0 0 1px var(--inset-highlight);
+  animation: menu-pop 260ms var(--ease-swift);
+  transform-origin: top right;
+  /* Custom scrollbar — thin amber line, no chrome. */
   scrollbar-width: thin;
-  scrollbar-color: rgba(177, 90, 22, 0.35) transparent;
+  scrollbar-color: color-mix(in srgb, var(--accent) 35%, transparent) transparent;
 }
 
 .petSwapMenu::-webkit-scrollbar {
@@ -44,7 +42,7 @@
   background: transparent;
 }
 .petSwapMenu::-webkit-scrollbar-thumb {
-  background: rgba(177, 90, 22, 0.32);
+  background: color-mix(in srgb, var(--accent) 32%, transparent);
   border-radius: 3px;
 }
 
@@ -59,7 +57,7 @@
   justify-content: space-between;
   gap: 10px;
   padding: 0 2px 8px;
-  border-bottom: 1px dashed rgba(140, 110, 60, 0.32);
+  border-bottom: 1px dashed var(--border-strong);
   margin-bottom: 8px;
 }
 
@@ -71,35 +69,35 @@
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent-deep, #8a4a16);
+  color: var(--accent-deep);
 }
 
 .petSwapMenuLabelDot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--accent, #d97a18);
-  box-shadow: 0 0 0 3px rgba(217, 122, 24, 0.18);
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
   animation: petSwapDotPulse 2.4s ease-in-out infinite;
 }
 
 @keyframes petSwapDotPulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(217, 122, 24, 0.18); }
-  50% { box-shadow: 0 0 0 5px rgba(217, 122, 24, 0.08); }
+  0%, 100% { box-shadow: 0 0 0 3px var(--accent-glow); }
+  50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 8%, transparent); }
 }
 
 .petSwapMenuCount {
   font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(86, 56, 22, 0.55);
+  color: var(--muted);
   padding: 3px 7px;
-  border: 1px solid rgba(140, 110, 60, 0.28);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(255, 250, 235, 0.6);
+  background: color-mix(in srgb, var(--surface-soft) 55%, var(--surface));
   white-space: nowrap;
 }
 
@@ -119,13 +117,13 @@
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 700;
-  color: rgba(140, 110, 60, 0.45);
+  color: var(--subtle);
   pointer-events: none;
-  transition: color 120ms var(--ease-out), transform 120ms var(--ease-out);
+  transition: color 200ms var(--ease-out), transform 200ms var(--ease-out);
 }
 
 .petSwapSearchWrap:focus-within .petSwapSearchPrefix {
-  color: var(--accent-deep, #b15a16);
+  color: var(--accent);
   transform: translateY(-52%) translateX(2px);
 }
 
@@ -135,27 +133,25 @@
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.02em;
-  border: 1px solid rgba(140, 110, 60, 0.32);
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 250, 235, 0.4)),
-    rgba(255, 250, 235, 0.55);
-  color: var(--ink, #2c1f10);
-  caret-color: var(--accent-deep, #b15a16);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-warm) 45%, var(--surface));
+  color: var(--ink);
+  caret-color: var(--accent);
   box-sizing: border-box;
-  transition: border-color 140ms var(--ease-out), box-shadow 140ms var(--ease-out), background 140ms var(--ease-out);
+  transition: border-color 200ms var(--ease-swift), box-shadow 200ms var(--ease-swift), background 200ms var(--ease-swift);
 }
 
 .petSwapSearch::placeholder {
-  color: rgba(140, 110, 60, 0.5);
+  color: var(--subtle);
   font-style: italic;
 }
 
 .petSwapSearch:focus {
   outline: none;
-  border-color: var(--accent-deep, #b15a16);
-  background: rgba(255, 245, 225, 0.85);
-  box-shadow: 0 0 0 3px rgba(217, 122, 24, 0.18);
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: var(--ring);
 }
 
 /* Hide the stock magnifying-glass / X that some browsers render so the
@@ -172,10 +168,10 @@
   margin: 6px 0;
   padding: 6px 8px;
   font-size: 11px;
-  color: #8a3220;
-  background: rgba(217, 80, 50, 0.08);
-  border: 1px solid rgba(217, 80, 50, 0.22);
-  border-radius: 6px;
+  color: var(--danger-fg);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 22%, transparent);
+  border-radius: var(--radius-sm);
   text-align: center;
 }
 
@@ -192,7 +188,7 @@
   align-items: center;
   gap: 6px;
   padding: 18px 8px 8px;
-  color: rgba(86, 56, 22, 0.6);
+  color: var(--muted);
   font-size: 12px;
   text-align: center;
 }
@@ -208,7 +204,7 @@
   font-family: var(--font-mono);
   font-size: 18px;
   letter-spacing: 0.05em;
-  color: rgba(177, 90, 22, 0.55);
+  color: color-mix(in srgb, var(--accent) 60%, transparent);
   transform: rotate(-4deg);
 }
 
@@ -231,25 +227,25 @@
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(86, 56, 22, 0.7);
+  color: var(--muted);
 }
 
 .petSwapSectionRule {
   display: inline-block;
   width: 10px;
   height: 1px;
-  background: rgba(177, 90, 22, 0.5);
+  background: color-mix(in srgb, var(--accent) 50%, transparent);
 }
 
 .petSwapSectionCount {
   margin-left: auto;
   font-size: 8px;
-  letter-spacing: 0.14em;
-  color: rgba(86, 56, 22, 0.45);
+  letter-spacing: 0.08em;
+  color: var(--subtle);
   padding: 1px 5px;
-  border: 1px solid rgba(140, 110, 60, 0.22);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(255, 250, 235, 0.4);
+  background: color-mix(in srgb, var(--surface-warm) 40%, transparent);
 }

@@ -1,0 +1,259 @@
+@media (max-width: 680px) {
+  /* Legacy top-nav rules removed — the app frame (app-frame.css) owns
+     the mobile top bar and drawer now. */
+  .accountName {
+    max-width: 58px;
+  }
+
+  .sectionHeader .metaText,
+  .sectionHeader .sectionSubhead {
+    display: none;
+  }
+
+  .galleryToolbar {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .galleryToolbar .btnLg {
+    width: 100%;
+  }
+
+  .galleryFilterRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sortControls {
+    width: 100%;
+  }
+
+  .galleryControlGroup {
+    width: 100%;
+  }
+
+  .sortControls,
+  .viewControls,
+  .kindControls,
+  .formatControls {
+    width: 100%;
+  }
+
+  .sortControls button,
+  .viewControls button,
+  .kindControls button,
+  .formatControls button {
+    justify-content: center;
+    flex: 1;
+  }
+
+  .resultBar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .resultBar span:last-child {
+    text-align: left;
+  }
+
+  .galleryStatusRow.hasFresh .resultBar {
+    padding-right: 0;
+  }
+
+  .freshPetsNotice {
+    top: auto;
+    right: 0;
+    bottom: 8px;
+    width: min(260px, 100%);
+    transform: none;
+  }
+
+  .freshPetsNotice .btn {
+    justify-content: center;
+  }
+
+  .tagDropdown,
+  .tagDropdownTrigger {
+    width: 100%;
+  }
+
+  .tagDropdownTrigger {
+    justify-content: space-between;
+  }
+
+  .tagDropdownMenu {
+    left: 0;
+    right: auto;
+    width: min(100%, 320px);
+  }
+
+  .galleryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .userCollectionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .collectionCardBody {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .collectionCardFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .collectionCardActions {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .galleryGrid.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sectionHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 36px 0 20px;
+  }
+
+  .collectionCommand {
+    width: 100%;
+  }
+
+  .detailHero {
+    padding: 22px;
+    gap: 22px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detailSurface,
+  .detailInstall {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detailHeader,
+  .detailLede,
+  .detailShowcase,
+  .detailHeroFooter {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detailLede {
+    overflow-wrap: anywhere;
+  }
+
+  .detailShowcase .spriteFrame.large {
+    width: min(100%, 210px);
+    max-width: 210px;
+    height: auto;
+    aspect-ratio: 192 / 208;
+  }
+
+  .detailHeroFooter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .detailSocialActions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .detailSocialActions .btn,
+  .detailSocialActions .adminPetMenu {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  .detailSocialActions .btn {
+    white-space: normal;
+  }
+
+  .detailSocialActions .adminPetMenuTrigger {
+    width: 100%;
+  }
+
+  .detailPreviewSkeleton {
+    width: min(100%, 210px);
+    max-width: 210px;
+    height: auto;
+    aspect-ratio: 192 / 208;
+  }
+
+  .detailTitle {
+    font-size: clamp(36px, 9vw, 48px);
+  }
+
+  .detailLede {
+    font-size: 15px;
+  }
+
+  .detailStates {
+    padding: 20px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detailStatesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .detailStatesActions {
+    width: 100%;
+  }
+
+  .detailStatesActions .btn {
+    flex: 1 1 calc(50% - 6px);
+  }
+
+  .importCommand,
+  .validationCard,
+  .validationCard.compact {
+    grid-template-columns: 1fr;
+  }
+
+  .validationCard div {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .validationCard div:last-child {
+    border-bottom: 0;
+  }
+
+  .importCommand .btn {
+    width: 100%;
+    border-left: 0;
+    border-top: 1px solid var(--terminal-border);
+  }
+
+  .authModal {
+    padding: 24px 22px 20px;
+  }
+
+  .shareCopyRow {
+    grid-template-columns: 1fr;
+  }
+
+  .socialShareActions {
+    grid-template-columns: 1fr;
+  }
+
+  .shareCopyRow .btn {
+    width: 100%;
+  }
+
+  .modalTitle h2 {
+    font-size: 24px;
+  }
+}
+

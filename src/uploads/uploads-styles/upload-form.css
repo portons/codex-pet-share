@@ -1,0 +1,107 @@
+/* Upload form */
+.uploadForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  align-items: start;
+  gap: 22px;
+  counter-reset: upload-step;
+}
+
+.uploadControls {
+  display: grid;
+  gap: 18px;
+  padding: 26px;
+}
+
+.uploadFormatGuide {
+  margin-bottom: 2px;
+}
+
+.uploadControls > .fileField,
+.uploadControls .uploadTagSection {
+  counter-increment: upload-step;
+}
+
+.uploadControls > .fileField .fileCopy .fieldLabel,
+.uploadControls .uploadTagSection > .fieldLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.uploadControls > .fileField .fileCopy .fieldLabel::before,
+.uploadControls .uploadTagSection > .fieldLabel::before {
+  content: counter(upload-step, decimal-leading-zero);
+  color: var(--accent-deep);
+  letter-spacing: 0;
+  font-weight: 500;
+}
+
+.uploadTags {
+  display: grid;
+  gap: 16px;
+}
+
+.uploadTagSection {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.fileField {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-warm);
+  padding: 16px 18px;
+  transition: border-color 220ms var(--ease-out), background 220ms var(--ease-out);
+  cursor: pointer;
+}
+
+.fileField:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent-soft) 62%, var(--surface));
+}
+
+.fileField:has(input:focus-visible) {
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+}
+
+.fileIcon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+.fileCopy {
+  min-width: 0;
+}
+
+.fileCopy small {
+  display: block;
+  overflow: hidden;
+  margin-top: 4px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileField input {
+  grid-column: 1 / -1;
+  width: 100%;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+

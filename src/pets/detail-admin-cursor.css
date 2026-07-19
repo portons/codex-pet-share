@@ -5,7 +5,7 @@
   padding: 18px 24px;
   background: var(--surface-warm);
   border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xl);
 }
 
 /* Cursor preview overlay */
@@ -25,7 +25,7 @@
   width: 42px;
   height: 42px;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   background:
     radial-gradient(circle at 65% 35%, var(--accent-glow), transparent 42%),
     var(--floating-control-bg);

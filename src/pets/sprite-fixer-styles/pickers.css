@@ -1,0 +1,196 @@
+.spriteEditorRowsStage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(258px, 0.48fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.spriteEditorRowPreviewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
+  gap: 8px;
+}
+
+.spriteEditorFrameRepairStage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.spriteEditorFrameRepairStage > .spriteEditorStagePanel:first-child,
+.spriteEditorFrameRepairStage > .spriteEditorStagePanel.primary {
+  grid-column: 1 / -1;
+}
+
+.spriteEditorRowPreviewCard {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 28%, transparent);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  transition: border-color 160ms var(--ease-out), background 160ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.spriteEditorRowPreviewCard:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+}
+
+.spriteEditorRowPreviewCard:active {
+  transform: translateY(1px);
+}
+
+.spriteEditorRowPreviewCard.active {
+  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 22%, var(--surface));
+}
+
+.spriteEditorRowPreviewCard header {
+  display: grid;
+  gap: 2px;
+}
+
+.spriteEditorRowPreviewCard strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 740;
+}
+
+.spriteEditorRowPreviewCard span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.spriteEditorSelectionSummary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 5px 10px;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 26%, transparent);
+}
+
+.spriteEditorSelectionSummary span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 620;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.spriteEditorSelectionSummary strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 740;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorStrip,
+.spriteEditorTimeline,
+.spriteEditorFramePicker {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.spriteEditorStrip::-webkit-scrollbar,
+.spriteEditorTimeline::-webkit-scrollbar,
+.spriteEditorFramePicker::-webkit-scrollbar {
+  display: none;
+}
+
+.spriteEditorRowPicker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: 7px;
+  min-width: 0;
+}
+
+.spriteEditorCellPicker {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.spriteEditorRowPicker button,
+.spriteEditorFramePicker button,
+.spriteEditorAllFramesButton {
+  min-width: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 24%, transparent);
+  color: var(--muted);
+  transition: border-color 160ms var(--ease-out), background 160ms var(--ease-out), color 160ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.spriteEditorRowPicker button:hover,
+.spriteEditorFramePicker button:hover,
+.spriteEditorAllFramesButton:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  color: var(--ink);
+}
+
+.spriteEditorRowPicker button:active,
+.spriteEditorFramePicker button:active,
+.spriteEditorAllFramesButton:active {
+  transform: translateY(1px);
+}
+
+.spriteEditorRowPicker button.active,
+.spriteEditorFramePicker button.active,
+.spriteEditorAllFramesButton.active {
+  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 26%, var(--surface));
+  color: var(--accent-deep);
+}
+
+.spriteEditorRowPicker button {
+  display: grid;
+  grid-template-columns: auto minmax(68px, 1fr);
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 46px;
+  padding: 5px 8px 5px 5px;
+  text-align: left;
+}
+
+.spriteEditorRowPicker span {
+  overflow: hidden;
+  color: inherit;
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorFramePicker button {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 5px;
+}
+
+.spriteEditorFramePicker span {
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 620;
+}
+

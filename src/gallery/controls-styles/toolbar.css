@@ -1,0 +1,249 @@
+/* Gallery toolbar */
+.galleryTools {
+  display: grid;
+  gap: 16px;
+  padding: 32px 0 16px;
+}
+
+.galleryToolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.galleryControlRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.galleryControlRowEnd {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.activeFilterChips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: -6px;
+}
+
+.filterChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px 0 11px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  transition: background 180ms var(--ease-swift), color 180ms var(--ease-swift),
+    transform 120ms var(--ease-swift);
+}
+
+.filterChip:hover {
+  background: color-mix(in srgb, var(--accent) 24%, var(--accent-soft));
+}
+
+.filterChip:active {
+  transform: scale(0.96);
+}
+
+.filterChipClear {
+  padding: 0 11px;
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+
+.filterChipClear:hover {
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.filtersPopover {
+  width: 320px;
+  padding: 14px;
+  display: grid;
+  gap: 14px;
+}
+
+.filtersPopoverGroup {
+  display: grid;
+  gap: 8px;
+}
+
+/* Inside the popover the segmented pill shell wraps badly — individual
+   chips wrap cleanly instead. */
+.filtersPopoverGroup .kindControls,
+.filtersPopoverGroup .formatControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.filtersPopoverGroup .kindControls button,
+.filtersPopoverGroup .formatControls button {
+  height: 28px;
+  padding: 0 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.filtersPopoverGroup .kindControls button:hover,
+.filtersPopoverGroup .formatControls button:hover {
+  border-color: var(--border-strong);
+}
+
+.filtersPopoverGroup .kindControls button.active,
+.filtersPopoverGroup .formatControls button.active {
+  border-color: var(--ink);
+}
+
+.filtersPopoverLabel {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.mobileFilterToggle {
+  display: none;
+}
+
+.resultBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 14px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-soft);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.creatorDetailSurface .resultBar {
+  border-top: 0;
+}
+
+.resultBar span:last-child {
+  min-height: 18px;
+  text-align: right;
+}
+
+.resultPageStatus {
+  display: inline-flex;
+  justify-content: flex-end;
+  min-width: 96px;
+}
+
+.galleryStatusRow {
+  position: relative;
+  min-height: 46px;
+  margin: 0 0 14px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.galleryStatusRow .resultBar {
+  min-height: 46px;
+  margin: 0;
+  padding: 10px 0;
+  border-top: 0;
+}
+
+.galleryStatusRow.hasFresh .resultBar {
+  padding-right: min(310px, 42vw);
+}
+
+.freshPetsNotice {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: 6;
+  width: fit-content;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 9px 10px 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 68%, transparent), transparent 62%),
+    color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: 0 16px 34px -28px var(--accent);
+  backdrop-filter: blur(10px);
+  transform: translateY(-50%);
+}
+
+.freshPetsNotice .btn {
+  height: 30px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.freshPetsEyebrow,
+.freshPetsCopy {
+  margin: 0;
+}
+
+.freshPetsEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.freshPetsDot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.freshPetsDot::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 1px solid var(--accent);
+  border-radius: inherit;
+  opacity: 0.22;
+  animation: fresh-pulse 1400ms var(--ease-out) infinite;
+}
+
+.freshPetsCopy {
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.2;
+}
+

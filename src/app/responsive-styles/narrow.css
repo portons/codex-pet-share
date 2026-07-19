@@ -1,0 +1,12 @@
+@media (max-width: 380px) {
+  .detailShowcase .spriteFrame.large {
+    width: min(100%, 192px);
+    max-width: 192px;
+  }
+
+  .detailPreviewSkeleton {
+    width: min(100%, 192px);
+    max-width: 192px;
+  }
+}
+

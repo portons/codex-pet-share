@@ -23,8 +23,8 @@
   align-items: center;
   gap: 6px;
   padding: 3px 8px 3px 6px;
-  background: rgba(15, 15, 14, 0.86);
-  color: var(--bg);
+  background: color-mix(in srgb, var(--terminal-bg) 88%, transparent);
+  color: color-mix(in srgb, var(--terminal-fg) 78%, transparent);
   font-size: 10.5px;
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -38,15 +38,15 @@
 }
 
 .roomBadge .roomBadgeName {
-  color: #fff;
+  color: var(--terminal-fg);
 }
 
 .roomBadge .roomBadgeSep {
-  color: rgba(255, 255, 255, 0.4);
+  color: color-mix(in srgb, var(--terminal-fg) 40%, transparent);
 }
 
 .roomBadge .roomBadgePet {
-  color: var(--accent-soft);
+  color: var(--terminal-prompt);
   letter-spacing: 0.04em;
 }
 
@@ -55,8 +55,8 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 2px rgba(101, 163, 13, 0.4);
+  background: var(--terminal-prompt);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .roomBubble {
@@ -66,7 +66,7 @@
   background: var(--surface);
   color: var(--ink);
   border: 1px solid var(--border-strong);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   font-family: var(--font-sans);
   font-size: 13px;
   line-height: 1.4;

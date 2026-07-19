@@ -1,0 +1,88 @@
+.paginationControls,
+.randomizeControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.galleryTopPagination {
+  display: flex;
+  justify-content: flex-end;
+  margin: 12px 0 20px;
+}
+
+.galleryTopPagination .paginationControls {
+  justify-content: flex-end;
+  margin-top: 0;
+}
+
+.paginationJump {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-soft) 72%, transparent);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+}
+
+.paginationJump::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
+  left: 10px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0;
+  transform: scaleX(0.18);
+  transform-origin: left center;
+  transition: opacity 160ms var(--ease-out), transform 260ms var(--ease-out);
+}
+
+.paginationControls[data-loading="true"] .paginationJump::after {
+  opacity: 0.8;
+  transform: scaleX(1);
+}
+
+.paginationJump label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding-left: 9px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.paginationJump input {
+  width: 56px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-align: center;
+  outline: none;
+  transition: border-color 180ms var(--ease-out), background 180ms var(--ease-out);
+}
+
+.paginationJump input:focus {
+  border-color: var(--border-strong);
+  background: var(--floating-control-bg-hover);
+}
+
+.paginationTotal {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+

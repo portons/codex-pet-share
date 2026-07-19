@@ -2,10 +2,10 @@
 .detailHero {
   display: grid;
   gap: 28px;
-  padding: 32px;
+  padding: 36px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-2xl);
 }
 
 .detailHeader {
@@ -73,12 +73,13 @@
 
 .detailTitle {
   margin: 0;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: clamp(40px, 5.6vw, 72px);
-  letter-spacing: -0.045em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(40px, 5.6vw, 76px);
+  letter-spacing: -0.02em;
   line-height: 0.95;
   color: var(--ink);
+  text-wrap: balance;
 }
 
 .detailLede {
@@ -96,15 +97,20 @@
   margin-top: 2px;
 }
 
+/* The exhibit — the pet is the page. One big stage, states switched in place. */
 .detailShowcase {
+  position: relative;
   display: grid;
-  gap: 16px;
+  gap: 10px;
   justify-items: center;
-  padding: 14px 0 18px;
-  border-top: 1px solid var(--border-soft);
-  border-bottom: 1px solid var(--border-soft);
+  padding: 26px 16px 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xl);
   background:
-    radial-gradient(circle at 50% 45%, rgba(216, 242, 90, 0.18), transparent 70%);
+    radial-gradient(circle at 50% 74%, var(--preview-ground), transparent 58%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, 18px 18px;
+  background-color: var(--stage-checker-a);
 }
 
 .detailShowcase .spriteFrame.large {
@@ -113,10 +119,65 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transform: scale(1.55);
+  transform-origin: center center;
+  margin: 66px 0 74px;
 }
 
 .detailShowcase .spriteFrame.large .sprite {
   transform-origin: center center;
+}
+
+.detailShowcase .detailWalkButton {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 3;
+  background: var(--floating-control-bg);
+}
+
+.detailStateChips {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  max-width: 560px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--floating-control-bg) 88%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-sm);
+}
+
+.detailStateChip {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition: background 200ms var(--ease-swift), color 200ms var(--ease-swift),
+    box-shadow 200ms var(--ease-swift);
+}
+
+.detailStateChip:hover {
+  color: var(--ink);
+}
+
+.detailStateChip.active {
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: var(--shadow-sm);
 }
 
 .detailWalkButton {
@@ -215,6 +276,15 @@
 }
 
 @media (max-width: 680px) {
+  .detailShowcase .spriteFrame.large {
+    transform: scale(1.12);
+    margin: 22px 0 26px;
+  }
+
+  .detailStateChips {
+    max-width: 100%;
+  }
+
   .detailHeroFooter {
     align-items: start;
   }

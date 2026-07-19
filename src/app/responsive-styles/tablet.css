@@ -1,0 +1,112 @@
+@media (max-width: 1100px) {
+  .appShell {
+    width: min(100vw - 48px, 1080px);
+  }
+
+  .galleryGrid.compact {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .appShell {
+    width: min(100vw - 32px, 1080px);
+  }
+
+  .galleryGrid.compact {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .collectionCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .collectionCardFooter {
+    grid-template-rows: auto;
+    border-left: 0;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .appNav {
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    padding: 10px 14px 12px;
+    border-radius: var(--radius-2xl);
+  }
+
+  .navLinks {
+    grid-column: 1 / -1;
+    order: 3;
+    justify-content: flex-start;
+    gap: 4px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .detailSurface {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "hero"
+      "install"
+      "states"
+      "admin"
+      "more";
+  }
+
+  .detailInstall {
+    position: static;
+  }
+
+  .detailMoreGrid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .detailStatesGrid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .uploadsHead,
+  .uploadsTable colgroup {
+    display: none;
+  }
+
+  .uploadsTable,
+  .uploadsTable tbody,
+  .uploadsRow {
+    display: block;
+  }
+
+  .uploadsRow {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .uploadsRow:last-child {
+    border-bottom: 0;
+  }
+
+  .uploadsRow td {
+    display: contents;
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .uploadsPackage {
+    display: contents;
+  }
+
+  .uploadsRow .monoText,
+  .uploadsRow .petStats,
+  .rowActions {
+    grid-column: 2 / -1;
+  }
+
+  .rowActions {
+    justify-content: flex-start;
+  }
+}
+

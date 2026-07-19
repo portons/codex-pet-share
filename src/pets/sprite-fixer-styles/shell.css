@@ -1,0 +1,228 @@
+.spriteEditorModal {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(1320px, calc(100vw - 28px));
+  height: min(660px, calc(100dvh - 28px));
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-modal);
+  animation: modal-in 260ms var(--ease-spring);
+}
+
+.spriteEditorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface) 92%, var(--surface-soft));
+}
+
+.spriteEditorVersionNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.spriteEditorHeader h2 {
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.3vw, 30px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+}
+
+.spriteEditorHeaderActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.spriteEditorModal .modalCloseButton {
+  position: static;
+  top: auto;
+  right: auto;
+}
+
+.spriteEditorDraftPill {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--muted) 28%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-soft) 64%, var(--surface));
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.spriteEditorShell {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr) 334px;
+  height: 100%;
+  min-height: 0;
+}
+
+.spriteEditorRail {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 0;
+  padding: 12px;
+  border-right: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface-soft) 48%, var(--surface));
+}
+
+.spriteEditorTool {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  grid-template-areas:
+    "icon label"
+    "icon kicker";
+  align-items: center;
+  gap: 1px 8px;
+  min-height: 46px;
+  padding: 8px 9px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  text-align: left;
+  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.spriteEditorTool .icon {
+  grid-area: icon;
+}
+
+.spriteEditorTool span {
+  grid-area: label;
+  overflow: hidden;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 680;
+  letter-spacing: -0.012em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+}
+
+.spriteEditorTool small {
+  grid-area: kicker;
+  overflow: hidden;
+  color: var(--subtle);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 560;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.spriteEditorTool:hover:not(.active) {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.spriteEditorTool:active {
+  transform: translateY(1px);
+}
+
+.spriteEditorTool.active {
+  border-color: color-mix(in srgb, var(--accent) 46%, var(--border));
+  background: var(--surface);
+  color: var(--accent-deep);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.spriteEditorWorkbench,
+.spriteEditorInspector {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-color: color-mix(in srgb, var(--accent) 42%, var(--muted)) transparent;
+  scrollbar-width: thin;
+}
+
+.spriteEditorWorkbench {
+  padding: 14px;
+}
+
+.spriteEditorInspector {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 14px;
+  border-left: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface-soft) 34%, var(--surface));
+}
+
+.spriteEditorStageStack {
+  display: grid;
+  gap: 12px;
+}
+
+.spriteEditorConfirmOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: color-mix(in srgb, var(--terminal-bg) 74%, transparent);
+}
+
+.spriteEditorConfirmPanel {
+  display: grid;
+  gap: 14px;
+  width: min(420px, 100%);
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-modal);
+  animation: menu-pop 260ms var(--ease-swift);
+}
+
+.spriteEditorConfirmPanel h3,
+.spriteEditorConfirmPanel p {
+  margin: 0;
+}
+
+.spriteEditorConfirmPanel h3 {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 760;
+  letter-spacing: -0.025em;
+}
+
+.spriteEditorConfirmPanel p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.spriteEditorConfirmActions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+

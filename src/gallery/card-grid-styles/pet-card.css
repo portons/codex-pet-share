@@ -1,0 +1,228 @@
+/* Pet card */
+.petCard {
+  --magnetic-x: 50%;
+  --magnetic-y: 38%;
+  --magnetic-pull-x: 0px;
+  --magnetic-pull-y: 0px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  min-height: 340px;
+  height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  transition: border-color 260ms var(--ease-swift), box-shadow 260ms var(--ease-swift),
+    transform 260ms var(--ease-swift);
+}
+
+.petCard:has(.adminPetMenuList) {
+  z-index: 40;
+}
+
+.petCard.compact {
+  min-height: 236px;
+  border-radius: var(--radius-md);
+}
+
+.petCardPreview {
+  border-radius: calc(var(--radius-xl) - 1px) calc(var(--radius-xl) - 1px) 0 0;
+  overflow: hidden;
+}
+
+.petCard.compact .petCardPreview {
+  border-radius: calc(var(--radius-md) - 1px) calc(var(--radius-md) - 1px) 0 0;
+}
+
+.petCardActions {
+  border-radius: 0 0 calc(var(--radius-xl) - 1px) calc(var(--radius-xl) - 1px);
+}
+
+.petCard.compact .petCardActions {
+  border-radius: 0 0 calc(var(--radius-md) - 1px) calc(var(--radius-md) - 1px);
+}
+
+.petCard:hover {
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--border-strong));
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+.petCard.pocMagneticPlate::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  left: 1px;
+  height: 46%;
+  z-index: 0;
+  border-radius: calc(var(--radius-xl) - 1px) calc(var(--radius-xl) - 1px) 0 0;
+  background:
+    radial-gradient(250px circle at var(--magnetic-x) var(--magnetic-y), color-mix(in srgb, var(--accent) 13%, transparent), transparent 64%),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms var(--ease-out);
+}
+
+.petCard.pocMagneticPlate:hover::before,
+.petCard.pocMagneticPlate:focus-within::before {
+  opacity: 1;
+}
+
+.petCard.pocMagneticPlate .petCardPreview {
+  transition: background 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+
+.petCard.pocMagneticPlate:hover .petCardPreview,
+.petCard.pocMagneticPlate:focus-within .petCardPreview {
+  background:
+    radial-gradient(176px circle at var(--magnetic-x) var(--magnetic-y), color-mix(in srgb, var(--accent) 12%, transparent), transparent 68%),
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, auto, 18px 18px;
+  background-color: var(--stage-checker-a);
+}
+
+.petCard.pocMagneticPlate .petCardBody,
+.petCard.pocMagneticPlate .petCardActions {
+  background: var(--surface);
+}
+
+.petCard.pocMagneticPlate .petCardPreview .galleryPreviewFrame {
+  transition: transform 180ms var(--ease-out), filter 180ms var(--ease-out);
+}
+
+.petCard.pocMagneticPlate:hover .petCardPreview .galleryPreviewFrame,
+.petCard.pocMagneticPlate:focus-within .petCardPreview .galleryPreviewFrame {
+  filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.18));
+  transform: translate3d(calc(var(--magnetic-pull-x) * 0.72), calc(var(--magnetic-pull-y) * 0.72), 0) scale(1.018);
+  will-change: transform;
+}
+
+.petCardPreview {
+  display: grid;
+  place-items: center;
+  min-height: 126px;
+  padding: 8px 18px;
+  background:
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, 18px 18px;
+  background-color: var(--stage-checker-a);
+  border: 0;
+  border-bottom: 1px solid var(--border-soft);
+  cursor: pointer;
+}
+
+.petCardQuickActions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: inline-flex;
+  gap: 4px;
+}
+
+.petCardQuickAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--floating-control-bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+
+.petCardQuickAction:hover:not(:disabled) {
+  background: var(--floating-control-bg-hover);
+  border-color: var(--border-strong);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.petCardQuickAction.activeSoft {
+  background: var(--accent-soft);
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}
+
+/* Lightweight, fast-appearing tooltip used on small icon buttons. The
+   native `title` attribute is retained as a fallback for accessibility
+   while this custom popup gives immediate hover feedback. */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translate(-50%, 4px);
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: rgba(16, 16, 15, 0.92);
+  color: #f5f0dc;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms var(--ease-out), transform 120ms var(--ease-out);
+  z-index: 10;
+  box-shadow: var(--shadow-md);
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Tooltips on the right edge of the card flip below to avoid clipping
+   above the gallery row above the card. */
+.petCardQuickAction[data-tooltip]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+  transform: translate(-50%, -4px);
+}
+
+.petCardQuickAction[data-tooltip]:hover::after,
+.petCardQuickAction[data-tooltip]:focus-visible::after {
+  transform: translate(-50%, 0);
+}
+
+/* Right-aligned actions sometimes get clipped at the card edge — anchor
+   the last quick action's tooltip to its right edge. */
+.petCardQuickActions > .petCardQuickAction:last-child[data-tooltip]::after {
+  left: auto;
+  right: 0;
+  transform: translate(0, -4px);
+}
+
+.petCardQuickActions > .petCardQuickAction:last-child[data-tooltip]:hover::after,
+.petCardQuickActions > .petCardQuickAction:last-child[data-tooltip]:focus-visible::after {
+  transform: translate(0, 0);
+}
+
+.petCard.compact .petCardQuickActions {
+  top: 6px;
+  right: 6px;
+  gap: 3px;
+}
+
+.petCard.compact .petCardQuickAction {
+  width: 22px;
+  height: 22px;
+}
+

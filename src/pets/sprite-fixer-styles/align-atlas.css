@@ -1,0 +1,262 @@
+.spriteEditorAtlasContext {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.spriteEditorAlignStage {
+  display: grid;
+  grid-template-columns: minmax(270px, 0.44fr) minmax(0, 1fr);
+  grid-template-areas:
+    "motion motion"
+    "preview targets";
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-height: 0;
+}
+
+.spriteEditorAlignStage .spriteEditorStagePanel {
+  min-height: 0;
+}
+
+.spriteEditorAtlasPanel {
+  grid-area: targets;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.spriteEditorTransformSelectedPanel {
+  grid-area: preview;
+  align-content: start;
+}
+
+.spriteEditorTransformMotionPanel {
+  grid-area: motion;
+}
+
+.spriteEditorAtlasPanel {
+  min-height: 0;
+}
+
+.spriteEditorAtlasContext article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 7px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 20%, transparent);
+}
+
+.spriteEditorAtlasFrames {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.spriteEditorAllFramesButton {
+  min-height: 42px;
+  padding: 0 5px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 680;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.spriteEditorTransformMotionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 7px;
+  min-width: 0;
+}
+
+.spriteEditorTransformMotionCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "meta"
+    "preview";
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
+  min-height: 98px;
+  padding: 7px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-soft) 24%, transparent);
+  color: var(--muted);
+  text-align: left;
+  transition: border-color 160ms var(--ease-out), background 160ms var(--ease-out), transform 80ms var(--ease-out);
+}
+
+.spriteEditorTransformMotionCard:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  color: var(--ink);
+}
+
+.spriteEditorTransformMotionCard:active {
+  transform: translateY(1px);
+}
+
+.spriteEditorTransformMotionCard.selected {
+  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 18%, var(--surface));
+}
+
+.spriteEditorTransformMotionCard.changed {
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent) 76%, var(--border));
+}
+
+.spriteEditorTransformMotionMeta {
+  grid-area: meta;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.spriteEditorTransformMotionCard strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 730;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorTransformMotionCard small {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 590;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorTransformMotionPreview {
+  position: relative;
+  grid-area: preview;
+  display: grid;
+  min-width: 0;
+  min-height: 64px;
+  place-items: center;
+  overflow: hidden;
+  padding: 4px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 72%, var(--terminal-bg));
+}
+
+.spriteEditorTransformMotionPreview::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: 15px;
+  height: 15px;
+  border: 1px solid color-mix(in srgb, var(--accent) 72%, var(--ink));
+  border-radius: 999px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--accent) 80%, var(--ink)), color-mix(in srgb, var(--accent) 80%, var(--ink))) center / 1px 100% no-repeat,
+    linear-gradient(color-mix(in srgb, var(--accent) 80%, var(--ink)), color-mix(in srgb, var(--accent) 80%, var(--ink))) center / 100% 1px no-repeat;
+  opacity: 0.82;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.spriteEditorTransformMotionPreview .spriteFrameClip {
+  grid-area: 1 / 1;
+  justify-self: center;
+  align-self: center;
+}
+
+.spriteEditorTransformMotionPreview .spriteFrameClip.ghost {
+  opacity: 0.28;
+  filter: grayscale(1);
+}
+
+.spriteEditorTransformMotionPreview .spriteFrameClip.after {
+  z-index: 2;
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border-soft));
+}
+
+.spriteEditorTransformSelectedPanel .spriteEditorAlignCanvas {
+  height: 246px;
+}
+
+.spriteEditorAtlasContext article.selected {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+}
+
+.spriteEditorAtlasContext article.shifted {
+  background: color-mix(in srgb, var(--accent-soft) 12%, var(--surface));
+}
+
+.spriteEditorAtlasRowHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 10px;
+  min-width: 0;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+}
+
+.spriteEditorAtlasFrames .spriteEditorFramePicker {
+  gap: 5px;
+  padding-bottom: 0;
+}
+
+.spriteEditorAtlasFrames .spriteEditorFramePicker button {
+  flex: 0 0 auto;
+  padding: 3px;
+}
+
+.spriteEditorAtlasFrames .spriteEditorFramePicker span {
+  display: none;
+}
+
+.spriteEditorAtlasContext strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 730;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorAtlasContext span {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorAtlasContext em {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 640;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spriteEditorAtlasContext em.placeholder {
+  color: var(--subtle);
+}
+

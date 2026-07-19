@@ -1,0 +1,44 @@
+/* Empty / gate */
+.emptyState,
+.signInGate {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  width: min(460px, 100%);
+  margin: 56px auto 0;
+  padding: 52px 32px 44px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background:
+    radial-gradient(420px circle at 50% -20%, color-mix(in srgb, var(--accent-soft) 60%, transparent), transparent 68%),
+    var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.emptyState p,
+.signInGate p {
+  max-width: 34ch;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--muted);
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+.gateIcon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  color: var(--muted);
+  background:
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, 14px 14px;
+  background-color: var(--stage-checker-a);
+}
+

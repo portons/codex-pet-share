@@ -1,0 +1,110 @@
+@media (max-width: 1080px) {
+  .spriteEditorModal {
+    width: min(980px, calc(100vw - 20px));
+  }
+
+  .spriteEditorShell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(360px, 1fr) auto;
+  }
+
+  .spriteEditorRail {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(118px, 1fr);
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .spriteEditorTool.active {
+    box-shadow: inset 0 -3px 0 var(--accent);
+  }
+
+  .spriteEditorInspector {
+    border-left: 0;
+    border-top: 1px solid var(--border-soft);
+  }
+}
+
+@media (max-width: 720px) {
+  .spriteEditorModal {
+    display: block;
+    width: calc(100vw - 12px);
+    height: auto;
+    max-height: calc(100dvh - 12px);
+    overflow: auto;
+  }
+
+  .spriteEditorHeader {
+    align-items: flex-start;
+    padding: 14px;
+  }
+
+  .spriteEditorHeaderActions {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .spriteEditorWorkbench,
+  .spriteEditorInspector {
+    overflow: visible;
+    padding: 10px;
+  }
+
+  .spriteEditorShell {
+    display: block;
+  }
+
+  .spriteEditorRunPair,
+  .spriteEditorDirectionCompare,
+  .spriteEditorAlignStage,
+  .spriteEditorRowsStage,
+  .spriteEditorFrameRepairStage,
+  .spriteEditorPixelLayout,
+  .spriteEditorAtlasFrames,
+  .spriteEditorAtlasContext article {
+    grid-template-columns: 1fr;
+  }
+
+  .spriteEditorAlignStage {
+    grid-template-areas:
+      "motion"
+      "preview"
+      "targets";
+    grid-template-rows: auto auto auto;
+  }
+
+  .spriteEditorTransformMotionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .spriteEditorRunTile {
+    min-height: 190px;
+  }
+
+  .spriteEditorRunTile.left .spriteFrameClip,
+  .spriteEditorRunTile.right .spriteFrameClip {
+    justify-self: center;
+  }
+
+  .spriteEditorAlignCanvas {
+    height: 300px;
+  }
+
+  .spriteEditorActions {
+    position: static;
+    grid-template-columns: 1fr;
+    padding-top: 0;
+    background: transparent;
+  }
+
+  .spriteEditorRuntimeCanvas {
+    min-height: 300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spriteEditorConfirmPanel {
+    animation: none;
+  }
+}

@@ -3,8 +3,8 @@
   padding: 0 4px;
   font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 0.1em;
-  color: rgba(86, 56, 22, 0.55);
+  letter-spacing: 0.08em;
+  color: var(--muted);
   text-align: right;
   font-style: italic;
 }
@@ -21,8 +21,8 @@
   gap: 6px;
 }
 
-/* Tile = miniature card-sleeve cell. Inset cream interior with a
-   subtle inner shadow giving "pocket" depth, and a faint rotation
+/* Tile = miniature card-sleeve cell. Inset porcelain interior with a
+   subtle inner highlight giving "pocket" depth, and a faint rotation
    hint on hover so it feels physical. */
 .petSwapTile {
   /* min-width:0 lets the grid's minmax(0, 1fr) actually shrink the tile
@@ -35,29 +35,27 @@
   align-items: center;
   gap: 2px;
   padding: 5px 3px 4px;
-  background: linear-gradient(180deg, rgba(255, 250, 235, 0.85), rgba(255, 240, 210, 0.55));
-  border: 1px solid rgba(140, 110, 60, 0.18);
-  border-radius: 7px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-family: inherit;
-  color: var(--ink, #2c1f10);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(140, 110, 60, 0.08);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
   transition:
-    background 140ms var(--ease-out),
-    border-color 140ms var(--ease-out),
-    transform 140ms var(--ease-out),
-    box-shadow 140ms var(--ease-out);
+    background 200ms var(--ease-swift),
+    border-color 200ms var(--ease-swift),
+    transform 200ms var(--ease-swift),
+    box-shadow 200ms var(--ease-swift);
 }
 
 .petSwapTile:hover:not(:disabled),
 .petSwapTile:focus-visible:not(:disabled) {
-  background: linear-gradient(180deg, rgba(255, 233, 214, 0.95), rgba(255, 215, 175, 0.7));
-  border-color: var(--accent-deep, #b15a16);
+  background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface));
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
   outline: none;
   transform: translateY(-1px) rotate(-0.4deg);
-  box-shadow:
-    0 6px 14px -8px rgba(177, 90, 22, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow-md), inset 0 1px 0 var(--inset-highlight);
 }
 
 .petSwapTile:active:not(:disabled) {
@@ -73,15 +71,15 @@
   filter: saturate(0.7);
 }
 
-/* Active = "currently in play". Stronger orange edge + a tiny corner
+/* Active = "currently in play". Stronger amber edge + a tiny corner
    notch (top-right) so it reads as a tabbed/dog-eared card. */
 .petSwapTile[data-active] {
-  border-color: var(--accent-deep, #b15a16);
-  background: linear-gradient(180deg, rgba(255, 220, 180, 0.95), rgba(255, 200, 140, 0.7));
+  border-color: var(--accent);
+  background: var(--accent-soft);
   box-shadow:
-    0 0 0 1px var(--accent-deep, #b15a16),
-    0 6px 14px -8px rgba(177, 90, 22, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 0 0 1px var(--accent),
+    var(--shadow-sm),
+    inset 0 1px 0 var(--inset-highlight);
 }
 
 .petSwapTile[data-active]::after {
@@ -93,13 +91,13 @@
   height: 0;
   border-style: solid;
   border-width: 0 7px 7px 0;
-  border-color: transparent var(--accent-deep, #b15a16) transparent transparent;
-  border-top-right-radius: 7px;
+  border-color: transparent var(--accent) transparent transparent;
+  border-top-right-radius: var(--radius-sm);
 }
 
-/* Tile frame: cream cell that holds the sprite. The sprite floats
-   above a soft elliptical shadow so it reads like a figure on a
-   spotlit display, not a clipped corner of an atlas. */
+/* Tile frame: checkerboard stage cell that holds the sprite. The
+   sprite floats above a soft ground shadow so it reads like a figure
+   on a spotlit display, not a clipped corner of an atlas. */
 .petSwapTileFrame {
   position: relative;
   display: flex;
@@ -108,9 +106,11 @@
   width: 100%;
   height: 44px;
   background:
-    radial-gradient(60% 22% at 50% 92%, rgba(86, 56, 22, 0.18), transparent 70%),
-    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.5), transparent 60%);
-  border-radius: 5px;
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, 18px 18px;
+  background-color: var(--stage-checker-a);
+  border-radius: var(--radius-xs);
   overflow: hidden;
 }
 
@@ -133,7 +133,7 @@
   letter-spacing: 0.04em;
   line-height: 1.15;
   text-align: center;
-  color: rgba(86, 56, 22, 0.85);
+  color: color-mix(in srgb, var(--ink) 85%, transparent);
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -141,7 +141,7 @@
 }
 
 .petSwapTile[data-active] .petSwapTileName {
-  color: var(--accent-deep, #8a4a16);
+  color: var(--accent-deep);
   font-weight: 700;
 }
 

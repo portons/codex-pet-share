@@ -2,33 +2,37 @@
 .appShell {
   position: relative;
   z-index: 1;
-  width: min(1080px, calc(100vw - 64px));
+  width: min(1200px, calc(100vw - 48px));
   margin: 0 auto;
-  padding: 16px 0 96px;
+  padding: 20px 0 96px;
 }
 
-/* Nav */
+/* Nav — floating island */
 .appNav {
   position: sticky;
-  top: 0;
+  top: 14px;
   z-index: 10;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 32px;
+  gap: 28px;
   min-height: 60px;
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--border-strong);
+  padding: 8px 12px 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
   background: var(--nav-bg);
-  backdrop-filter: saturate(140%) blur(14px);
-  -webkit-backdrop-filter: saturate(140%) blur(14px);
+  box-shadow: var(--shadow-md), inset 0 1px 0 var(--inset-highlight);
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+  margin-bottom: 18px;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   min-width: 0;
+  padding-left: 4px;
   color: var(--ink);
   white-space: nowrap;
   text-decoration: none;
@@ -40,8 +44,8 @@
 }
 
 .brandMark {
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   flex: 0 0 auto;
   object-fit: contain;
   transform: translateY(-1px);
@@ -57,7 +61,7 @@
   align-items: center;
   gap: 8px;
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: 16.5px;
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1;
@@ -67,7 +71,7 @@
 .brandPrompt {
   color: var(--accent);
   font-weight: 700;
-  font-size: 19px;
+  font-size: 17.5px;
   line-height: 1;
 }
 
@@ -77,17 +81,17 @@
 
 .brandCursor {
   display: inline-block;
-  width: 9px;
-  height: 18px;
+  width: 8px;
+  height: 16px;
   margin-left: -2px;
-  background: var(--ink);
+  background: var(--accent);
   border-radius: 1px;
   transform: translateY(0);
   animation: brand-cursor-blink 1.1s steps(1) infinite;
 }
 
 .brand:hover .brandCursor {
-  background: var(--accent);
+  background: var(--ink);
 }
 
 @keyframes brand-mark-glitch {
@@ -134,7 +138,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   justify-content: flex-start;
 }
 
@@ -148,28 +152,28 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  height: 30px;
-  padding: 0 10px;
-  border-radius: var(--radius-sm);
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: color 200ms var(--ease-out), background 200ms var(--ease-out);
+  letter-spacing: 0.03em;
+  transition: color 220ms var(--ease-swift), background 220ms var(--ease-swift);
 }
 
 .navLinks a::before {
   content: "";
   position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 4px;
+  left: 14px;
+  right: 14px;
+  bottom: 6px;
   height: 1px;
   background: var(--accent);
   transform: scaleX(0);
   transform-origin: left center;
-  transition: transform 220ms var(--ease-out);
+  transition: transform 260ms var(--ease-swift);
 }
 
 .navLinks a:hover {
@@ -182,8 +186,8 @@
 }
 
 .navLinks a.active {
-  color: var(--ink);
-  background: var(--surface-soft);
+  color: var(--accent-ink);
+  background: var(--accent-soft);
 }
 
 .navLinks a.active::before {
@@ -191,25 +195,39 @@
 }
 
 .navLinks .navUploadLink {
-  gap: 5px;
-  margin-left: 10px;
+  gap: 6px;
+  margin-left: 8px;
+  border: 1px solid var(--border);
+  background: var(--nav-action-bg);
   color: var(--ink);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
+}
+
+.navLinks .navUploadLink:hover {
+  border-color: var(--border-strong);
+  background: var(--nav-action-bg-hover);
 }
 
 .navLinks .navUploadLink::before {
-  left: 28px;
+  display: none;
+}
+
+.navLinks .navUploadLink.active {
+  border-color: transparent;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
 }
 
 .appFooter {
   display: grid;
   justify-items: center;
   gap: 7px;
-  margin-top: 48px;
-  padding: 22px 0 0;
+  margin-top: 64px;
+  padding: 26px 0 0;
   border-top: 1px solid var(--border-soft);
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 12.5px;
+  line-height: 1.5;
   text-align: center;
 }
 
@@ -217,32 +235,30 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 20px;
+  margin-bottom: 6px;
 }
 
 .appFooter .footerSocialLinks a {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 30px;
-  padding: 0 11px;
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  color: var(--ink);
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
   font-family: var(--font-mono);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   text-decoration: none;
-  text-underline-offset: 3px;
-  transition: transform 180ms var(--ease-out), border-color 180ms var(--ease-out), background 180ms var(--ease-out);
+  transition: color 180ms var(--ease-out);
 }
 
 .appFooter .footerSocialLinks a:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-soft);
   color: var(--ink);
+  background: transparent;
 }
 
 .appFooter .footerSocialLinks a:active {
@@ -252,23 +268,24 @@
 .themeToggle {
   display: inline-grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
+  border-radius: 999px;
+  background: var(--nav-action-bg);
   color: var(--muted);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
   transition: transform 160ms var(--ease-out), border-color 180ms var(--ease-out), color 180ms var(--ease-out), background 180ms var(--ease-out);
 }
 
 .themeToggle:hover {
   border-color: var(--border-strong);
-  background: var(--surface-soft);
+  background: var(--nav-action-bg-hover);
   color: var(--ink);
 }
 
 .themeToggle:active {
-  transform: translateY(1px);
+  transform: scale(0.94);
 }
 
 .appFooter a {
@@ -285,6 +302,6 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }

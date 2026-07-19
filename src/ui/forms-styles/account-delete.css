@@ -1,0 +1,80 @@
+.modalBodyCopy {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.modalActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.modalActionRow .btn {
+  flex: 1 1 150px;
+  justify-content: center;
+}
+
+.accountDeleteModal {
+  width: min(460px, 100%);
+}
+
+.accountDeleteOptions {
+  display: grid;
+  gap: 10px;
+}
+
+.accountDeleteOption {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 200ms var(--ease-swift), background 200ms var(--ease-swift),
+    box-shadow 200ms var(--ease-swift);
+}
+
+.accountDeleteOption:hover:not(:disabled) {
+  border-color: var(--border-strong);
+}
+
+.accountDeleteOption.isSelected {
+  border-color: var(--ink);
+  background: var(--surface-soft);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.accountDeleteOption:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.accountDeleteOption span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.accountDeleteOption strong {
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.accountDeleteOption small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.35;
+}

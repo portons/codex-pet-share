@@ -1,0 +1,65 @@
+.petCardPreview .galleryPreviewFrame {
+  position: relative;
+  width: 144px;
+  height: 156px;
+  margin: 8px 0;
+}
+
+.petCardPreview .galleryPreviewSpriteLayer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 90ms var(--ease-out);
+}
+
+.petCardPreview .galleryPreviewSpriteLayer.active {
+  opacity: 1;
+}
+
+.petCardPreview .galleryPreviewSpriteLayer .sprite {
+  animation-play-state: paused;
+}
+
+.petCardPreview .galleryPreviewSpriteLayer.active .sprite {
+  animation-play-state: running;
+}
+
+.petCardPreview .galleryPreviewFrame .sprite {
+  transform: scale(0.75);
+  transform-origin: top left;
+}
+
+.petCardPreview .galleryPreviewStillImage {
+  display: block;
+  width: 192px;
+  height: 208px;
+  max-width: none;
+  image-rendering: pixelated;
+  transform: scale(0.75);
+  transform-origin: top left;
+}
+
+.petCardPreview .galleryPreviewFrame.isAnimating .galleryPreviewStillImage {
+  visibility: hidden;
+}
+
+.petCard.compact .petCardPreview {
+  min-height: 94px;
+  padding: 6px 8px;
+}
+
+.petCard.compact .petCardPreview .galleryPreviewFrame {
+  width: 96px;
+  height: 104px;
+  margin: 0;
+}
+
+.petCard.compact .petCardPreview .galleryPreviewFrame .sprite {
+  transform: scale(0.5);
+  transform-origin: top left;
+}
+
+.petCard.compact .petCardPreview .galleryPreviewStillImage {
+  transform: scale(0.5);
+}
+

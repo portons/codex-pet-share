@@ -46,14 +46,11 @@ export function GallerySearch({
   onFormat: (value: GalleryFormat) => void;
   onSubmit: (event: FormEvent) => void;
 }) {
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const activeFilterCount =
-    (activeSort === "new" ? 0 : 1) +
-    (activeView === "standard" ? 0 : 1) +
-    (activeKind === "all" ? 0 : 1) +
-    (activeFormat === "all" ? 0 : 1) +
-    activeTags.length;
-  const filterSummary = activeFilterCount ? `${activeFilterCount} active` : "Default";
+  /* Sort and view stay one click away; everything narrower (kind, format,
+     tags) lives in the Filters popover and surfaces as removable chips. */
+  const hiddenFilterCount = (activeKind === "all" ? 0 : 1) + (activeFormat === "all" ? 0 : 1) + activeTags.length;
+  const activeKindLabel = petKindOptions.find((kind) => kind.id === activeKind)?.label;
+  const activeFormatLabel = galleryFormatOptions.find((format) => format.id === activeFormat)?.label;
 
   return (
     <div className="galleryTools">
@@ -73,25 +70,148 @@ export function GallerySearch({
           {loading ? "Finding" : "Find"}
         </button>
       </form>
-      <button
-        className="mobileFilterToggle"
-        type="button"
-        aria-expanded={mobileFiltersOpen}
-        aria-controls="gallery-filter-panel"
-        onClick={() => setMobileFiltersOpen((current) => !current)}
-      >
-        <span>Filters</span>
-        <strong>{filterSummary}</strong>
-      </button>
-      <div id="gallery-filter-panel" className={`galleryFilterRow ${mobileFiltersOpen ? "open" : ""}`}>
-        <div className="galleryControlGroup">
-          <SortControls activeSort={activeSort} onSort={onSort} />
-          <ViewControls activeView={activeView} onView={onView} />
-          <KindControls activeKind={activeKind} onKind={onKind} />
-          <FormatControls activeFormat={activeFormat} onFormat={onFormat} />
+      <div className="galleryControlRow">
+        <SortControls activeSort={activeSort} onSort={onSort} />
+        <div className="galleryControlRowEnd">
+          <FiltersPopover
+            contentMode={contentMode}
+            activeTags={activeTags}
+            activeKind={activeKind}
+            activeFormat={activeFormat}
+            hiddenFilterCount={hiddenFilterCount}
+            onTagToggle={onTagToggle}
+            onKind={onKind}
+            onFormat={onFormat}
+          />
         </div>
-        <TagFilterDropdown contentMode={contentMode} activeTags={activeTags} onTagToggle={onTagToggle} onTagsClear={onTagsClear} />
       </div>
+      {hiddenFilterCount > 0 && (
+        <div className="activeFilterChips" aria-label="Active filters">
+          {activeKind !== "all" && (
+            <button className="filterChip" type="button" onClick={() => onKind("all")}>
+              {activeKindLabel}
+              <Icon name="close" size={10} />
+            </button>
+          )}
+          {activeFormat !== "all" && (
+            <button className="filterChip" type="button" onClick={() => onFormat("all")}>
+              {activeFormatLabel}
+              <Icon name="close" size={10} />
+            </button>
+          )}
+          {activeTags.map((tag) => (
+            <button className="filterChip" key={tag} type="button" onClick={() => onTagToggle(tag as TagName)}>
+              #{tag}
+              <Icon name="close" size={10} />
+            </button>
+          ))}
+          <button
+            className="filterChip filterChipClear"
+            type="button"
+            onClick={() => {
+              onTagsClear();
+              onKind("all");
+              onFormat("all");
+            }}
+          >
+            Clear all
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FiltersPopover({
+  contentMode,
+  activeTags,
+  activeKind,
+  activeFormat,
+  hiddenFilterCount,
+  onTagToggle,
+  onKind,
+  onFormat
+}: {
+  contentMode: ContentMode;
+  activeTags: string[];
+  activeKind: PetKind;
+  activeFormat: GalleryFormat;
+  hiddenFilterCount: number;
+  onTagToggle: (value: TagName) => void;
+  onKind: (value: PetKind) => void;
+  onFormat: (value: GalleryFormat) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
+  const tags = contentMode === "all" ? galleryFilterTags : galleryFilterTags.filter((tag) => tag !== "nsfw");
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const onPointerDown = (event: PointerEvent) => {
+      if (!popoverRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
+
+  return (
+    <div
+      ref={popoverRef}
+      className="tagDropdown filtersPopoverAnchor"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setOpen(false);
+        }
+      }}
+    >
+      <button
+        className={`tagDropdownTrigger ${open || hiddenFilterCount > 0 ? "active" : ""}`}
+        type="button"
+        aria-haspopup="true"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <Icon name="tag" size={12} />
+        <span>Filters</span>
+        {hiddenFilterCount > 0 ? <strong>{hiddenFilterCount}</strong> : null}
+      </button>
+      {open && (
+        <div className="tagDropdownMenu filtersPopover" role="menu">
+          <div className="filtersPopoverGroup">
+            <span className="filtersPopoverLabel">Kind</span>
+            <KindControls activeKind={activeKind} onKind={onKind} />
+          </div>
+          <div className="filtersPopoverGroup">
+            <span className="filtersPopoverLabel">Format</span>
+            <FormatControls activeFormat={activeFormat} onFormat={onFormat} />
+          </div>
+          <div className="filtersPopoverGroup">
+            <span className="filtersPopoverLabel">Tags</span>
+            <div className="tagDropdownList">
+              {tags.map((tag) => {
+                const selected = activeTags.includes(tag);
+                return (
+                  <button
+                    className={`tagDropdownOption ${selected ? "active" : ""}`}
+                    key={tag}
+                    type="button"
+                    role="menuitemcheckbox"
+                    aria-checked={selected}
+                    onClick={() => onTagToggle(tag)}
+                  >
+                    <span className="tagCheck">{selected ? <Icon name="check" size={12} /> : null}</span>
+                    {tag}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -124,28 +244,6 @@ function SortControls({ activeSort, onSort }: { activeSort: GallerySort; onSort:
           onClick={() => onSort(sort.id)}
         >
           {sort.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function ViewControls({ activeView, onView }: { activeView: GalleryView; onView: (value: GalleryView) => void }) {
-  const views: Array<{ id: GalleryView; label: string }> = [
-    { id: "standard", label: "Detailed" },
-    { id: "compact", label: "Compact" }
-  ];
-
-  return (
-    <div className="viewControls" aria-label="Gallery view">
-      {views.map((view) => (
-        <button
-          className={activeView === view.id ? "active" : ""}
-          key={view.id}
-          type="button"
-          onClick={() => onView(view.id)}
-        >
-          {view.label}
         </button>
       ))}
     </div>
@@ -188,89 +286,6 @@ export function EditableKindControls({
           {kind.label}
         </button>
       ))}
-    </div>
-  );
-}
-
-function TagFilterDropdown({
-  contentMode,
-  activeTags,
-  onTagToggle,
-  onTagsClear
-}: {
-  contentMode: ContentMode;
-  activeTags: string[];
-  onTagToggle: (value: TagName) => void;
-  onTagsClear: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const label = activeTags.length === 0 ? "All" : activeTags.length === 1 ? activeTags[0] : `${activeTags.length} selected`;
-  const tags = contentMode === "all" ? galleryFilterTags : galleryFilterTags.filter((tag) => tag !== "nsfw");
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const onPointerDown = (event: PointerEvent) => {
-      if (!dropdownRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [open]);
-
-  return (
-    <div
-      ref={dropdownRef}
-      className="tagDropdown"
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-          setOpen(false);
-        }
-      }}
-    >
-      <button
-        className={`tagDropdownTrigger ${open ? "active" : ""}`}
-        type="button"
-        aria-haspopup="true"
-        aria-expanded={open}
-        onClick={() => setOpen((current) => !current)}
-      >
-        <span>Tags</span>
-        <strong>{label}</strong>
-      </button>
-      {open && (
-        <div className="tagDropdownMenu" role="menu">
-          <div className="tagDropdownHead">
-            <span>Filter tags</span>
-            {activeTags.length ? (
-              <button type="button" onClick={onTagsClear}>
-                Clear
-              </button>
-            ) : null}
-          </div>
-          <div className="tagDropdownList">
-            {tags.map((tag) => {
-              const selected = activeTags.includes(tag);
-              return (
-                <button
-                  className={`tagDropdownOption ${selected ? "active" : ""}`}
-                  key={tag}
-                  type="button"
-                  role="menuitemcheckbox"
-                  aria-checked={selected}
-                  onClick={() => onTagToggle(tag)}
-                >
-                  <span className="tagCheck">{selected ? <Icon name="check" size={12} /> : null}</span>
-                  {tag}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

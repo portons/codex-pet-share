@@ -189,7 +189,7 @@ export const gallerySorts: { id: GallerySort; label: string }[] = [
 export const galleryFormatOptions: Array<{ id: GalleryFormat; label: string }> = [
   { id: "all", label: "All formats" },
   { id: "v2", label: "V2" },
-  { id: "v1", label: "V1" }
+  { id: "v1", label: "V1 legacy" }
 ];
 
 export const defaultGalleryUrlState: GalleryUrlState = {

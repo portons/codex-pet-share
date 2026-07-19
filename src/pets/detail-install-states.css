@@ -10,9 +10,9 @@
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 34%, var(--surface))),
     var(--surface);
   border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--border));
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-2xl);
   align-self: start;
-  box-shadow: inset 0 1px 0 var(--inset-highlight), 0 20px 54px -42px color-mix(in srgb, var(--accent) 54%, #0f0f0e);
+  box-shadow: inset 0 1px 0 var(--inset-highlight), 0 20px 54px -42px color-mix(in srgb, var(--accent) 54%, #16130e);
 }
 
 .detailInstall::before {
@@ -99,7 +99,7 @@
   padding: 28px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-2xl);
 }
 
 .detailStatesActions {
@@ -166,106 +166,15 @@
   min-width: 148px;
 }
 
-.detailStatesGrid {
+.detailExportBar {
+  gap: 14px;
+  padding: 20px 24px;
+}
+
+.detailExportCopy {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 10px;
-}
-
-.detailStateTile {
-  position: relative;
-  display: grid;
-  overflow: hidden;
-  min-height: 200px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  transition: background 200ms var(--ease-out), border-color 200ms var(--ease-out),
-    transform 80ms var(--ease-out);
-}
-
-.detailStateTile:hover {
-  background: var(--surface-warm);
-  border-color: var(--border-strong);
-}
-
-.detailStateTile:active {
-  transform: translateY(1px);
-}
-
-.detailStateTile.active {
-  border-color: var(--ink);
-  background: var(--surface-warm);
-}
-
-.detailStateTileMain {
-  appearance: none;
-  display: grid;
-  grid-template-rows: 1fr auto;
-  justify-items: center;
-  align-items: center;
-  width: 100%;
-  min-height: 200px;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  color: inherit;
-  cursor: pointer;
-}
-
-.detailStateTileMain .spriteFrame {
-  margin: 22px 12px 16px;
-}
-
-.detailStateTileLabel {
-  width: 100%;
-  border-top: 1px solid var(--border-soft);
-  background: var(--surface);
-  padding: 11px 8px;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  text-align: center;
-  color: var(--ink);
-}
-
-.detailStateTileGif {
-  appearance: none;
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 22px;
-  padding: 0 8px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--floating-control-bg);
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: background 180ms var(--ease-out), border-color 180ms var(--ease-out),
-    color 180ms var(--ease-out), transform 80ms var(--ease-out);
-}
-
-.detailStateTileGif:hover {
-  background: var(--floating-control-bg-hover);
-  color: var(--ink);
-  border-color: var(--border-strong);
-}
-
-.detailStateTileGif:active {
-  transform: translateY(1px);
-}
-
-.detailStateTileGif:disabled {
-  cursor: wait;
-  opacity: 0.6;
+  gap: 3px;
+  min-width: 0;
 }
 
 .detailStatesStatus {

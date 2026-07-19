@@ -38,7 +38,11 @@
   object-fit: contain;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
-  background: var(--surface);
+  background:
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, 18px 18px;
+  background-color: var(--stage-checker-a);
   image-rendering: pixelated;
 }
 
@@ -54,6 +58,11 @@
   font-weight: 650;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.quickCommentPet a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .quickCommentPet small {

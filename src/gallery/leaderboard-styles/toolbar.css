@@ -1,0 +1,73 @@
+.creatorLeaderboardHeader {
+  align-items: flex-start;
+}
+
+.creatorLeaderboardActions {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: min(100%, 720px);
+}
+
+.creatorSearchForm {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.creatorSearchShell {
+  min-height: 36px;
+}
+
+.creatorLeaderboardToolbar {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  align-items: center;
+  gap: 2px;
+  width: fit-content;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-soft) 55%, var(--surface));
+}
+
+.creatorLeaderboardToolbar button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 200ms var(--ease-swift), color 200ms var(--ease-swift),
+    transform 200ms var(--ease-swift), box-shadow 200ms var(--ease-swift);
+}
+
+.creatorLeaderboardToolbar button:hover,
+.creatorLeaderboardToolbar button:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.creatorLeaderboardToolbar button:active {
+  transform: scale(0.98);
+}
+
+.creatorLeaderboardToolbar button.active {
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: var(--shadow-sm);
+}
+

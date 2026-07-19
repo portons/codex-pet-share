@@ -1,0 +1,50 @@
+.userCollectionModal .collectionCheckboxList {
+  max-height: min(320px, 45vh);
+  overflow: auto;
+}
+
+.collectionPetAdderModal {
+  width: min(760px, calc(100vw - 32px));
+}
+
+.collectionPetAdderSearch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.collectionPetAdderSearch .petSwapSearchPrefix {
+  left: 12px;
+}
+
+.collectionPetAdderSearchButton {
+  min-height: 36px;
+}
+
+.collectionPetAdderResultsHeader {
+  margin-top: 0;
+}
+
+.collectionPetAdderGrid {
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+  max-height: min(420px, 48vh);
+  overflow: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 35%, transparent) transparent;
+}
+
+.collectionPetAdderGrid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.collectionPetAdderGrid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.collectionPetAdderGrid::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  border-radius: 3px;
+}
+

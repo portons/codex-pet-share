@@ -10,9 +10,9 @@
   gap: 6px;
   height: 34px;
   padding: 0 10px;
-  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--nav-action-bg) 88%, var(--surface));
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--nav-action-bg);
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -20,21 +20,21 @@
   letter-spacing: 0;
   box-shadow: inset 0 1px 0 var(--inset-highlight);
   transition:
-    background 180ms var(--ease-out),
-    border-color 180ms var(--ease-out),
-    color 180ms var(--ease-out),
-    transform 90ms var(--ease-out);
+    background 220ms var(--ease-swift),
+    border-color 220ms var(--ease-swift),
+    color 220ms var(--ease-swift),
+    transform 120ms var(--ease-swift);
 }
 
 .commentNoticeButton:hover,
 .commentNoticeButton[aria-expanded="true"] {
-  border-color: color-mix(in srgb, var(--accent) 40%, var(--border-strong));
+  border-color: var(--border-strong);
   background: var(--nav-action-bg-hover);
   color: var(--ink);
 }
 
 .commentNoticeButton:active {
-  transform: translateY(1px);
+  transform: scale(0.96);
 }
 
 .commentNoticeButton.error {
@@ -49,10 +49,11 @@
   height: 18px;
   padding: 0 5px;
   border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent-deep);
+  background: var(--accent);
+  color: var(--bg);
   font-size: 10px;
   font-weight: 700;
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .commentNoticePanel {
@@ -66,23 +67,19 @@
   max-height: min(430px, calc(100vh - 88px));
   overflow-y: auto;
   padding: 11px;
-  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 42%, transparent), transparent 70%),
-    color-mix(in srgb, var(--surface) 97%, transparent);
-  box-shadow:
-    inset 0 1px 0 var(--inset-highlight),
-    0 18px 40px rgba(48, 40, 27, 0.13);
-  backdrop-filter: blur(16px);
-  animation: comment-dropdown-in 180ms var(--ease-out) both;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  transform-origin: top right;
+  animation: menu-pop 260ms var(--ease-swift) both;
 }
 
 .commentNoticePanel.error {
   border-color: var(--danger-border);
   background:
     linear-gradient(135deg, var(--danger-bg), transparent 70%),
-    color-mix(in srgb, var(--surface) 97%, transparent);
+    var(--surface);
 }
 
 .commentNoticeHeader {
@@ -97,8 +94,8 @@
   color: var(--accent-deep);
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
@@ -130,21 +127,21 @@
   animation: comment-notice-item-in 220ms var(--ease-out) both;
   animation-delay: calc(var(--notice-index) * 40ms);
   transition:
-    border-color 180ms var(--ease-out),
-    background 180ms var(--ease-out),
-    color 180ms var(--ease-out),
-    transform 90ms var(--ease-out);
+    border-color 200ms var(--ease-swift),
+    background 200ms var(--ease-swift),
+    color 200ms var(--ease-swift),
+    transform 120ms var(--ease-swift);
 }
 
 .commentNoticeItem:hover {
-  border-color: color-mix(in srgb, var(--accent) 38%, var(--border));
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
   background: color-mix(in srgb, var(--surface) 88%, var(--accent-soft));
   color: var(--ink);
   transform: translateY(-1px);
 }
 
 .commentNoticeItem:active {
-  transform: translateY(1px);
+  transform: translateY(0) scale(0.98);
 }
 
 .commentNoticeAvatar {
@@ -152,9 +149,11 @@
   place-items: center;
   width: 30px;
   height: 30px;
-  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 78%, var(--accent-soft));
+  background:
+    radial-gradient(circle at 35% 20%, var(--inset-highlight), transparent 40%),
+    color-mix(in srgb, var(--accent-soft) 58%, var(--surface));
   color: var(--accent-deep);
   font-family: var(--font-mono);
   font-size: 10px;
@@ -225,6 +224,19 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .commentNoticePanel,
+  .commentNoticeItem {
+    animation: none;
+  }
+
+  .commentNoticeItem:hover,
+  .commentNoticeItem:active,
+  .commentNoticeButton:active {
+    transform: none;
   }
 }
 

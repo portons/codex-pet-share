@@ -3,7 +3,7 @@
   place-items: center;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
-  border-radius: 999px;
+  border-radius: 30%;
   background:
     radial-gradient(circle at 35% 20%, var(--inset-highlight), transparent 40%),
     color-mix(in srgb, var(--accent-soft) 58%, var(--surface));

@@ -46,7 +46,13 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: #f5f0dc;
+  /* Checkerboard stage shows before the (opaque) canvas paints and
+     faintly through the translucent loading overlay. */
+  background:
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, 18px 18px;
+  background-color: var(--stage-checker-a);
 }
 
 .playgroundCanvas {
@@ -66,11 +72,11 @@
   right: 12px;
   width: 144px;
   height: 144px;
-  border-radius: 12px;
-  background: #92866d;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--terminal-bg) 84%, var(--terminal-fg));
   box-shadow:
-    0 0 0 2px rgba(45, 38, 25, 0.78),
-    inset 0 0 0 1px rgba(255, 242, 198, 0.48),
+    0 0 0 2px var(--terminal-border),
+    inset 0 0 0 1px color-mix(in srgb, var(--terminal-fg) 34%, transparent),
     0 8px 18px -10px rgba(0, 0, 0, 0.55);
   pointer-events: none;
   opacity: 0.82;
@@ -107,12 +113,12 @@
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 13px;
   color: var(--muted);
-  background: rgba(245, 240, 220, 0.85);
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
   pointer-events: none;
 }
 
 .playgroundOverlay.error {
-  color: #b13b30;
+  color: var(--danger);
 }
 
 .playgroundHostClosedOverlay {
@@ -121,7 +127,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(28, 24, 22, 0.62);
+  background: color-mix(in srgb, var(--terminal-bg) 62%, transparent);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 12;
@@ -134,11 +140,11 @@
 }
 
 .playgroundHostClosedCard {
-  background: var(--surface, #fff);
-  border: 1px solid var(--border-strong, rgba(0, 0, 0, 0.18));
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
   padding: 22px 28px 20px;
-  box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.3), 0 8px 24px -10px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--shadow-modal);
   text-align: center;
   max-width: 360px;
   margin: 0 18px;
@@ -146,9 +152,10 @@
 
 .playgroundHostClosedHeading {
   margin: 0 0 6px;
-  font-family: var(--font-display, inherit);
+  font-family: var(--font-display);
   font-size: 18px;
   font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 
@@ -180,8 +187,9 @@
   align-items: center;
   gap: 8px;
   padding: 7px 12px 7px 10px;
-  background: rgba(28, 24, 22, 0.86);
-  color: #f7efd9;
+  background: color-mix(in srgb, var(--terminal-bg) 88%, transparent);
+  border: 1px solid var(--terminal-border);
+  color: var(--terminal-fg);
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 12px;
   letter-spacing: 0.02em;
@@ -195,8 +203,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--accent, #d97a18);
-  box-shadow: 0 0 0 3px rgba(217, 122, 24, 0.22);
+  background: var(--terminal-prompt);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 @keyframes joinToastIn {
@@ -210,8 +218,8 @@
   left: 10px;
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(16, 16, 15, 0.78);
-  color: #d8f25a;
+  background: color-mix(in srgb, var(--terminal-bg) 80%, transparent);
+  color: var(--terminal-prompt);
   font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
   font-size: 11px;
   letter-spacing: 0.04em;

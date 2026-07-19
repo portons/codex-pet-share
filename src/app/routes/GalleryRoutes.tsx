@@ -1,0 +1,147 @@
+import { FavoritesPage, GalleryWithPresence } from "../../gallery/GalleryPages";
+import type { AppRoutesProps } from "../AppRoutes.types";
+
+export function GalleryRoute({
+  pets,
+  recentComments,
+  galleryMeta,
+  loading,
+  query,
+  activeTags,
+  activeSort,
+  activeView,
+  activeKind,
+  activeFormat,
+  contentMode,
+  deletingPetId,
+  shadowbanBusyOwnerId,
+  nsfwBusyId,
+  collections,
+  session,
+  setQuery,
+  selectTag,
+  clearTags,
+  selectSort,
+  selectView,
+  selectKind,
+  selectFormat,
+  selectPage,
+  randomizeGallery,
+  freshPetCount,
+  showFreshPets,
+  submitSearch,
+  user,
+  likeBusyId,
+  toggleLike,
+  setSharingPet,
+  setPlaygroundPet,
+  setDownloadPet,
+  selectVisibleTag,
+  openTagEditor,
+  openCollectionEditor,
+  openPetCollector,
+  openQuickComment,
+  togglePetNsfw,
+  toggleOwnerShadowban,
+  deleteUpload,
+  openAuth
+}: AppRoutesProps) {
+  return (
+    <GalleryWithPresence
+      pets={pets}
+      recentComments={recentComments}
+      meta={galleryMeta}
+      loading={loading}
+      query={query}
+      activeTags={activeTags}
+      activeSort={activeSort}
+      activeView={activeView}
+      activeKind={activeKind}
+      activeFormat={activeFormat}
+      contentMode={contentMode}
+      deletingPetId={deletingPetId}
+      shadowbanBusyOwnerId={shadowbanBusyOwnerId}
+      nsfwBusyId={nsfwBusyId}
+      hasCollections={collections.length > 0}
+      collections={collections}
+      session={session}
+      onQuery={setQuery}
+      onTagToggle={selectTag}
+      onTagsClear={clearTags}
+      onSort={selectSort}
+      onView={selectView}
+      onKind={selectKind}
+      onFormat={selectFormat}
+      onPage={selectPage}
+      onRandomize={randomizeGallery}
+      freshPetCount={freshPetCount}
+      onFreshPets={showFreshPets}
+      onSearch={submitSearch}
+      user={user}
+      likeBusyId={likeBusyId}
+      onLike={toggleLike}
+      onShare={setSharingPet}
+      onPlayground={setPlaygroundPet}
+      onDownload={setDownloadPet}
+      onTagClick={selectVisibleTag}
+      onEditTags={openTagEditor}
+      onManageCollections={openCollectionEditor}
+      onCollect={openPetCollector}
+      onQuickComment={openQuickComment}
+      onToggleNsfw={togglePetNsfw}
+      onShadowbanOwner={toggleOwnerShadowban}
+      onDelete={deleteUpload}
+      onSignIn={openAuth}
+    />
+  );
+}
+
+export function FavoritesRoute({
+  user,
+  favoritePets,
+  favoritesLoading,
+  likeBusyId,
+  deletingPetId,
+  shadowbanBusyOwnerId,
+  nsfwBusyId,
+  contentMode,
+  collections,
+  toggleLike,
+  setSharingPet,
+  setPlaygroundPet,
+  setDownloadPet,
+  selectVisibleTag,
+  openTagEditor,
+  openCollectionEditor,
+  openPetCollector,
+  togglePetNsfw,
+  toggleOwnerShadowban,
+  deleteUpload,
+  openAuth
+}: AppRoutesProps) {
+  return (
+    <FavoritesPage
+      user={user}
+      pets={favoritePets}
+      loading={favoritesLoading}
+      likeBusyId={likeBusyId}
+      deletingPetId={deletingPetId}
+      shadowbanBusyOwnerId={shadowbanBusyOwnerId}
+      nsfwBusyId={nsfwBusyId}
+      contentMode={contentMode}
+      hasCollections={collections.length > 0}
+      onLike={toggleLike}
+      onShare={setSharingPet}
+      onPlayground={setPlaygroundPet}
+      onDownload={setDownloadPet}
+      onTagClick={selectVisibleTag}
+      onEditTags={openTagEditor}
+      onManageCollections={openCollectionEditor}
+      onCollect={openPetCollector}
+      onToggleNsfw={togglePetNsfw}
+      onShadowbanOwner={toggleOwnerShadowban}
+      onDelete={deleteUpload}
+      onSignIn={openAuth}
+    />
+  );
+}

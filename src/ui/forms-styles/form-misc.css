@@ -1,0 +1,14 @@
+.stackForm label,
+.stackField {
+  display: grid;
+  gap: 7px;
+}
+
+.modalFootnote {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+  text-align: center;
+}

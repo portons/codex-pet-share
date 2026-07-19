@@ -1,12 +1,13 @@
 /* ---- Pet picker grid (room gate) ────────────────────────────────
-   Mirrors the in-room pet-swap pocketbook aesthetic — cream paper,
-   orange-rust accents, monospace stencil section labels with leading
+   Mirrors the in-room pet-swap aesthetic — neutral museum chrome,
+   amber signal accents, monospace stencil section labels with leading
    rules and trailing count pills. Tiles read as miniature card-sleeve
    cells so the join screen and the in-room swap menu feel like the
    same artifact at different sizes. */
 
 .roomGate {
   width: min(560px, 100%);
+  border-radius: var(--radius-2xl);
 }
 
 .roomGateHeader {
@@ -14,17 +15,18 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px dashed rgba(140, 110, 60, 0.32);
+  border-bottom: 1px solid var(--border);
   padding-bottom: 14px;
   margin-bottom: 16px;
 }
 
 .roomGateHeader h2 {
   margin: 6px 0 0;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  color: var(--ink, #2c1f10);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
 
 .roomGateCallsign {
@@ -33,10 +35,10 @@
   gap: 8px;
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent-deep, #8a4a16);
+  color: var(--accent-deep);
 }
 
 .roomGateCallsign .roomDot {
@@ -51,9 +53,9 @@
 .roomGateLead {
   font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(86, 56, 22, 0.6);
+  color: var(--muted);
   margin: 0 0 14px;
 }
 
@@ -66,7 +68,7 @@
   max-height: 240px;
 }
 
-/* Mono stencil label with a leading warm rule. Section count is appended
+/* Mono stencil label with a leading amber rule. Section count is appended
    inline by the picker (it counts items per section). */
 .roomPetSectionLabel {
   display: flex;
@@ -76,10 +78,10 @@
   padding: 0 2px;
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(86, 56, 22, 0.7);
+  color: var(--muted);
 }
 
 .roomPetSectionLabel::before {
@@ -87,7 +89,7 @@
   display: inline-block;
   width: 10px;
   height: 1px;
-  background: rgba(177, 90, 22, 0.5);
+  background: color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
 .roomPetGrid {
@@ -100,7 +102,7 @@
   padding: 4px;
   /* Match the pocketbook scrollbar treatment. */
   scrollbar-width: thin;
-  scrollbar-color: rgba(177, 90, 22, 0.35) transparent;
+  scrollbar-color: color-mix(in srgb, var(--accent) 35%, transparent) transparent;
 }
 
 .roomPetGrid::-webkit-scrollbar {
@@ -110,7 +112,7 @@
   background: transparent;
 }
 .roomPetGrid::-webkit-scrollbar-thumb {
-  background: rgba(177, 90, 22, 0.32);
+  background: color-mix(in srgb, var(--accent) 32%, transparent);
   border-radius: 3px;
 }
 
@@ -129,41 +131,42 @@
   color: inherit;
   text-align: left;
   overflow: hidden;
-  transition: border-color 200ms var(--ease-out),
-              transform 200ms var(--ease-out),
-              box-shadow 200ms var(--ease-out);
+  transition: border-color 200ms var(--ease-swift),
+              transform 200ms var(--ease-swift),
+              box-shadow 200ms var(--ease-swift);
 }
 
 .roomPetTile {
-  background: linear-gradient(180deg, rgba(255, 250, 235, 0.92), rgba(255, 240, 210, 0.6));
-  border: 1px solid rgba(140, 110, 60, 0.2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(140, 110, 60, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 var(--inset-highlight);
 }
 
 .roomPetTile:hover,
 .roomPetTile:focus-visible {
-  border-color: var(--accent-deep);
-  transform: translateY(-1px) rotate(-0.4deg);
-  box-shadow:
-    0 8px 18px -10px rgba(177, 90, 22, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border-strong));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
   outline: none;
 }
 
 .roomPetTile:active {
-  transform: translateY(0) rotate(0deg);
+  transform: translateY(0) scale(0.98);
 }
 
 .roomPetTile:hover .roomPetTilePreview,
 .roomPetTile:focus-visible .roomPetTilePreview {
   background:
-    radial-gradient(60% 22% at 50% 92%, rgba(86, 56, 22, 0.22), transparent 70%),
-    linear-gradient(180deg, rgba(255, 233, 214, 0.6), rgba(255, 215, 175, 0.45));
+    radial-gradient(120px circle at 50% 42%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 68%),
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, auto, 18px 18px;
+  background-color: var(--stage-checker-a);
 }
 
-/* Sprite "stage": cream cell with a soft elliptical floor shadow under
-   the figure so it reads as a sprite on a spotlit shelf, not a clipped
-   atlas tile. */
+/* Sprite "stage": checkerboard cell with a soft elliptical floor shadow
+   under the figure so it reads as a sprite on a spotlit shelf, not a
+   clipped atlas tile. */
 .roomPetTilePreview {
   display: flex;
   align-items: flex-end;
@@ -171,11 +174,12 @@
   height: 92px;
   padding: 8px 0 6px;
   background:
-    radial-gradient(55% 20% at 50% 92%, rgba(86, 56, 22, 0.18), transparent 70%),
-    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.55), transparent 60%),
-    linear-gradient(180deg, rgba(255, 250, 235, 0.55), rgba(255, 240, 210, 0.35));
-  border-bottom: 1px dashed rgba(140, 110, 60, 0.22);
-  transition: background 200ms var(--ease-out);
+    radial-gradient(circle at 50% 82%, var(--preview-ground), transparent 60%),
+    conic-gradient(var(--stage-checker-b) 25%, transparent 0 50%, var(--stage-checker-b) 0 75%, transparent 0);
+  background-size: auto, 18px 18px;
+  background-color: var(--stage-checker-a);
+  border-bottom: 1px solid var(--border-soft);
+  transition: background 200ms var(--ease-swift);
 }
 
 /* Show frame 0 of the 8x9 spritesheet atlas (192x208 per cell). */
@@ -198,7 +202,7 @@
 
 .roomPetTileName {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.005em;
   color: var(--ink);
   white-space: nowrap;
@@ -210,7 +214,7 @@
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.04em;
-  color: rgba(86, 56, 22, 0.45);
+  color: var(--subtle);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -240,10 +244,13 @@
   max-width: 32ch;
 }
 
-/* ---- Sign-in checkpoint (interstitial) ---------------------- */
+/* ---- Sign-in checkpoint (interstitial) ----------------------
+   Designed empty state: generous card radius, mono eyebrow with the
+   live presence dot, display heading, quiet supporting line. */
 
 .roomSignInGate {
   width: min(440px, 100%);
+  border-radius: var(--radius-2xl);
 }
 
 .roomSignInGate .roomGateCallsign {
@@ -252,9 +259,11 @@
 
 .roomSignInGate h2 {
   margin: 0 0 10px;
-  font-size: 24px;
+  font-family: var(--font-display);
+  font-size: 26px;
   font-weight: 600;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
 
 .roomSignInGate p {

@@ -1,32 +1,20 @@
-import { useEffect, useState, type SetStateAction } from "react";
-import { useAdminActions } from "../admin/useAdminActions";
-import { useAppEntityData } from "./useAppEntityData";
-import { useAppNavigationActions } from "./useAppNavigationActions";
-import { useAppRouteEffects } from "./useAppRouteEffects";
-import { AppView, type AppViewProps } from "./AppView";
-import { useSessionApi } from "./useSessionApi";
+import { useState } from "react";
 import { useAuthForms } from "../auth/useAuthForms";
-import { navigate, routeFromHash } from "../domain/routing";
-import { readJson } from "../domain/http";
-import { normalizeUser } from "../domain/users";
-import { useUploadWorkflow } from "../uploads/useUploadWorkflow";
-import { usePetEditors } from "../pets/usePetEditors";
-import { usePetMutations } from "../pets/usePetMutations";
-import { usePetComments } from "../pets/usePetComments";
-import { useGalleryBrowser } from "../gallery/useGalleryBrowser";
 import { useUserCollections } from "../collections/useUserCollections";
+import { routeFromHash } from "../domain/routing";
+import { useGalleryBrowser } from "../gallery/useGalleryBrowser";
+import { refreshAppSession } from "./appRefreshActions";
+import { createAppSessionHandlers } from "./appSessionHandlers";
+import { buildAppViewProps } from "./appViewProps";
+import { AppView } from "./AppView";
+import { useAppActions } from "./useAppActions";
+import { createQuickCommentHandlers, useAppDialogs } from "./useAppDialogs";
+import { useAppEffects } from "./useAppEffects";
+import { useAppEntityData } from "./useAppEntityData";
+import { useAppNavigation } from "./useAppNavigation";
+import { useSessionApi } from "./useSessionApi";
 import { useTheme } from "./useTheme";
-import { refreshAfterAuthRoute, refreshAppSession } from "./appRefreshActions";
-import { useCommentNotifications } from "../comments/useCommentNotifications";
-import type {
-  AuthSession,
-  CollectionSummary,
-  EntityShareTarget,
-  Pet,
-  PetComment,
-  Route,
-  User
-} from "../domain/types";
+import type { Route } from "../domain/types";
 
 export type { CollectionSummary, Pet, User } from "../domain/types";
 
@@ -34,179 +22,31 @@ function App() {
   const [route, setRoute] = useState<Route>(() => routeFromHash());
   const { theme, toggleTheme } = useTheme();
   const { session, user, setUser, apiFetch, applySession, loadMe, refreshSession } = useSessionApi();
-  const {
-    pets,
-    setPets,
-    recentComments,
-    galleryMeta,
-    loading,
-    setLoading,
-    query,
-    setQuery,
-    activeTags,
-    activeSort,
-    activeView,
-    activeKind,
-    activeFormat,
-    contentMode,
-    setContentMode,
-    applyGalleryState,
-    pushGalleryState,
-    scrollPageTop,
-    loadGallery,
-    submitSearch,
-    selectTag,
-    clearTags,
-    selectSort,
-    selectView,
-    selectKind,
-    selectFormat,
-    selectPage,
-    randomizeGallery,
-    freshPetCount,
-    showFreshPets,
-    selectVisibleTag,
-    removePetFromGallery
-  } = useGalleryBrowser({ apiFetch, session, user, route, setRoute });
-  const {
-    minePets,
-    setMinePets,
-    favoritePets,
-    setFavoritePets,
-    detailPet,
-    setDetailPet,
-    morePets,
-    setMorePets,
-    creator,
-    setCreator,
-    creatorPets,
-    setCreatorPets,
-    creatorMeta,
-    setCreatorMeta,
-    creators,
-    creatorsMeta,
-    creatorsSort,
-    creatorsQuery,
-    setCreatorsMeta,
-    setCreatorsSort,
-    setCreatorsQuery,
-    collections,
-    setCollections,
-    userCollections,
-    setUserCollections,
-    adminCollections,
-    setAdminCollections,
-    collectionDetail,
-    setCollectionDetail,
-    collectionPets,
-    setCollectionPets,
-    collectionMeta,
-    setCollectionMeta,
-    detailLoading,
-    mineLoading,
-    favoritesLoading,
-    creatorLoading,
-    creatorsLoading,
-    collectionsLoading,
-    userCollectionsLoading,
-    adminCollectionsLoading,
-    collectionDetailLoading,
-    loadMine,
-    loadFavorites,
-    loadDetail,
-    loadCreator,
-    loadCreators,
-    loadCollections,
-    loadUserCollections,
-    loadCollectionDetail,
-    loadAdminCollections,
-    refreshPrimaryPetLists,
-    refreshRoutePetLists
-  } = useAppEntityData({
+  const gallery = useGalleryBrowser({ apiFetch, session, user, route, setRoute });
+  const entity = useAppEntityData({
     apiFetch,
     session,
     user,
     route,
-    query,
-    activeTags,
-    activeSort,
-    activeView,
-    activeKind,
-    contentMode,
-    galleryMeta,
-    loadGallery
+    query: gallery.query,
+    activeTags: gallery.activeTags,
+    activeSort: gallery.activeSort,
+    activeView: gallery.activeView,
+    activeKind: gallery.activeKind,
+    contentMode: gallery.contentMode,
+    galleryMeta: gallery.galleryMeta,
+    loadGallery: gallery.loadGallery
   });
-  const [sharingPet, setSharingPet] = useState<Pet | null>(null);
-  const [quickCommentPet, setQuickCommentPet] = useState<Pet | null>(null);
-  const [quickCommentStatus, setQuickCommentStatus] = useState("");
-  const [quickCommentBusy, setQuickCommentBusy] = useState(false);
-  const [sharingEntity, setSharingEntity] = useState<EntityShareTarget | null>(null);
-  const [downloadPet, setDownloadPet] = useState<Pet | null>(null);
-  const [playgroundPet, setPlaygroundPet] = useState<Pet | null>(null);
-
-  async function handleAccountDeleted() {
-    setMinePets([]);
-    setFavoritePets([]);
-    setUserCollections([]);
-    setAdminCollections([]);
-    setDetailPet(null);
-    setCreator(null);
-    setCreatorPets([]);
-    navigate("/");
-    setRoute(routeFromHash());
-  }
-
-  const {
-    authOpen,
-    authMode,
-    selectAuthMode,
-    displayName,
-    setDisplayName,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    authStatus,
-    setAuthStatus,
-    authBusy,
-    resendBusy,
-    authProviders,
-    startOAuth,
-    resendVerification,
-    submitAuth,
-    openAuth,
-    closeAuth,
-    settingsOpen,
-    settingsDisplayName,
-    setSettingsDisplayName,
-    settingsCurrentPassword,
-    setSettingsCurrentPassword,
-    settingsNewPassword,
-    setSettingsNewPassword,
-    settingsStatus,
-    settingsBusy,
-    settingsAvatarStatus,
-    settingsAvatarBusy,
-    settingsAvatarPets,
-    settingsAvatarPetsLoading,
-    apiKeys,
-    apiKeysLoading,
-    apiKeyBusy,
-    newApiKeyName,
-    setNewApiKeyName,
-    newApiKeySecret,
-    apiKeyStatus,
-    loadSettingsAvatarPets,
-    createApiKey,
-    revokeApiKey,
-    submitSettings,
-    submitAvatar,
-    deleteAccount,
-    openSettings,
-    openPasswordReset,
-    closeSettings,
-    setAuthMode
-  } = useAuthForms({
+  const dialogs = useAppDialogs();
+  const { handleAccountDeleted, refreshAfterAuth, refreshAfterSettings } = createAppSessionHandlers({
+    route,
+    setRoute,
+    session,
+    gallery,
+    entity,
+    refresh
+  });
+  const auth = useAuthForms({
     user,
     apiFetch,
     applySession,
@@ -215,249 +55,21 @@ function App() {
     onSettingsSaved: refreshAfterSettings,
     onAccountDeleted: handleAccountDeleted
   });
-  const {
-    deleteStatus,
-    deletingPetId,
-    deleteConfirmPet,
-    likeBusyId,
-    deleteUpload,
-    confirmDeleteUpload,
-    closeDeleteConfirm,
-    replacePet,
-    reconcilePetCollections,
-    reconcileTaggedPet,
-    toggleLike
-  } = usePetMutations({
-    user,
-    route,
-    session,
-    contentMode,
-    query,
-    activeTags,
-    activeSort,
-    activeView,
-    activeKind,
-    activeFormat,
-    galleryMeta,
-    creatorMeta,
-    setCreatorMeta,
-    creatorPets,
-    collectionPets,
-    adminCollections,
-    apiFetch,
-    setAuthStatus,
-    setPets,
-    setMinePets,
-    setFavoritePets,
-    setCreatorPets,
-    setDetailPet,
-    setMorePets,
-    setCollectionPets,
-    setSharingPet,
-    setCreator,
-    setCollections,
-    setAdminCollections,
-    setCollectionDetail,
-    loadCollections,
-    refreshRoutePetLists,
-    loadCreator,
-    loadCreators,
-    removePetFromGallery,
-    openAuth
-  });
-  const {
-    comments,
-    commentsLoading,
-    commentsBusy,
-    commentsStatus,
-    commentsMeta,
-    clearComments,
-    loadComments,
-    submitComment,
-    deleteComment,
-    toggleReaction
-  } = usePetComments({
-    apiFetch,
-    session,
-    user,
-    setDetailPet,
-    openAuth
-  });
-  const commentNotifications = useCommentNotifications({
-    apiFetch,
-    session,
-    user
-  });
-  const {
-    adminStatus,
-    setAdminStatus,
-    adminModerationBusy,
-    adminCollectionBusySlug,
-    shadowbanBusyOwnerId,
-    nsfwBusyId,
-    setAdminUserShadowban,
-    removeAdminUser,
-    createCollection,
-    updateCollection,
-    deleteCollection,
-    toggleOwnerShadowban,
-    togglePetNsfw
-  } = useAdminActions({
-    user,
-    session,
-    route,
-    contentMode,
-    apiFetch,
-    setAuthStatus,
-    setPets,
-    setMinePets,
-    setFavoritePets,
-    setCreatorPets,
-    setDetailPet,
-    setSharingPet,
-    setCreator,
-    loadAdminCollections,
-    loadCollections,
-    refreshPrimaryPetLists,
-    refreshRoutePetLists,
-    replacePet
-  });
-  const {
-    uploadState,
-    uploadStatus,
-    uploadBusy,
-    setUploadState,
-    setUploadStatus,
-    submitUpload
-  } = useUploadWorkflow({ apiFetch, refresh });
-  const {
-    tagEditorPet,
-    tagEditorDisplayName,
-    tagEditorDescription,
-    tagEditorTags,
-    tagEditorKind,
-    tagEditorStatus,
-    tagEditorBusy,
-    setTagEditorDisplayName,
-    setTagEditorDescription,
-    setTagEditorKind,
-    openTagEditor,
-    closeTagEditor,
-    toggleTagEditorTag,
-    submitTagEditor,
-    spriteFixerPet,
-    spriteFixerStatus,
-    spriteFixerBusy,
-    openSpriteFixer,
-    closeSpriteFixer,
-    submitSpriteFixer,
-    collectionEditorPet,
-    collectionEditorSlugs,
-    collectionEditorStatus,
-    collectionEditorBusy,
-    openCollectionEditor,
-    closeCollectionEditor,
-    toggleCollectionEditorSlug,
-    submitCollectionEditor
-  } = usePetEditors({
-    user,
-    adminCollections,
-    setAdminCollections,
-    apiFetch,
-    reconcileTaggedPet,
-    reconcilePetCollections
-  });
+  const actions = useAppActions({ user, route, session, apiFetch, gallery, entity, dialogs, auth, refresh });
   const userCollectionActions = useUserCollections({
     user,
     session,
     route,
-    contentMode,
+    contentMode: gallery.contentMode,
     apiFetch,
-    userCollections,
-    setUserCollections,
-    setCollectionDetail,
-    setCollectionPets,
-    loadUserCollections,
-    loadCollectionDetail,
-    openAuth
+    userCollections: entity.userCollections,
+    setUserCollections: entity.setUserCollections,
+    setCollectionDetail: entity.setCollectionDetail,
+    setCollectionPets: entity.setCollectionPets,
+    loadUserCollections: entity.loadUserCollections,
+    loadCollectionDetail: entity.loadCollectionDetail,
+    openAuth: auth.openAuth
   });
-  async function refreshAfterAuth(nextUser: User, nextSession: AuthSession) {
-    await refreshAfterAuthRoute({
-      nextUser,
-      nextSession,
-      route,
-      query,
-      activeTags,
-      activeSort,
-      activeView,
-      activeKind,
-      contentMode,
-      galleryMeta,
-      creatorMeta,
-      refresh,
-      loadGallery,
-      loadMine,
-      loadFavorites,
-      loadCreator,
-      loadCreators,
-      loadCollections,
-      loadUserCollections,
-      loadCollectionDetail,
-      loadAdminCollections
-    });
-  }
-
-  async function refreshAfterSettings(nextUser: User) {
-    await refreshPrimaryPetLists(session, nextUser);
-    setDetailPet((current) =>
-      current?.ownerId === nextUser.id ? { ...current, ownerName: nextUser.displayName, ownerAvatarUrl: nextUser.avatarUrl } : current
-    );
-  }
-
-  function openQuickComment(pet: Pet) {
-    if (!user) {
-      openAuth();
-      return;
-    }
-    setQuickCommentPet(pet);
-    setQuickCommentStatus("");
-  }
-
-  function closeQuickComment() {
-    if (quickCommentBusy) return;
-    setQuickCommentPet(null);
-    setQuickCommentStatus("");
-  }
-
-  async function submitQuickComment(body: string) {
-    if (!quickCommentPet) return;
-    setQuickCommentStatus("");
-    setQuickCommentBusy(true);
-    try {
-      const result = await readJson<{ comment: PetComment; total: number }>(
-        await apiFetch(`/api/pets/${quickCommentPet.id}/comments`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ body })
-        })
-      );
-      const withCommentCount = (pet: Pet) => pet.id === quickCommentPet.id ? { ...pet, commentCount: result.total } : pet;
-      setPets((current) => current.map(withCommentCount));
-      setMinePets((current) => current.map(withCommentCount));
-      setFavoritePets((current) => current.map(withCommentCount));
-      setCreatorPets((current) => current.map(withCommentCount));
-      setCollectionPets((current) => current.map(withCommentCount));
-      setDetailPet((current) => current && current.id === quickCommentPet.id ? withCommentCount(current) : current);
-      setQuickCommentPet(null);
-      if (route.name === "gallery") {
-        await loadGallery(query, activeTags, activeSort, galleryMeta.page, session, contentMode, activeView, activeKind, activeFormat, true);
-      }
-    } catch (error) {
-      setQuickCommentStatus(error instanceof Error ? error.message : "Could not post comment.");
-    } finally {
-      setQuickCommentBusy(false);
-    }
-  }
 
   async function refresh(authSession = session) {
     await refreshAppSession({
@@ -465,254 +77,56 @@ function App() {
       route,
       refreshSession,
       loadMe,
-      loadAdminCollections,
-      setAuthStatus
+      loadAdminCollections: entity.loadAdminCollections,
+      setAuthStatus: auth.setAuthStatus
     });
   }
 
-  useEffect(() => {
-    const hash = window.location.hash.replace(/^#\/?/, "");
-    if (hash.startsWith("auth/reset-password")) {
-      const params = new URLSearchParams(hash.split("?")[1] || "");
-      const token = params.get("token") || "";
-      navigate("/");
-      setRoute(routeFromHash());
-      if (token) {
-        openPasswordReset(token);
-      } else {
-        openAuth();
-        setAuthStatus("Password reset link is invalid.");
-      }
-      return;
-    }
-    if (!hash.startsWith("auth/callback")) return;
-    const params = new URLSearchParams(hash.split("?")[1] || "");
-    const code = params.get("code") || "";
-    navigate("/");
-    setRoute(routeFromHash());
-    if (!code) {
-      openAuth();
-      setAuthStatus("Authentication link is invalid.");
-      return;
-    }
-    let cancelled = false;
-    async function completeAuthCallback() {
-      try {
-        const body = await readJson<{ user: User; session: AuthSession | null }>(
-          await apiFetch(
-            "/api/auth/session-code",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ code })
-            },
-            null
-          )
-        );
-        if (cancelled) return;
-        if (!body.session) throw new Error("Authentication session was not created.");
-        const nextUser = normalizeUser(body.user);
-        applySession(body.session);
-        setUser(nextUser);
-        await refreshAfterAuth(nextUser, body.session);
-      } catch (error) {
-        if (cancelled) return;
-        openAuth();
-        setAuthStatus(error instanceof Error ? error.message : "Authentication failed.");
-      }
-    }
-    void completeAuthCallback();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useAppRouteEffects({
+  useAppEffects({
     route,
     setRoute,
     session,
     user,
-    playgroundPet,
-    refresh,
-    loadCollections,
-    loadUserCollections,
-    setAuthStatus,
-    applyGalleryState,
-    setLoading,
-    loadGallery,
-    setUploadStatus,
-    loadDetail,
-    loadMine,
-    loadFavorites,
-    setCreator,
-    setCreatorPets,
-    setCreatorMeta,
-    loadCreator,
-    setCreatorsMeta,
-    setCreatorsSort,
-    setCreatorsQuery,
-    loadCreators,
-    setCollectionDetail,
-    setCollectionPets,
-    setCollectionMeta,
-    loadCollectionDetail,
-    loadAdminCollections,
-    setAdminStatus
-  });
-
-  useEffect(() => {
-    if (route.name !== "detail") {
-      clearComments();
-      return;
-    }
-    loadComments(route.id, 1, route.commentId).catch((error) =>
-      setAuthStatus(error instanceof Error ? error.message : "failed to load comments")
-    );
-  }, [route.name, route.name === "detail" ? route.id : "", route.name === "detail" ? route.commentId : "", user?.id, session?.accessToken]);
-
-  const {
-    selectContentMode,
-    selectCreatorPage,
-    selectCreatorsPage,
-    selectCreatorsSort,
-    selectCreatorsQuery,
-    selectCollectionPage,
-    logout
-  } = useAppNavigationActions({
-    route,
-    user,
-    session,
-    contentMode,
-    setContentMode,
-    query,
-    activeTags,
-    activeSort,
-    activeView,
-    activeKind,
-    activeFormat,
-    galleryMeta,
-    creatorMeta,
-    creatorsMeta,
-    creatorsSort,
-    creatorsQuery,
-    collectionMeta,
     apiFetch,
     applySession,
     setUser,
-    setMinePets,
-    setFavoritePets,
-    setCreatorMeta,
-    setCreatorsMeta,
-    setCreatorsSort,
-    setCreatorsQuery,
-    setCollectionMeta,
-    setLoading,
-    pushGalleryState,
-    scrollPageTop,
-    loadGallery,
-    loadCreator,
-    loadCreators,
-    loadCollections,
-    loadUserCollections,
-    loadCollectionDetail
+    gallery,
+    entity,
+    dialogs,
+    auth,
+    actions,
+    refresh,
+    refreshAfterAuth
   });
 
-  function setEntryAuthMode(next: SetStateAction<"login" | "register">) {
-    setAuthMode(typeof next === "function" ? next(authMode === "register" ? "register" : "login") : next);
-  }
+  const navigation = useAppNavigation({ route, user, session, apiFetch, applySession, setUser, gallery, entity });
+  const quickComment = createQuickCommentHandlers({
+    user,
+    route,
+    session,
+    apiFetch,
+    gallery,
+    entity,
+    dialogs,
+    openAuth: auth.openAuth
+  });
 
-  const viewProps = {
-    nav: {
-      route,
-      user,
-      theme,
-      onLogout: logout,
-      onSignIn: openAuth,
-      onAccount: openSettings,
-      onThemeToggle: toggleTheme,
-      commentNotifications: {
-        notifications: commentNotifications.notifications,
-        unreadCount: commentNotifications.unreadCount,
-        loading: commentNotifications.loading,
-        status: commentNotifications.status,
-        onOpen: commentNotifications.openCommentNotification,
-        onDismiss: commentNotifications.dismissCommentNotifications
-      }
-    },
-    routes: {
-      route, user, session, pets, recentComments, galleryMeta, loading, query, activeTags, activeSort, activeView, activeKind, activeFormat,
-      contentMode, deletingPetId, shadowbanBusyOwnerId, nsfwBusyId, collections, userCollections,
-      userCollectionsLoading, setQuery, selectTag,
-      clearTags, selectSort, selectView, selectKind, selectFormat, selectPage, randomizeGallery,
-      freshPetCount, showFreshPets,
-      submitSearch, likeBusyId, toggleLike, setSharingPet, setPlaygroundPet, setDownloadPet,
-      selectVisibleTag, openTagEditor, openSpriteFixer, openCollectionEditor, togglePetNsfw, toggleOwnerShadowban,
-      openPetCollector: userCollectionActions.openPetCollector,
-      openCollectionCreator: userCollectionActions.openCollectionCreator,
-      openUserCollectionEditor: userCollectionActions.openCollectionEditor,
-      openCollectionPetAdder: userCollectionActions.openCollectionPetAdder,
-      openQuickComment,
-      deleteUserCollection: userCollectionActions.deleteUserCollection,
-      removePetFromUserCollection: userCollectionActions.removePetFromCollection,
-      startUserCollectionRoom: userCollectionActions.startCollectionRoom,
-      deleteUpload, openAuth, favoritePets, favoritesLoading, minePets, mineLoading, deleteStatus,
-      uploadState, uploadStatus, uploadBusy, setUploadState, setUploadStatus, submitUpload, creators,
-      creatorsMeta, creatorsSort, creatorsQuery, creatorsLoading, collectionsLoading, setAuthMode: setEntryAuthMode, setSharingEntity, collectionDetail,
-      collectionPets, collectionMeta, collectionDetailLoading, adminCollections, adminCollectionsLoading,
-      adminCollectionBusySlug, adminModerationBusy, adminStatus, setAdminUserShadowban, removeAdminUser,
-      createCollection, updateCollection, deleteCollection, creator, creatorPets, creatorMeta,
-      creatorLoading, selectCreatorPage, selectCreatorsPage, selectCreatorsSort, selectCreatorsQuery,
-      selectCollectionPage, detailLoading, detailPet, morePets, comments, commentsLoading,
-      commentsBusy, commentsStatus, commentsMeta, loadComments, submitComment,
-      deleteComment, toggleReaction
-    },
-    dialogs: {
-      user, contentMode, selectContentMode,
-      authOpen, authMode, selectAuthMode, displayName, setDisplayName, email, setEmail, password,
-      setPassword, authStatus, authBusy, resendBusy, authProviders, startOAuth, resendVerification, submitAuth,
-      closeAuth, settingsOpen, settingsDisplayName,
-      setSettingsDisplayName, settingsCurrentPassword, setSettingsCurrentPassword, settingsNewPassword,
-      setSettingsNewPassword, settingsStatus, settingsBusy, settingsAvatarStatus, settingsAvatarBusy,
-      settingsAvatarPets, settingsAvatarPetsLoading, apiKeys, apiKeysLoading, apiKeyBusy,
-      newApiKeyName, setNewApiKeyName, newApiKeySecret, apiKeyStatus,
-      loadSettingsAvatarPets, createApiKey, revokeApiKey, submitSettings, submitAvatar,
-      deleteAccount, closeSettings, sharingPet, setSharingPet, quickCommentPet, quickCommentStatus,
-      quickCommentBusy, submitQuickComment, closeQuickComment, sharingEntity, setSharingEntity, downloadPet, setDownloadPet, tagEditorPet,
-      tagEditorDisplayName, tagEditorDescription, tagEditorTags, tagEditorKind, tagEditorStatus, tagEditorBusy,
-      setTagEditorDisplayName, setTagEditorDescription, setTagEditorKind, toggleTagEditorTag,
-      submitTagEditor, closeTagEditor, spriteFixerPet, spriteFixerStatus, spriteFixerBusy,
-      submitSpriteFixer, closeSpriteFixer, collectionEditorPet, adminCollections, collectionEditorSlugs,
-      collectionEditorStatus, collectionEditorBusy, toggleCollectionEditorSlug, submitCollectionEditor,
-      closeCollectionEditor, deleteConfirmPet, deleteStatus, deletingPetId, confirmDeleteUpload, closeDeleteConfirm,
-      userCollectionEditor: userCollectionActions.collectionEditor,
-      userCollectionEditorStatus: userCollectionActions.collectionEditorStatus,
-      userCollectionEditorBusy: userCollectionActions.collectionEditorBusy,
-      setUserCollectionEditorDisplayName: userCollectionActions.setCollectionEditorDisplayName,
-      submitUserCollectionEditor: userCollectionActions.submitCollectionEditor,
-      closeUserCollectionEditor: userCollectionActions.closeCollectionEditor,
-      collectPet: userCollectionActions.collectPet,
-      collectSelectedSlugs: userCollectionActions.collectSelectedSlugs,
-      collectNewName: userCollectionActions.collectNewName,
-      collectStatus: userCollectionActions.collectStatus,
-      collectBusy: userCollectionActions.collectBusy,
-      setCollectNewName: userCollectionActions.setCollectNewName,
-      toggleCollectSlug: userCollectionActions.toggleCollectSlug,
-      submitPetCollector: userCollectionActions.submitPetCollector,
-      closePetCollector: userCollectionActions.closePetCollector,
-      collectionPetAdder: userCollectionActions.collectionPetAdder,
-      collectionPetAdderStatus: userCollectionActions.collectionPetAdderStatus,
-      collectionPetAdderLoading: userCollectionActions.collectionPetAdderLoading,
-      collectionPetAdderBusyId: userCollectionActions.collectionPetAdderBusyId,
-      setCollectionPetAdderQuery: userCollectionActions.setCollectionPetAdderQuery,
-      searchCollectionPetAdder: userCollectionActions.searchCollectionPetAdder,
-      addPetToCollection: userCollectionActions.addPetToCollection,
-      closeCollectionPetAdder: userCollectionActions.closeCollectionPetAdder,
-      userCollections
-    },
-    playground: {
-      route, user, session, playgroundPet, favoritePets, collections, setPlaygroundPet, setAuthMode: setEntryAuthMode, apiFetch
-    }
-  } satisfies AppViewProps;
+  const viewProps = buildAppViewProps({
+    route,
+    theme,
+    toggleTheme,
+    user,
+    session,
+    apiFetch,
+    gallery,
+    entity,
+    dialogs,
+    quickComment,
+    auth,
+    actions,
+    userCollectionActions,
+    navigation
+  });
 
   return <AppView {...viewProps} />;
 }

@@ -1,0 +1,126 @@
+/* Import command — terminal panel */
+.importCommand {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 0;
+  max-width: 760px;
+  margin-top: 4px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--terminal-bg);
+  border: 1px solid var(--terminal-border);
+  box-shadow: 0 14px 32px -22px rgba(15, 15, 14, 0.5);
+}
+
+.commandLine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  height: 48px;
+  background: var(--terminal-bg);
+  color: color-mix(in srgb, var(--terminal-fg) 55%, var(--terminal-bg));
+  padding: 0 18px;
+  border: 0;
+}
+
+.commandLine .icon {
+  color: var(--terminal-prompt);
+  flex-shrink: 0;
+}
+
+.commandLine code {
+  overflow: hidden;
+  min-width: 0;
+  color: var(--terminal-fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.importCommand .btn {
+  height: 48px;
+  border-radius: 0;
+  border: 0;
+  border-left: 1px solid var(--terminal-border);
+  background: var(--terminal-bg);
+  color: var(--terminal-fg);
+  padding: 0 18px;
+  font-size: 12px;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+.importCommand .btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--terminal-fg) 7%, var(--terminal-bg));
+  color: var(--terminal-prompt);
+  border-color: var(--terminal-border);
+}
+
+/* Validation card */
+.validationCard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.validationCard.compact {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 0;
+}
+
+.validationCard div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 16px;
+  background: transparent;
+  border-right: 1px solid var(--border-soft);
+}
+
+.validationCard div:last-child {
+  border-right: 0;
+}
+
+.validationCard span {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.validationCard strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  font-feature-settings: "tnum", "zero";
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.validationCard.compact div {
+  gap: 6px;
+  padding: 14px 16px;
+}
+
+/* Status */
+.status {
+  margin: 12px 0 0;
+  color: var(--danger-fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0;
+}
