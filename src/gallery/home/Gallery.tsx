@@ -1,11 +1,13 @@
-import { type CSSProperties, type FormEvent, useMemo } from "react";
+import { type CSSProperties, type FormEvent, useEffect, useMemo, useState } from "react";
 import { type TagName } from "../../domain/config";
 import type { CollectionSummary, ContentMode, GalleryFormat, GalleryMeta, GalleryRecentComment, GallerySort, GalleryView, Pet, PetKind, User } from "../../domain/types";
+import { CursorPetPreview, useCursorPreviewAssets, useCursorPreviewMotion, useCursorPreviewSupport } from "../../pets/CursorPreview";
 import { PetCard } from "../../pets/PetCard";
 import { EmptyState } from "../../ui/EmptyState";
 import { Icon } from "../../ui/Icon";
 import { ResultBar } from "../../ui/ResultBar";
 import { GallerySkeleton } from "../../ui/Skeletons";
+import { Spinner } from "../../ui/Spinner";
 import { GallerySearch } from "../GalleryControls";
 import { DiscussionLeaderboard } from "./DiscussionLeaderboard";
 import { DiscussionContextRail } from "./DiscussionRail";
@@ -103,6 +105,14 @@ export function Gallery({
   onDelete: (pet: Pet) => void;
   onSignIn: () => void;
 }) {
+  const [previewPet, setPreviewPet] = useState<Pet | null>(null);
+  const canCursorPreview = useCursorPreviewSupport();
+  const cursorPreviewEnabled = Boolean(previewPet && canCursorPreview);
+  const cursorPreviewReady = useCursorPreviewAssets(previewPet, cursorPreviewEnabled);
+  const { cursorPoint, cursorStateId, cursorRotationDeg, cursorLookDirectionIndex } = useCursorPreviewMotion(
+    cursorPreviewEnabled,
+    previewPet?.spriteVersionNumber === 2
+  );
   const publicCollectionByPetId = useMemo(() => {
     const byPetId = new Map<string, Pick<CollectionSummary, "slug" | "displayName">>();
     for (const collection of collections) {
@@ -115,6 +125,12 @@ export function Gallery({
     }
     return byPetId;
   }, [collections]);
+
+  useEffect(() => {
+    if (!canCursorPreview) {
+      setPreviewPet(null);
+    }
+  }, [canCursorPreview]);
 
   return (
     <section className="surface">
@@ -199,6 +215,10 @@ export function Gallery({
                   onManageCollections={onManageCollections}
                   onCollect={onCollect}
                   onQuickComment={onQuickComment}
+                  onPreview={canCursorPreview ? (previewTarget) =>
+                    setPreviewPet((current) => (current?.id === previewTarget.id ? null : previewTarget))
+                  : undefined}
+                  previewActive={previewPet?.id === pet.id}
                   onToggleNsfw={onToggleNsfw}
                   onShadowbanOwner={onShadowbanOwner}
                   onDelete={onDelete}
@@ -219,6 +239,27 @@ export function Gallery({
         onPage={onPage}
         onRandomize={onRandomize}
       />
+      {previewPet && cursorPoint && (
+        <div
+          className="cursorPetPreview"
+          style={
+            {
+              left: cursorPoint.x,
+              top: cursorPoint.y,
+              "--cursor-rotation": cursorPreviewReady ? `${cursorRotationDeg}deg` : "0deg"
+            } as CSSProperties
+          }
+          aria-hidden="true"
+        >
+          {cursorPreviewReady ? (
+            <CursorPetPreview pet={previewPet} stateId={cursorStateId} lookDirectionIndex={cursorLookDirectionIndex} />
+          ) : (
+            <div className="cursorPetLoader">
+              <Spinner size={14} />
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }
