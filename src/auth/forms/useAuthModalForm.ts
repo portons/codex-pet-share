@@ -33,9 +33,9 @@ export function useAuthModalForm({
     setPassword("");
   }
 
-  function openAuth(status = "") {
+  function openAuth(status?: unknown) {
     setAuthMode("login");
-    setAuthStatus(status);
+    setAuthStatus(typeof status === "string" ? status : "");
     setAuthOpen(true);
     void loadAuthProviders();
   }

@@ -1,4 +1,3 @@
-import type { SetStateAction } from "react";
 import type { useAuthForms } from "../auth/useAuthForms";
 import type { useUserCollections } from "../collections/useUserCollections";
 import type { useGalleryBrowser } from "../gallery/useGalleryBrowser";
@@ -97,16 +96,12 @@ export function buildAppViewProps({
     settingsAvatarStatus, settingsAvatarBusy, settingsAvatarPets, settingsAvatarPetsLoading, apiKeys,
     apiKeysLoading, apiKeyBusy, newApiKeyName, setNewApiKeyName, newApiKeySecret, apiKeyStatus,
     loadSettingsAvatarPets, createApiKey, revokeApiKey, submitSettings, submitAvatar, deleteAccount,
-    openSettings, closeSettings, setAuthMode
+    openSettings, closeSettings
   } = auth;
   const {
     selectContentMode, selectCreatorPage, selectCreatorsPage, selectCreatorsSort, selectCreatorsQuery,
     selectCollectionPage, logout
   } = navigation;
-
-  function setEntryAuthMode(next: SetStateAction<"login" | "register">) {
-    setAuthMode(typeof next === "function" ? next(authMode === "register" ? "register" : "login") : next);
-  }
 
   return {
     nav: {
@@ -144,7 +139,7 @@ export function buildAppViewProps({
       startUserCollectionRoom: userCollectionActions.startCollectionRoom,
       deleteUpload, openAuth, favoritePets, favoritesLoading, minePets, mineLoading, deleteStatus,
       uploadState, uploadStatus, uploadBusy, setUploadState, setUploadStatus, submitUpload, creators,
-      creatorsMeta, creatorsSort, creatorsQuery, creatorsLoading, collectionsLoading, setAuthMode: setEntryAuthMode, setSharingEntity, collectionDetail,
+      creatorsMeta, creatorsSort, creatorsQuery, creatorsLoading, collectionsLoading, setSharingEntity, collectionDetail,
       collectionPets, collectionMeta, collectionDetailLoading, adminCollections, adminCollectionsLoading,
       adminCollectionBusySlug, adminModerationBusy, adminStatus, setAdminUserShadowban, removeAdminUser,
       createCollection, updateCollection, deleteCollection, creator, creatorPets, creatorMeta,
@@ -197,7 +192,7 @@ export function buildAppViewProps({
       userCollections
     },
     playground: {
-      route, user, session, playgroundPet, favoritePets, collections, setPlaygroundPet, setAuthMode: setEntryAuthMode, apiFetch
+      route, user, session, playgroundPet, favoritePets, collections, setPlaygroundPet, openAuth, apiFetch
     }
   } satisfies AppViewProps;
 }

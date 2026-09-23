@@ -18,7 +18,7 @@ export function PlaygroundRouteLayers({
   favoritePets,
   collections,
   setPlaygroundPet,
-  setAuthMode,
+  openAuth,
   apiFetch
 }: {
   route: Route;
@@ -28,7 +28,7 @@ export function PlaygroundRouteLayers({
   favoritePets: Pet[];
   collections: CollectionSummary[];
   setPlaygroundPet: Dispatch<SetStateAction<Pet | null>>;
-  setAuthMode: Dispatch<SetStateAction<"login" | "register">>;
+  openAuth: () => void;
   apiFetch: (path: string, init?: RequestInit, authSession?: AuthSession | null) => Promise<Response>;
 }) {
   return (
@@ -84,7 +84,7 @@ export function PlaygroundRouteLayers({
             <h2>Sign in to join</h2>
             <p>Playground rooms are for signed-in pets. Bring your account, pick one, and join the floor.</p>
             <div className="formActions">
-              <button className="btn btnPrimary" type="button" onClick={() => { setAuthMode("login"); navigate("#/"); }}>Sign in</button>
+              <button className="btn btnPrimary" type="button" onClick={() => { navigate("#/"); openAuth(); }}>Sign in</button>
               <button className="btn btnGhost" type="button" onClick={() => navigate("#/")}>Cancel</button>
             </div>
           </section>
@@ -113,7 +113,7 @@ export function PlaygroundRouteLayers({
             <h2>Sign in to join</h2>
             <p>The collection playground is open to signed-in pets. Bring your account and join the floor.</p>
             <div className="formActions">
-              <button className="btn btnPrimary" type="button" onClick={() => { setAuthMode("login"); navigate(`#/collections/${route.slug}`); }}>Sign in</button>
+              <button className="btn btnPrimary" type="button" onClick={() => { navigate(`#/collections/${route.slug}`); openAuth(); }}>Sign in</button>
               <button className="btn btnGhost" type="button" onClick={() => navigate(`#/collections/${route.slug}`)}>Cancel</button>
             </div>
           </section>

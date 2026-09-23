@@ -14,7 +14,7 @@ export function CollectionsRoute({
   userCollectionsLoading,
   user,
   session,
-  setAuthMode,
+  openAuth,
   openCollectionCreator,
   openUserCollectionEditor,
   deleteUserCollection,
@@ -29,7 +29,7 @@ export function CollectionsRoute({
       userCollectionsLoading={userCollectionsLoading}
       signedIn={!!user}
       session={session}
-      onSignIn={() => setAuthMode("login")}
+      onSignIn={openAuth}
       onCreateCollection={openCollectionCreator}
       onEditCollection={openUserCollectionEditor}
       onDeleteCollection={deleteUserCollection}
