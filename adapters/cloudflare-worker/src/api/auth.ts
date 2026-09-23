@@ -2,6 +2,7 @@ import { Google, Twitter, generateCodeVerifier, generateState } from "arctic";
 import { bearerToken, escapeHtml, HttpError, json, readJsonBody } from "../core/http";
 import { decodePayload, encodePayload, hmac, randomId, sha256Hex, timingSafeEqual, uuid } from "../core/crypto";
 import { all, first, nowIso, serializeUser } from "../core/db";
+import { enforceAuthEmailRateLimit } from "../core/authEmailRateLimit";
 import { hashPassword, verifyPassword } from "../core/password";
 import { deleteAsset, putAsset, userAvatarPath, userAvatarUrl } from "../storage/assets";
 import type { AppContext, AuthSession, AuthUser, PetRow } from "../core/types";
@@ -136,6 +137,7 @@ export async function handleAuth(ctx: AppContext, partsOrAction: string[] | stri
     const normalizedDisplayName = validateDisplayName(displayName);
     if (!normalizedEmail.includes("@")) throw new HttpError("valid email is required", 400);
     if (rawPassword.length < 8) throw new HttpError("password must be at least 8 characters", 400);
+    await enforceAuthEmailRateLimit(ctx, normalizedEmail);
     if (await userByEmail(ctx, normalizedEmail)) throw new HttpError("account already exists", 409);
 
     const id = uuid();
@@ -516,6 +518,7 @@ async function sendVerificationEmail(ctx: AppContext, user: AuthUser) {
 
 async function sendPasswordResetEmail(ctx: AppContext, email: string) {
   if (!email.includes("@")) throw new HttpError("valid email is required", 400);
+  await enforceAuthEmailRateLimit(ctx, email);
   const user = await userByEmail(ctx, email);
   if (!user) return;
   const token = await createPasswordResetToken(ctx, user.id);
@@ -568,9 +571,9 @@ async function changePassword(ctx: AppContext, user: AuthUser, currentPassword: 
 
 async function resendVerificationEmail(ctx: AppContext, email: string) {
   if (!email.includes("@")) throw new HttpError("valid email is required", 400);
+  await enforceAuthEmailRateLimit(ctx, email);
   const row = await first<UserRow>(ctx.env.DB.prepare("select * from users where email = ?").bind(email));
-  if (!row) throw new HttpError("account not found", 404);
-  if (row.email_verified_at) throw new HttpError("email is already confirmed", 409);
+  if (!row || row.email_verified_at) return;
   await sendVerificationEmail(ctx, serializeUser(row, userAvatarUrl(ctx, row)));
 }
 
