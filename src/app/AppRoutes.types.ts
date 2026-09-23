@@ -96,7 +96,6 @@ export type AppRoutesProps = {
   creatorsQuery: string;
   creatorsLoading: boolean;
   collectionsLoading: boolean;
-  setAuthMode: SetState<"login" | "register">;
   setSharingEntity: SetState<EntityShareTarget | null>;
   collectionDetail: Omit<CollectionSummary, "topPets"> | null;
   collectionPets: Pet[];
